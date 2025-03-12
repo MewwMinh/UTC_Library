@@ -1,11 +1,10 @@
 package edu.utc.demo_01.service;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.patron.request.ReservationBookRequest;
 import edu.utc.demo_01.dto.patron.request.ReviewBookRequest;
 import edu.utc.demo_01.dto.patron.response.*;
-import edu.utc.demo_01.entity.Book;
-import edu.utc.demo_01.entity.BookReview;
-import edu.utc.demo_01.entity.User;
+import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
 import edu.utc.demo_01.repository.*;
@@ -14,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -27,18 +28,10 @@ public class PatronService {
     BorrowRecordRepository borrowRecordRepository;
     BookReviewRepository bookReviewRepository;
     UserViolationRepository userViolationRepository;
+    UserFavoriteRepository userFavoriteRepository;
+    BookReservationRepository bookReservationRepository;
 
-//    public PatronInformation getPatronInformation(){
-//        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
-//        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-//        Optional<PatronInformation> result = userRepository.getPatronInformationByUserID(userID);
-//        System.out.println("Kết quả truy vấn từ database: " + result);
-//        if (result.isEmpty()) {
-//            throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-//        }
-//        return userRepository.getPatronInformationByUserID(userID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION));
-//
-//    }
+    //region Dashboard
     public APIResponse<PatronInformation> getPatronInformation(){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
@@ -53,23 +46,7 @@ public class PatronService {
         return APIResponse.<List<BorrowBookResponse>>builder().code(1000).result(bookResponseList).build();
     }
 
-    public boolean reviewBook(ReviewBookRequest request){
-        Book book = bookRepository.findByBookID(request.getBookID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
-        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-        User user = userRepository.findByUserID(userID).orElseThrow();
 
-        if (bookReviewRepository.existsByBookIDAndUserID(book,user)) return false;
-
-        BookReview bookReview = new BookReview();
-        bookReview.setBookID(book);
-        bookReview.setUserID(user);
-        bookReview.setRating(request.getRating());
-        if (request.getComment() != null) bookReview.setComment(request.getComment());
-        bookReview.setCreatedAt(LocalDate.now());
-        bookReviewRepository.save(bookReview);
-        return true;
-    }
 
     public APIResponse<StatisticsReponse> statistics(){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -88,8 +65,90 @@ public class PatronService {
         List<TopPatronReponse> listUser = userRepository.findTop10ByMemberPoints();
         return APIResponse.<List<TopPatronReponse>>builder().code(1000).result(listUser).build();
     }
+
     public APIResponse<List<TopBookResponse>> top10Books(){
         List<TopBookResponse> list = borrowRecordRepository.findTop10BorrowedBooks();
         return APIResponse.<List<TopBookResponse>>builder().code(1000).result(list).build();
     }
+    //endregion
+
+    //region BookDetail
+    public APIResponse<BookDetailResponse> bookDetail(String bookID){
+        BookDetailResponse result = bookRepository.getBookDetailByBookID(bookID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
+        return APIResponse.<BookDetailResponse>builder().code(1000).result(result).build();
+    }
+
+    public APIResponse<List<BookReviewResponse>> bookReviews(String bookID){
+        List<BookReviewResponse> result = bookReviewRepository.findReviewsByBookId(bookID);
+        return APIResponse.<List<BookReviewResponse>>builder().code(1000).result(result).build();
+    }
+
+    public boolean checkFavorite(String bookID){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        Book book = bookRepository.findByBookID(bookID).orElseThrow();
+
+        return userFavoriteRepository.existsByUserIDAndBookID(user,book);
+    }
+
+    public APIResponse<Boolean> addFavorite(String bookID){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        Book book = bookRepository.findByBookID(bookID).orElseThrow();
+
+        UserFavorite userFavorite = new UserFavorite();
+        userFavorite.setUserID(user);
+        userFavorite.setBookID(book);
+        userFavoriteRepository.save(userFavorite);
+        return APIResponse.<Boolean>builder().code(1000).result(true).build();
+    }
+
+    @Transactional
+    public APIResponse<Boolean> removeFavorite(String bookID){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        Book book = bookRepository.findByBookID(bookID).orElseThrow();
+        userFavoriteRepository.deleteByUserIDAndBookID(user,book);
+        return APIResponse.<Boolean>builder().code(1000).result(true).build();
+    }
+
+    public APIResponse<Boolean> reserveBook(ReservationBookRequest request){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        Book book = bookRepository.findByBookID(request.getBookID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
+
+        BookReservation bookReservation = new BookReservation();
+        bookReservation.setUserID(user);
+        bookReservation.setBookID(book);
+        LocalDate pickupDate =LocalDate.parse(request.getPickupDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        bookReservation.setReservationDate(LocalDate.now());
+        bookReservation.setExpiryDate(LocalDate.now().plusDays(7));
+        bookReservation.setStatus("Đang đợi xử lý");
+        bookReservation.setPickupDate(pickupDate);
+        bookReservationRepository.save(bookReservation);
+        return APIResponse.<Boolean>builder().code(1000).result(true).build();
+    }
+
+    public APIResponse<String> reviewBook(ReviewBookRequest request){
+        Book book = bookRepository.findByBookID(request.getBookID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+
+        if (bookReviewRepository.existsByBookIDAndUserID(book,user)) throw new AppException(ErrorCode.USER_REVIEWED);
+
+        BookReview bookReview = new BookReview();
+        bookReview.setBookID(book);
+        bookReview.setUserID(user);
+        bookReview.setRating(request.getRating());
+        if (request.getComment() != null) bookReview.setComment(request.getComment());
+        bookReview.setCreatedAt(LocalDate.now());
+        bookReviewRepository.save(bookReview);
+        return APIResponse.<String>builder().code(1000).result("Đánh giá sách thành công").build();
+    }
+    //endregion
 }

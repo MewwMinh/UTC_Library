@@ -1,9 +1,9 @@
-package edu.utc.demo_01.dto.user.reponse;
+package edu.utc.demo_01.dto.patron.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 @Builder
 @AllArgsConstructor
@@ -14,5 +14,5 @@ public class BookReviewResponse {
     String fullName;
     Integer rating;
     String comment;
-    Timestamp createdAt;
+    Date createdAt;
 }

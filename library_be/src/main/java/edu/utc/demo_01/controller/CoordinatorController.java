@@ -19,4 +19,9 @@ public class CoordinatorController {
         service.createPatron(request);
         return true;
     }
+    @PostMapping("reset_patron_password/{id}")
+    boolean changePw(@PathVariable String id) {
+        service.resetPatronPassword(id);
+        return true;
+    }
 }

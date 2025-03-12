@@ -1,6 +1,7 @@
 package edu.utc.demo_01.controller;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.patron.request.ReservationBookRequest;
 import edu.utc.demo_01.dto.patron.request.ReviewBookRequest;
 import edu.utc.demo_01.dto.patron.response.*;
 import edu.utc.demo_01.service.PatronService;
@@ -40,11 +41,33 @@ public class PatronController {
     }
 
 
-
+    @GetMapping("get-book-details/{id}")
+    public APIResponse<BookDetailResponse> getBookDetails(@PathVariable String id) {
+        return service.bookDetail(id);
+    }
+    @GetMapping("get-book-reviews/{id}")
+    public APIResponse<List<BookReviewResponse>> getBookReviews(@PathVariable String id) {
+        return service.bookReviews(id);
+    }
     @PostMapping("review-book")
-    public boolean reviewBook(@RequestBody ReviewBookRequest request){
+    public APIResponse<String> reviewBook(@RequestBody ReviewBookRequest request){
         return service.reviewBook(request);
     }
-
+    @GetMapping("check-favorite/{id}")
+    public boolean checkFavorite(@PathVariable String id) {
+        return service.checkFavorite(id);
+    }
+    @PostMapping("add-to-favorites")
+    public APIResponse<Boolean> addToFavorites(@RequestBody ReviewBookRequest request){
+        return service.addFavorite(request.getBookID());
+    }
+    @PostMapping("remove-from-favorites")
+    public APIResponse<Boolean> removeFromFavorites(@RequestBody ReviewBookRequest request){
+        return service.removeFavorite(request.getBookID());
+    }
+    @PostMapping("reserve-book")
+    public APIResponse<Boolean> reserveBook(@RequestBody ReservationBookRequest request){
+        return service.reserveBook(request);
+    }
 
 }

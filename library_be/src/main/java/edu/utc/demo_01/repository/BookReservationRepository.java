@@ -1,4 +1,7 @@
 package edu.utc.demo_01.repository;
 
-public interface BookReservationRepository extends org.springframework.data.jpa.repository.JpaRepository<edu.utc.demo_01.entity.BookReservation, java.lang.String> {
-  }
+import edu.utc.demo_01.entity.BookReservation;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BookReservationRepository extends JpaRepository<BookReservation, String> {
+}
