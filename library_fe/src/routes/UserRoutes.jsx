@@ -19,7 +19,7 @@ const UserRoutes = () => {
         <Route index element={<UserDashboard />} />
         <Route path="dashboard" element={<UserDashboard />} />
         <Route path="searchBook" element={<BookSearch />} />
-        <Route path="bookDetails" element={<BookDetails />} />
+        <Route path="bookDetails/:id" element={<BookDetails />} />
         <Route path="borrowReturnBook" element={<BorrowReturn />} />
         <Route path="violation" element={<ViolationManagement />} />
         <Route path="request" element={<SupportRequests />} />
