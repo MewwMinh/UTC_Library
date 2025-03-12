@@ -1,0 +1,15 @@
+html,
+body {
+  overflow-x: hidden;
+}
+
+.container {
+  position: relative;
+  top: 64px;
+}
+
+.content {
+  position: relative;
+  left: 250px;
+  max-width: calc(100vw - 250px);
+}

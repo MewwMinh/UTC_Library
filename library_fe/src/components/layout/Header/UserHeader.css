@@ -1,0 +1,45 @@
+/* UserHeader.css */
+.modern-header {
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.modern-header.scrolled {
+  height: 56px !important;
+  background-color: #1976d2 !important; /* Màu xanh dương hơi sáng hơn khi scroll */
+}
+
+.modern-header.scrolled div {
+  font-size: 18px !important;
+}
+
+.search-input {
+  transition: all 0.2s ease;
+}
+
+.search-input:hover,
+.search-input:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Đảm bảo layout responsive */
+@media (max-width: 1200px) {
+  .modern-header div {
+    font-size: 18px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .modern-header div {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-header {
+    padding: 0 10px !important;
+  }
+
+  .search-container {
+    max-width: 180px !important;
+  }
+}

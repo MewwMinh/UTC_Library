@@ -1,0 +1,58 @@
+.fixed-sider {
+  position: fixed;
+  left: 0;
+  top: 64px;
+  bottom: 0;
+  background: #fff;
+  border-right: 1px solid #ddd;
+}
+
+.layout-container {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 64px); /* Trừ đi chiều cao của Header */
+  margin-left: 230px;
+  margin-top: 64px;
+  width: clamp(500px, calc(100vw - 230px), 100vw) !important;
+  background: #ffffff;
+}
+
+.scrollable-sider {
+  width: 300px;
+  background: #ffffff;
+  padding: 16px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.content-area {
+  background: #ffffff;
+  margin-top: 20px;
+  margin-left: 20px;
+  min-height: calc(100vh - 64px);
+  flex-grow: 1;
+}
+
+.content-placeholder {
+  height: 500px;
+  background: rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+@media (max-width: 1024px) {
+  .scrollable-sider {
+    display: none;
+  }
+}
+
+.scrollable-sider .card {
+  margin-top: 10px;
+  margin-right: 10px;
+  /* background: "linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%)";
+  border-radius: "12px";
+  box-shadow: "0px 4px 10px rgba(0, 0, 0, 0.1)";
+  color: "#338"; */
+}

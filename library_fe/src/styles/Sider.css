@@ -1,0 +1,22 @@
+.side-bar {
+  position: fixed;
+  height: calc(100vh - 64px);
+  background: #fff;
+  transition: all 0.5s ease;
+}
+
+.ant-menu-item {
+  transition: all 0.3s;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  line-height: 1.2;
+  padding: 10px 5px;
+  height: auto !important;
+}
+
+.ant-menu-item:hover,
+.ant-menu-item-selected {
+  background: #e6f7ff !important;
+  color: #1890ff !important;
+  border-radius: 15px;
+}

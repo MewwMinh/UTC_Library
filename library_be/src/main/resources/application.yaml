@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: demo_01
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/test_06
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      format_sql: true
+      show_sql: true
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true  # Định dạng SQL cho dễ đọc
+        highlight_sql: true  # Làm nổi bật SQL (cần Hibernate 6+)
+
+server:
+  port: 8088
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG  # Ghi log SQL (chỉ hoạt động nếu show-sql bật)
+        orm:
+          jdbc:
+            bind: TRACE  # Hiển thị giá trị tham số trong câu lệnh SQL
+
+
+jwt:
+  signer-key: "ee991bc5bg1+9jXP7d97bNo5qY84C6IvwiKfLEAJvM8KOx2zGlx8SOZiwMVGSZJq"
+  access-token-expiration: 1 #Hour
+  refresh-token-expiration: 30 #Day
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method

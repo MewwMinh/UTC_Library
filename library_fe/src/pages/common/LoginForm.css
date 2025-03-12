@@ -1,0 +1,409 @@
+/* Modern glassmorphism login form with 3D effects */
+
+/* Main container */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(45deg, #0a2463, #1e50a2, #3a7bd5);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  overflow: hidden;
+  position: relative;
+  font-family: "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+}
+
+/* Animated background gradient */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Background shapes styled as books */
+.login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.book-shape {
+  position: absolute;
+  backdrop-filter: blur(5px);
+  animation: float 10s infinite ease-in-out;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Book 1 - Large book with pages */
+.book1 {
+  width: 200px;
+  height: 250px;
+  top: 15%;
+  left: 10%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px 20px 20px 5px;
+  transform: rotate(-10deg);
+  animation-delay: 0s;
+  position: relative;
+  overflow: hidden;
+}
+
+.book1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.book1::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 30px;
+  right: 10px;
+  bottom: 10px;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 15px,
+    rgba(255, 255, 255, 0.1) 15px,
+    rgba(255, 255, 255, 0.1) 16px
+  );
+}
+
+/* Book 2 - Stack of books on right */
+.book2 {
+  width: 180px;
+  height: 40px;
+  bottom: 25%;
+  right: 15%;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 5px 0 0 5px;
+  animation-delay: 2s;
+  transform: rotate(5deg);
+}
+
+.book2::before {
+  content: "";
+  position: absolute;
+  top: -35px;
+  left: 10px;
+  width: 160px;
+  height: 30px;
+  background: rgba(135, 206, 250, 0.2);
+  border-radius: 5px 0 0 5px;
+}
+
+.book2::after {
+  content: "";
+  position: absolute;
+  top: -70px;
+  left: 20px;
+  width: 140px;
+  height: 30px;
+  background: rgba(70, 130, 180, 0.2);
+  border-radius: 5px 0 0 5px;
+}
+
+/* Book 3 - Open book */
+.book3 {
+  width: 140px;
+  height: 100px;
+  bottom: 30%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 0 5px 5px 0;
+  transform: rotate(15deg);
+  animation-delay: 4s;
+  transform-style: preserve-3d;
+  perspective: 500px;
+}
+
+.book3::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -140px;
+  width: 140px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px 0 0 5px;
+  transform: rotateY(-30deg);
+  transform-origin: right;
+}
+
+.book3::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: -130px;
+  width: 260px;
+  height: 80px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 4px,
+    rgba(255, 255, 255, 0.05) 4px,
+    rgba(255, 255, 255, 0.05) 5px
+  );
+}
+
+/* Book 4 - Small bookmark */
+.book4 {
+  width: 40px;
+  height: 80px;
+  top: 35%;
+  right: 25%;
+  background: rgba(173, 216, 230, 0.2);
+  transform: rotate(-25deg);
+  animation-delay: 6s;
+  border-radius: 5px;
+}
+
+/* Book 5 - Floating page with text lines */
+.book5 {
+  width: 120px;
+  height: 150px;
+  top: 60%;
+  right: 30%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  transform: rotate(8deg);
+  animation-delay: 3s;
+  overflow: hidden;
+}
+
+.book5::after {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  background: repeating-linear-gradient(
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.1) 10px,
+    rgba(255, 255, 255, 0.1) 11px
+  );
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--rotation, 0deg)) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) rotate(var(--rotation, 0deg)) scale(1.03);
+  }
+}
+
+/* Login card with glassmorphism */
+.login-card {
+  width: 400px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.1),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+  transform: translateZ(50px);
+}
+
+/* Login header */
+.login-header {
+  margin-bottom: 30px;
+  text-align: center;
+  color: white;
+}
+
+.library-logo {
+  margin: 0 auto 15px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+  transform: translateZ(30px);
+}
+
+.library-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.library-logo:hover img {
+  transform: scale(1.1);
+}
+
+.login-header h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+  font-size: 16px;
+  opacity: 0.8;
+  margin-bottom: 0;
+}
+
+/* Form elements */
+.login-form {
+  transform: translateZ(20px);
+}
+
+.login-input {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px !important;
+  color: white !important;
+  height: 45px !important;
+  padding-left: 15px !important;
+  transition: all 0.3s ease !important;
+}
+
+.login-input:hover,
+.login-input:focus {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-3px);
+}
+
+.login-input input {
+  color: white !important;
+}
+
+.login-input .ant-input-prefix {
+  color: rgba(255, 255, 255, 0.8) !important;
+  margin-right: 10px !important;
+}
+
+/* Checkbox and forgot password link */
+.remember-forgot {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 20px !important;
+}
+
+.ant-checkbox-wrapper {
+  color: white !important;
+}
+
+.ant-checkbox-inner {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #1890ff !important;
+  border-color: #1890ff !important;
+}
+
+.forgot-link {
+  color: rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.3s ease;
+}
+
+.forgot-link:hover {
+  color: white !important;
+  text-decoration: underline;
+}
+
+/* Button */
+.login-button {
+  height: 45px !important;
+  border-radius: 10px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  background: linear-gradient(45deg, #1890ff, #36cfc9) !important;
+  border: none !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.login-button:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  background: linear-gradient(45deg, #0c7cd5, #2bcbba) !important;
+}
+
+.login-button:active {
+  transform: translateY(-1px) !important;
+}
+
+/* Placeholder color */
+.login-input input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Error messages */
+.ant-form-item-explain-error {
+  color: #ff7875 !important;
+  margin-top: 5px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Responsive styles */
+@media (max-width: 480px) {
+  .login-card {
+    width: 320px;
+    padding: 30px;
+  }
+
+  .login-header h1 {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+}
