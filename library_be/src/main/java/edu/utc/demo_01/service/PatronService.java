@@ -1,6 +1,7 @@
 package edu.utc.demo_01.service;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.patron.request.RequestDTO;
 import edu.utc.demo_01.dto.patron.request.ReservationBookRequest;
 import edu.utc.demo_01.dto.patron.request.ReviewBookRequest;
 import edu.utc.demo_01.dto.patron.response.*;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -30,6 +32,10 @@ public class PatronService {
     UserViolationRepository userViolationRepository;
     UserFavoriteRepository userFavoriteRepository;
     BookReservationRepository bookReservationRepository;
+    HelpTicketRepository helpTicketRepository;
+    TicketResponseRepository ticketResponseRepository;
+    UserAchievementRepository userAchievementRepository;
+
 
     //region Dashboard
     public APIResponse<PatronInformation> getPatronInformation(){
@@ -165,5 +171,74 @@ public class PatronService {
         List<BookBriefResponse> result = bookRepository.findBookByTitleOrAuthor(keyword);
         return APIResponse.<List<BookBriefResponse>>builder().code(1000).result(result).build();
     }
+    //endregion Request
+
+    //region Request
+    public boolean sendRequest(RequestDTO request){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+
+        HelpTicket helpTicket = new HelpTicket();
+        helpTicket.setUserID(user);
+        helpTicket.setProblem(request.getProblem());
+        helpTicket.setTitle(request.getTitle());
+        helpTicket.setDescription(request.getDescription());
+        helpTicket.setStatus("Đang chờ xử lý");
+        helpTicket.setCreatedAt(Instant.now());
+        helpTicketRepository.save(helpTicket);
+        return true;
+    }
+
+    public APIResponse<List<RequestDetailDTO>> getMyRequest(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<RequestDetailDTO> result = helpTicketRepository.findByUserID(userID);
+        return APIResponse.<List<RequestDetailDTO>>builder().code(1000).result(result).build();
+    }
+
+    public APIResponse<RequestDetailDTO> getRequestDetails(String ticketID){
+        RequestDetailDTO result = helpTicketRepository.findTicketDetailByTicketID(ticketID);
+        return APIResponse.<RequestDetailDTO>builder().code(1000).result(result).build();
+    }
+    public APIResponse<List<RespondDTO>> getResponses(String ticketID){
+        List<RespondDTO> result = ticketResponseRepository.findByTicketID(ticketID);
+        return APIResponse.<List<RespondDTO>>builder().code(1000).result(result).build();
+    }
     //endregion
+
+    //region BorrowHistory
+    public APIResponse<List<BorrowBookResponse1>> getBorrowingBooks(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<BorrowBookResponse1> result = borrowRecordRepository.findBorrowingBooks(userID);
+        return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
+    }
+
+    public APIResponse<List<BorrowBookResponse1>> getNearAndOverDueBooks(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<BorrowBookResponse1> result = borrowRecordRepository.getNearAndOverDueBooks(userID);
+        return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
+    }
+
+    public APIResponse<List<BorrowBookResponse1>> getBorrowRecordsHistory(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<BorrowBookResponse1> result = borrowRecordRepository.getBorrowRecordsHistory(userID);
+        return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
+    }
+    //endregion
+
+    //region Achievement & Violation
+    public APIResponse<List<UserAchievement>> getUserAchievements(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        List<UserAchievement> result = userAchievementRepository.findByUserID(user);
+        return APIResponse.<List<UserAchievement>>builder().code(1000).result(result).build();
+    }
+
+    //endregion
+
 }

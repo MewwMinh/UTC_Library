@@ -23,7 +23,7 @@ const UserRoutes = () => {
         <Route path="borrowReturnBook" element={<BorrowReturn />} />
         <Route path="violation" element={<ViolationManagement />} />
         <Route path="request" element={<SupportRequests />} />
-        <Route path="request/details" element={<RequestDetails />} />
+        <Route path="request/:requestId" element={<RequestDetails />} />
         <Route path="order" element={<Order />} />
         <Route path="event" element={<Event />} />
       </Route>

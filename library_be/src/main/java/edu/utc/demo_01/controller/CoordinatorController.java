@@ -1,6 +1,7 @@
 package edu.utc.demo_01.controller;
 
 import edu.utc.demo_01.dto.coordinator.request.CreatePatron;
+import edu.utc.demo_01.dto.coordinator.request.ResponseTicket;
 import edu.utc.demo_01.service.CoordinatorService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,9 @@ public class CoordinatorController {
     boolean changePw(@PathVariable String id) {
         service.resetPatronPassword(id);
         return true;
+    }
+    @PostMapping("response-ticket")
+    boolean responseTicket(@RequestBody ResponseTicket request) {
+        return service.responseTicket(request);
     }
 }

@@ -34,6 +34,11 @@ public class TicketResponse {
     @JoinColumn(name = "StaffID", nullable = false)
     private User staffID;
 
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "Title", nullable = false)
+    private String title;
+
     @NotNull
     @Column(name = "ResponseText", nullable = false)
     private String responseText;

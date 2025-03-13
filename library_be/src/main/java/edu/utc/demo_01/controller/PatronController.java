@@ -1,9 +1,11 @@
 package edu.utc.demo_01.controller;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.patron.request.RequestDTO;
 import edu.utc.demo_01.dto.patron.request.ReservationBookRequest;
 import edu.utc.demo_01.dto.patron.request.ReviewBookRequest;
 import edu.utc.demo_01.dto.patron.response.*;
+import edu.utc.demo_01.entity.UserAchievement;
 import edu.utc.demo_01.service.PatronService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -81,5 +83,40 @@ public class PatronController {
     @GetMapping("find-books-by-keyword/{keyword}")
     public APIResponse<List<BookBriefResponse>> findBooksByKeyword(@PathVariable String keyword) {
         return service.findBooksByKeyword(keyword);
+    }
+
+    @PostMapping("send-request")
+    public boolean sendRequest(@RequestBody RequestDTO request) {
+        return service.sendRequest(request);
+    }
+    @GetMapping("get-request")
+    public APIResponse<List<RequestDetailDTO>> getRequest() {
+        return service.getMyRequest();
+    }
+    @GetMapping("get-request/{id}")
+    public APIResponse<RequestDetailDTO> getRequestDetails(@PathVariable String id) {
+        return service.getRequestDetails(id);
+    }
+    @GetMapping("get-responses/{id}")
+    public APIResponse<List<RespondDTO>> getResponses(@PathVariable String id) {
+        return service.getResponses(id);
+    }
+
+    @GetMapping("get-borrowing-books")
+    public APIResponse<List<BorrowBookResponse1>> getBorrowingBooks() {
+        return service.getBorrowingBooks();
+    }
+    @GetMapping("get-near-and-over-due-books")
+    public APIResponse<List<BorrowBookResponse1>> getNearAndOverDueBooks() {
+        return service.getNearAndOverDueBooks();
+    }
+    @GetMapping("get-borrow-records-history")
+    public APIResponse<List<BorrowBookResponse1>> getBorrowRecordsHistory() {
+        return service.getBorrowRecordsHistory();
+    }
+
+    @GetMapping("get-user-achievement")
+    public APIResponse<List<UserAchievement>> getUserAchievement() {
+        return service.getUserAchievements();
     }
 }

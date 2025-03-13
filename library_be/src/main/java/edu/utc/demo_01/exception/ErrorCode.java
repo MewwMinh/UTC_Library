@@ -17,6 +17,7 @@ public enum ErrorCode {
     CAN_NOT_FIND_CLASSIFICATION("Không thể tìm thấy mã phân loại sách", 1008, HttpStatus.NOT_FOUND),
     CAN_NOT_FIND_BORROW_RECORD("Không thể tìm thấy bản ghi mượn cuốn sách này", 1009, HttpStatus.NOT_FOUND),
     USER_REVIEWED("Bạn đã đánh giá cuốn sách này rồi, không thể đánh giá lại !!", 1010, HttpStatus.BAD_REQUEST),
+    CAN_NOT_FIND_TICKET("Không thể tìm thấy phiếu yêu cầu !!", 1011, HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, int code, HttpStatusCode httpStatusCode) {

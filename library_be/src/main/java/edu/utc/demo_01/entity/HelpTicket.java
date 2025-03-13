@@ -38,6 +38,11 @@ public class HelpTicket {
     @Column(name = "Problem", nullable = false)
     private String problem;
 
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "Title", nullable = false)
+    private String title;
+
     @NotNull
     @Column(name = "Description", nullable = false)
     private String description;

@@ -2,6 +2,7 @@ package edu.utc.demo_01.service;
 
 import com.github.javafaker.Faker;
 import edu.utc.demo_01.dto.coordinator.request.CreatePatron;
+import edu.utc.demo_01.dto.coordinator.request.ResponseTicket;
 import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
@@ -10,6 +11,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,8 @@ public class CoordinatorService {
     DDCClassificationRepository ddcRepository;
     BorrowRecordRepository borrowRecordRepository;
     BookReviewRepository bookReviewRepository;
+    TicketResponseRepository ticketResponseRepository;
+    HelpTicketRepository helpTicketRepository;
     @Transactional
     public boolean createPatron(CreatePatron request) {
         User user = new User();
@@ -78,6 +82,19 @@ public class CoordinatorService {
         AuthCredential credential = authCredentialRepository.findByUserID(user).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION));
         credential.setPasswordHash(passwordEncoder.encode("123456"));
         authCredentialRepository.save(credential);
+        return true;
+    }
+    public boolean responseTicket(ResponseTicket request) {
+        TicketResponse ticketResponse = new TicketResponse();
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User coordinator = userRepository.findByUserID(userID).orElseThrow();
+        ticketResponse.setTicketID(helpTicketRepository.findByTicketID(request.getTicketID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_TICKET)));
+        ticketResponse.setStaffID(coordinator);
+        ticketResponse.setTitle(request.getTitle());
+        ticketResponse.setResponseText(request.getResponseText());
+        ticketResponse.setCreatedAt(Instant.now());
+        ticketResponseRepository.save(ticketResponse);
         return true;
     }
     //regionFakeData
@@ -654,5 +671,5 @@ public class CoordinatorService {
     }
 
     // Cần thêm method này vào BookReviewRepository
-    //endRegion
+    //endregion
 }

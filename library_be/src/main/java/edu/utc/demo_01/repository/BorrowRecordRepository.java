@@ -1,6 +1,7 @@
 package edu.utc.demo_01.repository;
 
 import edu.utc.demo_01.dto.patron.response.BorrowBookResponse;
+import edu.utc.demo_01.dto.patron.response.BorrowBookResponse1;
 import edu.utc.demo_01.dto.patron.response.TopBookResponse;
 import edu.utc.demo_01.entity.BorrowRecord;
 import edu.utc.demo_01.entity.User;
@@ -56,5 +57,44 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
     LIMIT 10
 """, nativeQuery = true)
     List<TopBookResponse> findTop10BorrowedBooks();
-
+    @Query(value = """
+    SELECT b.BookName AS bookName, 
+               br.BorrowDate AS borrowDate,
+               br.DueDate AS dueDate,
+               br.ReturnDate AS returnDate,
+               b.CoverImage AS bookImage
+        FROM BorrowRecords br
+        JOIN Books b ON br.bookID = b.bookID
+        WHERE br.userID = :id
+        AND br.ReturnDate IS NULL
+        ORDER BY br.BorrowDate DESC
+""", nativeQuery = true)
+    List<BorrowBookResponse1> findBorrowingBooks(@Param("id") String id);
+    @Query(value = """
+    SELECT b.BookName AS bookName, 
+               br.BorrowDate AS borrowDate,
+               br.DueDate AS dueDate,
+               br.ReturnDate AS returnDate,
+               b.CoverImage AS bookImage
+        FROM BorrowRecords br
+        JOIN Books b ON br.bookID = b.bookID
+        WHERE br.userID = :id
+        AND DueDate < DATE_ADD(CURDATE(), INTERVAL 7 DAY)  
+        AND br.ReturnDate IS NULL
+        ORDER BY br.DueDate ASC 
+""", nativeQuery = true)
+    List<BorrowBookResponse1> getNearAndOverDueBooks(@Param("id") String id);
+    @Query(value = """
+    SELECT b.BookName AS bookName, 
+               br.BorrowDate AS borrowDate,
+               br.DueDate AS dueDate,
+               br.ReturnDate AS returnDate,
+               b.CoverImage AS bookImage
+        FROM BorrowRecords br
+        JOIN Books b ON br.bookID = b.bookID
+        WHERE br.userID = :id 
+        AND br.ReturnDate IS NOT NULL
+        ORDER BY br.BorrowDate DESC 
+""", nativeQuery = true)
+    List<BorrowBookResponse1> getBorrowRecordsHistory(@Param("id") String id);
 }

@@ -1,4 +1,4 @@
-import { RequestDetail, Feedback } from "/src/components/user/request";
+import { RequestDetail } from "/src/components/user/request";
 
 export default function RequestDetails() {
   return (
@@ -11,8 +11,6 @@ export default function RequestDetails() {
       }}
     >
       <RequestDetail />
-      <div style={{ textAlign: "center", fontSize: "40px" }}>🔗</div>
-      <Feedback />
     </div>
   );
 }
