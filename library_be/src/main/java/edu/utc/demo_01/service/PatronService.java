@@ -151,4 +151,19 @@ public class PatronService {
         return APIResponse.<String>builder().code(1000).result("Đánh giá sách thành công").build();
     }
     //endregion
+
+    //region SearchBook
+    public APIResponse<List<BookBriefResponse>> getTechnologyTopicBooks(){
+        List<BookBriefResponse> result = bookRepository.getBookByDDCCode("600");
+        return APIResponse.<List<BookBriefResponse>>builder().code(1000).result(result).build();
+    }
+    public APIResponse<List<BookBriefResponse>> getSuggestionBooks(){
+        List<BookBriefResponse> result = bookRepository.getSuggestionBooks();
+        return APIResponse.<List<BookBriefResponse>>builder().code(1000).result(result).build();
+    }
+    public APIResponse<List<BookBriefResponse>> findBooksByKeyword(String keyword){
+        List<BookBriefResponse> result = bookRepository.findBookByTitleOrAuthor(keyword);
+        return APIResponse.<List<BookBriefResponse>>builder().code(1000).result(result).build();
+    }
+    //endregion
 }

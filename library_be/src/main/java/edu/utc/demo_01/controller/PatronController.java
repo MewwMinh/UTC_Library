@@ -70,4 +70,16 @@ public class PatronController {
         return service.reserveBook(request);
     }
 
+    @GetMapping("get-tech-books")
+    public APIResponse<List<BookBriefResponse>> getTechBooks() {
+        return service.getTechnologyTopicBooks();
+    }
+    @GetMapping("get-suggestion-books")
+    public APIResponse<List<BookBriefResponse>> getSuggestionBooks() {
+        return service.getSuggestionBooks();
+    }
+    @GetMapping("find-books-by-keyword/{keyword}")
+    public APIResponse<List<BookBriefResponse>> findBooksByKeyword(@PathVariable String keyword) {
+        return service.findBooksByKeyword(keyword);
+    }
 }

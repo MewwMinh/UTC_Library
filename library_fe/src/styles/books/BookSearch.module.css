@@ -1,0 +1,186 @@
+/* src/pages/BookSearch.module.css */
+.container {
+  padding: 24px;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(139, 100, 0, 0.2);
+  position: relative;
+}
+
+.headerBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/images/library-pattern.svg");
+  background-size: cover;
+  opacity: 0.07;
+  z-index: 0;
+}
+
+.headerBackgroundAnimation {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  transform: translateX(100%);
+  animation: shine 4s infinite;
+  z-index: 1;
+}
+
+.headerContent {
+  position: relative;
+  z-index: 2;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.headerTitle {
+  color: #654303; /* Màu nâu đậm cho tương phản với nền vàng */
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.headerDescription {
+  margin: 12px 0 0;
+  font-size: 16px;
+  max-width: 80%;
+  color: #5d4037; /* Nâu trung bình */
+  line-height: 1.5;
+}
+
+.statsContainer {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.statItem {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  min-width: 120px;
+  flex: 1;
+  max-width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.statItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.2;
+  color: #5d4037; /* Nâu đậm cho số liệu */
+}
+
+.statLabel {
+  font-size: 14px;
+  margin: 4px 0 0;
+  color: #795548; /* Nâu nhạt cho nhãn */
+  font-weight: 500;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    padding: 24px 16px;
+  }
+
+  .titleContainer {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .headerDescription {
+    max-width: 100%;
+  }
+
+  .statsContainer {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .statItem {
+    min-width: calc(33% - 16px);
+    flex: 0 0 calc(33% - 16px);
+  }
+}
+
+@media (max-width: 480px) {
+  .statItem {
+    min-width: 100%;
+    flex: 1 0 100%;
+  }
+
+  .headerTitle {
+    font-size: 20px;
+  }
+
+  .headerDescription {
+    font-size: 14px;
+  }
+}

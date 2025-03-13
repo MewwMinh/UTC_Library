@@ -1,0 +1,66 @@
+/* src/components/BookSearch/SearchCard.module.css */
+.searchCard {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.searchInput {
+  margin-bottom: 24px;
+}
+
+.bookCover {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.bookImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.bookCard {
+  border-radius: 8px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bookCard:hover .bookImage {
+  transform: scale(1.05);
+}
+
+.bookBody {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.bookTitle {
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.availableBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.availableCount {
+  background-color: #52c41a;
+}
+
+.unavailableCount {
+  background-color: #ff4d4f;
+}
+
+.paginationContainer {
+  text-align: center;
+  margin-top: 24px;
+}

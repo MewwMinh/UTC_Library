@@ -4,3 +4,6 @@ export { default as BookRating } from "./BookRating";
 export { default as BorrowHistory } from "./BorrowHistory";
 export { default as ListBorrowingBook } from "./ListBorrowingBook";
 export { default as ListCloseToDueBook } from "./ListCloseToDueBook";
+export { default as TechBooks } from "./TechBooks";
+export { default as SuggestedBooks } from "./SuggestedBooks";
+export { default as SearchCard } from "./SearchCard";

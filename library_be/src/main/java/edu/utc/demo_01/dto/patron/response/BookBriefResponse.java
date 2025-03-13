@@ -9,4 +9,10 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookBriefResponse {
+    String bookID;
+    String bookName;
+    String bookAuthor;
+    int availableCopies;
+    String ddcName;
+    String bookImage;
 }

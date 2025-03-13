@@ -277,6 +277,89 @@ const patronService = {
       };
     }
   },
+
+  // Tìm kiếm sách theo từ khóa
+  searchBooks: async (keyword) => {
+    try {
+      const response = await apiClient.get(
+        `/patron/find-books-by-keyword/${keyword}`
+      );
+
+      if (response.data.code === 1000) {
+        return {
+          success: true,
+          data: response.data.result,
+        };
+      } else {
+        return {
+          success: false,
+          message: response.data.message || "Không thể tìm kiếm sách",
+          code: response.data.code,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Không thể kết nối đến máy chủ",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
+
+  // Lấy sách gợi ý
+  getSuggestedBooks: async () => {
+    try {
+      const response = await apiClient.get("/patron/get-suggestion-books");
+
+      if (response.data.code === 1000) {
+        return {
+          success: true,
+          data: response.data.result,
+        };
+      } else {
+        return {
+          success: false,
+          message: response.data.message || "Không thể lấy sách gợi ý",
+          code: response.data.code,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Không thể kết nối đến máy chủ",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
+
+  // Lấy sách công nghệ
+  getTechBooks: async () => {
+    try {
+      const response = await apiClient.get("/patron/get-tech-books");
+
+      if (response.data.code === 1000) {
+        return {
+          success: true,
+          data: response.data.result,
+        };
+      } else {
+        return {
+          success: false,
+          message: response.data.message || "Không thể lấy sách công nghệ",
+          code: response.data.code,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Không thể kết nối đến máy chủ",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
 };
 
 export default patronService;

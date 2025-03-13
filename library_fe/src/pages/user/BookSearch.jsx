@@ -1,150 +1,128 @@
-import { useState } from "react";
-import { Input, Card, List, Tag } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+// src/pages/BookSearch.jsx
+import { useState, useEffect } from "react";
+import { Row, Col, Typography } from "antd";
+import {
+  BookOutlined,
+  TeamOutlined,
+  CalendarOutlined,
+} from "@ant-design/icons";
+import {
+  TechBooks,
+  SuggestedBooks,
+  SearchCard,
+} from "/src/components/user/book";
+import styles from "/src/styles/books/BookSearch.module.css";
 
-const booksData = [
-  {
-    id: 1,
-    title: "Clean Code",
-    author: "Robert C. Martin",
-    available: 5,
-    categories: ["Programming", "Software Engineering"],
-    image: "https://example.com/clean-code.jpg",
-  },
-  {
-    id: 2,
-    title: "The Pragmatic Programmer",
-    author: "Andrew Hunt & David Thomas",
-    available: 3,
-    categories: ["Programming", "Software Development"],
-    image: "https://example.com/pragmatic-programmer.jpg",
-  },
-  {
-    id: 3,
-    title: "Design Patterns",
-    author: "Erich Gamma et al.",
-    available: 7,
-    categories: ["Software Engineering", "Architecture"],
-    image: "https://example.com/design-patterns.jpg",
-  },
-  {
-    id: 4,
-    title: "Refactoring",
-    author: "Martin Fowler",
-    available: 6,
-    categories: ["Programming", "Software Engineering"],
-    image: "https://example.com/refactoring.jpg",
-  },
-  {
-    id: 5,
-    title: "You Don't Know JS",
-    author: "Kyle Simpson",
-    available: 4,
-    categories: ["JavaScript", "Web Development"],
-    image: "https://example.com/ydkjs.jpg",
-  },
-  {
-    id: 6,
-    title: "Eloquent JavaScript",
-    author: "Marijn Haverbeke",
-    available: 8,
-    categories: ["JavaScript", "Programming"],
-    image: "https://example.com/eloquent-js.jpg",
-  },
-  {
-    id: 7,
-    title: "Introduction to Algorithms",
-    author: "Thomas H. Cormen",
-    available: 2,
-    categories: ["Algorithms", "Computer Science"],
-    image: "https://example.com/algorithms.jpg",
-  },
-  {
-    id: 8,
-    title: "The Art of Computer Programming",
-    author: "Donald Knuth",
-    available: 1,
-    categories: ["Computer Science", "Mathematics"],
-    image: "https://example.com/art-cp.jpg",
-  },
-  {
-    id: 9,
-    title: "Deep Learning",
-    author: "Ian Goodfellow, Yoshua Bengio, Aaron Courville",
-    available: 5,
-    categories: ["Artificial Intelligence", "Machine Learning"],
-    image: "https://example.com/deep-learning.jpg",
-  },
-  {
-    id: 10,
-    title: "Python Crash Course",
-    author: "Eric Matthes",
-    available: 9,
-    categories: ["Python", "Programming"],
-    image: "https://example.com/python-crash.jpg",
-  },
-];
+const { Title, Text } = Typography;
 
-const BookSearch = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate();
+function BookSearch() {
+  const [statsData] = useState({
+    totalBooks: 12850,
+    activeReaders: 876,
+    dailyLoans: 124,
+  });
 
-  const filteredBooks = searchTerm
-    ? booksData.filter(
-        (book) =>
-          book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          book.author.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : booksData;
+  // Thêm hiệu ứng đếm số cho các thống kê
+  const [animatedStats, setAnimatedStats] = useState({
+    totalBooks: 0,
+    activeReaders: 0,
+    dailyLoans: 0,
+  });
+
+  useEffect(() => {
+    // Tạo hiệu ứng đếm số tăng dần
+    const duration = 2500; // Thời gian hoàn thành animation (2.5 giây)
+    const interval = 20; // Mỗi 20ms cập nhật một lần
+    const steps = duration / interval;
+
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep += 1;
+      const progress = Math.min(currentStep / steps, 1);
+
+      setAnimatedStats({
+        totalBooks: Math.floor(progress * statsData.totalBooks),
+        activeReaders: Math.floor(progress * statsData.activeReaders),
+        dailyLoans: Math.floor(progress * statsData.dailyLoans),
+      });
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+      }
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [statsData]);
 
   return (
-    <div style={{ padding: 20 }}>
-      <Input
-        placeholder="Tìm kiếm theo tên sách hoặc tác giả"
-        prefix={<SearchOutlined />}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        allowClear
-        style={{ marginBottom: 20 }}
-      />
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <div className={styles.headerBackground}></div>
+        <div className={styles.headerBackgroundAnimation}></div>
 
-      <List
-        grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4 }}
-        dataSource={filteredBooks}
-        renderItem={(book) => (
-          <List.Item>
-            <Card
-              cover={
-                <img
-                  alt={book.title}
-                  src="/public/ex-sach.jpg"
-                  style={{ height: 500, objectFit: "cover" }}
-                  onClick={() => navigate(`/user/bookDetails`)}
-                />
-              }
-            >
-              <p>
-                <b>{book.title}</b>
-              </p>
-              <p>
-                <b>Tác giả:</b> {book.author}
-              </p>
-              <p>
-                <b>Số bản còn lại:</b> {book.available}
-              </p>
-              <p>
-                <b>Danh mục:</b>{" "}
-                {book.categories.map((cat) => (
-                  <Tag key={cat}>{cat}</Tag>
-                ))}
-              </p>
-            </Card>
-          </List.Item>
-        )}
-      />
+        <div className={styles.headerContent}>
+          <div className={styles.topRow}>
+            <div className={styles.titleContainer}>
+              <img
+                src="/public/logo-utc.png"
+                alt="Logo UTC"
+                className={styles.logo}
+              />
+              <div>
+                <Title level={2} className={styles.headerTitle}>
+                  Thư Viện Trường Đại học Giao Thông Vận Tải
+                </Title>
+                <Text className={styles.headerDescription}>
+                  Khám phá kho tàng tri thức với hơn 10.000 đầu sách từ các lĩnh
+                  vực khoa học, kỹ thuật và văn hóa. Hãy bắt đầu hành trình đọc
+                  sách của bạn ngay hôm nay!
+                </Text>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.statsContainer}>
+            <div className={styles.statItem}>
+              <div className={styles.statValue}>
+                {animatedStats.totalBooks.toLocaleString()}
+                <BookOutlined style={{ fontSize: 20, marginLeft: 8 }} />
+              </div>
+              <div className={styles.statLabel}>Tổng số sách</div>
+            </div>
+
+            <div className={styles.statItem}>
+              <div className={styles.statValue}>
+                {animatedStats.activeReaders.toLocaleString()}
+                <TeamOutlined style={{ fontSize: 20, marginLeft: 8 }} />
+              </div>
+              <div className={styles.statLabel}>Bạn đọc tích cực</div>
+            </div>
+
+            <div className={styles.statItem}>
+              <div className={styles.statValue}>
+                {animatedStats.dailyLoans.toLocaleString()}
+                <CalendarOutlined style={{ fontSize: 20, marginLeft: 8 }} />
+              </div>
+              <div className={styles.statLabel}>Lượt mượn hàng ngày</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Row gutter={[0, 24]}>
+        <Col span={24}>
+          <SearchCard />
+        </Col>
+        <Col span={24}>
+          <SuggestedBooks />
+        </Col>
+        <Col span={24}>
+          <TechBooks />
+        </Col>
+      </Row>
     </div>
   );
-};
+}
 
 export default BookSearch;

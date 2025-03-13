@@ -66,6 +66,7 @@ function UserHeader() {
           }
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAuthenticated, dispatch]);
 
   // Xử lý đăng xuất
