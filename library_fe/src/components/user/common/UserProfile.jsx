@@ -185,7 +185,7 @@ function UserProfile() {
                       <Text strong style={{ marginRight: "8px" }}>
                         <UserOutlined /> Giới tính:
                       </Text>
-                      <Text>{getGenderText(userData?.gender) || "N/A"}</Text>
+                      <Text>{userData?.gender || "N/A"}</Text>
                     </Col>
                     <Col xs={24} sm={12}>
                       <Text strong style={{ marginRight: "8px" }}>

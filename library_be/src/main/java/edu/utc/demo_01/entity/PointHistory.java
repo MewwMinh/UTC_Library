@@ -3,5 +3,5 @@ package edu.utc.demo_01.entity;
 import jakarta.persistence.Entity;
 
 @Entity
-public class UserAchievement {
+public class PointHistory {
   }
