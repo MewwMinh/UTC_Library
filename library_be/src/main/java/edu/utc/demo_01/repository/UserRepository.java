@@ -46,4 +46,46 @@ public interface UserRepository extends JpaRepository<User, String> {
         """, nativeQuery = true)
     List<TopPatronReponse> findTop10ByMemberPoints();
 
+    @Query(value = """
+        SELECT *        
+        FROM Users      
+        WHERE UserType = 'Patron'
+        """, nativeQuery = true)
+    List<User> findAllPatron();
+    @Query(value = """
+        SELECT u.UserID AS userID,
+                       u.FullName AS fullName,
+                       u.Gender AS gender,
+                       u.UserType AS userType,
+                       u.Status AS status,
+                       u.createdAt AS createdAt,
+                       u.DOB AS dob,
+                       u.Expiry AS expiry,   
+                       u.MemberPoints AS memberPoints,
+                       u.UserImage AS userImage,
+                       u.NationalID AS nationalID
+                FROM Users u
+                JOIN UserRoles ur ON u.UserId = ur.UserId
+                JOIN Roles r ON ur.RoleId = r.RoleId
+        		WHERE r.RoleName = 'Librarian'
+    """, nativeQuery = true)
+    List<User> findAllLibrarian();
+    @Query(value = """
+        SELECT u.UserID AS userID,
+                       u.FullName AS fullName,
+                       u.Gender AS gender,
+                       u.UserType AS userType,
+                       u.Status AS status,
+                       u.createdAt AS createdAt,
+                       u.DOB AS dob,
+                       u.Expiry AS expiry,   
+                       u.MemberPoints AS memberPoints,
+                       u.UserImage AS userImage,
+                       u.NationalID AS nationalID
+                FROM Users u
+                JOIN UserRoles ur ON u.UserId = ur.UserId
+                JOIN Roles r ON ur.RoleId = r.RoleId
+        		WHERE r.RoleName = 'Coordinator'
+    """, nativeQuery = true)
+    List<User> findAllCoordinator();
 }

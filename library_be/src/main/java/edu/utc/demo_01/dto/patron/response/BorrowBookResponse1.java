@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BorrowBookResponse1 {
+    String bookID;
     String bookName;
     Timestamp borrowDate;
     Timestamp dueDate;

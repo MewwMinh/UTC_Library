@@ -1,4 +1,7 @@
 package edu.utc.demo_01.repository;
 
-public interface EventRepository extends org.springframework.data.jpa.repository.JpaRepository<edu.utc.demo_01.entity.Event, java.lang.String> {
-  }
+import edu.utc.demo_01.entity.Event;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EventRepository extends JpaRepository<Event, String> {
+}

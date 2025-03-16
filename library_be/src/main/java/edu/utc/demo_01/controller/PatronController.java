@@ -5,7 +5,6 @@ import edu.utc.demo_01.dto.patron.request.RequestDTO;
 import edu.utc.demo_01.dto.patron.request.ReservationBookRequest;
 import edu.utc.demo_01.dto.patron.request.ReviewBookRequest;
 import edu.utc.demo_01.dto.patron.response.*;
-import edu.utc.demo_01.entity.UserAchievement;
 import edu.utc.demo_01.service.PatronService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -115,8 +114,4 @@ public class PatronController {
         return service.getBorrowRecordsHistory();
     }
 
-    @GetMapping("get-user-achievement")
-    public APIResponse<List<UserAchievement>> getUserAchievement() {
-        return service.getUserAchievements();
-    }
 }

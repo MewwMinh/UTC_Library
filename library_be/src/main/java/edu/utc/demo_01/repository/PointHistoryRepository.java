@@ -1,4 +1,7 @@
 package edu.utc.demo_01.repository;
 
-public interface PointHistoryRepository extends org.springframework.data.jpa.repository.JpaRepository<edu.utc.demo_01.entity.PointHistory, java.lang.String> {
-  }
+import edu.utc.demo_01.entity.PointHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PointHistoryRepository extends JpaRepository<PointHistory, String> {
+}

@@ -79,16 +79,7 @@ public class LibrarianService {
             userRepository.save(user);
         } else {
             User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-            UserAchievement userAchievement = new UserAchievement();
-            userAchievement.setUserID(user);
-            userAchievement.setAchievementType("Trả sách đúng hạn");
-            userAchievement.setDescription("Trả sách đúng hạn");
-            userAchievement.setPointsAwarded(5);
-            userAchievement.setAwardedAt(Instant.now());
-            userAchievementRepository.save(userAchievement);
 
-            user.setMemberPoints(user.getMemberPoints() + 5);
-            userRepository.save(user);
         }
         return true;
     }

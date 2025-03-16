@@ -58,7 +58,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
 """, nativeQuery = true)
     List<TopBookResponse> findTop10BorrowedBooks();
     @Query(value = """
-    SELECT b.BookName AS bookName, 
+    SELECT b.BookID AS bookID,
+        b.BookName AS bookName, 
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
                br.ReturnDate AS returnDate,
@@ -71,7 +72,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
 """, nativeQuery = true)
     List<BorrowBookResponse1> findBorrowingBooks(@Param("id") String id);
     @Query(value = """
-    SELECT b.BookName AS bookName, 
+    SELECT b.BookID AS bookID,
+        b.BookName AS bookName, 
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
                br.ReturnDate AS returnDate,
@@ -85,7 +87,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
 """, nativeQuery = true)
     List<BorrowBookResponse1> getNearAndOverDueBooks(@Param("id") String id);
     @Query(value = """
-    SELECT b.BookName AS bookName, 
+    SELECT b.BookID AS bookID,
+        b.BookName AS bookName, 
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
                br.ReturnDate AS returnDate,

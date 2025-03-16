@@ -231,13 +231,7 @@ public class PatronService {
     //endregion
 
     //region Achievement & Violation
-    public APIResponse<List<UserAchievement>> getUserAchievements(){
-        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-        User user = userRepository.findByUserID(userID).orElseThrow();
-        List<UserAchievement> result = userAchievementRepository.findByUserID(user);
-        return APIResponse.<List<UserAchievement>>builder().code(1000).result(result).build();
-    }
+
 
     //endregion
 

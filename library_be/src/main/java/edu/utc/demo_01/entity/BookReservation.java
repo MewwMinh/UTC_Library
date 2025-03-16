@@ -27,12 +27,10 @@ public class BookReservation {
     @Column(name = "ReservationID", nullable = false, length = 36)
     private String reservationID;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "UserID", nullable = false)
     private User userID;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "BookID", nullable = false)
     private Book bookID;
