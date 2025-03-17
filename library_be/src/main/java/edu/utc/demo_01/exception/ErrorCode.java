@@ -18,6 +18,9 @@ public enum ErrorCode {
     CAN_NOT_FIND_BORROW_RECORD("Không thể tìm thấy bản ghi mượn cuốn sách này", 1009, HttpStatus.NOT_FOUND),
     USER_REVIEWED("Bạn đã đánh giá cuốn sách này rồi, không thể đánh giá lại !!", 1010, HttpStatus.BAD_REQUEST),
     CAN_NOT_FIND_TICKET("Không thể tìm thấy phiếu yêu cầu !!", 1011, HttpStatus.BAD_REQUEST),
+    CAN_NOT_FIND_EVENT("Không thể tìm thấy sự kiện !!", 1012, HttpStatus.BAD_REQUEST),
+    REGISTED_EVENT("Bạn đã đăng ký tham gia sự kiện này rồi !!", 1013, HttpStatus.BAD_REQUEST),
+    EVENT_TOOK_PLACE("Sự kiễn này đã diễn ra rồi !!", 1013, HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, int code, HttpStatusCode httpStatusCode) {

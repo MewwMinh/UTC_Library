@@ -1,9 +1,7 @@
 package edu.utc.demo_01.controller;
 
 import edu.utc.demo_01.dto.APIResponse;
-import edu.utc.demo_01.dto.patron.request.RequestDTO;
-import edu.utc.demo_01.dto.patron.request.ReservationBookRequest;
-import edu.utc.demo_01.dto.patron.request.ReviewBookRequest;
+import edu.utc.demo_01.dto.patron.request.*;
 import edu.utc.demo_01.dto.patron.response.*;
 import edu.utc.demo_01.service.PatronService;
 import lombok.AccessLevel;
@@ -114,4 +112,37 @@ public class PatronController {
         return service.getBorrowRecordsHistory();
     }
 
+    @GetMapping("get-all-events")
+    public APIResponse<List<EventResponse>> getAllEvents() {
+        return service.getAllEvents();
+    }
+    @GetMapping("get-all-attended-events")
+    public APIResponse<List<EventResponse>> getAllAttendedEvents() {
+        return service.getAllAttendedEvents();
+    }
+    @PostMapping("register-event")
+    public APIResponse registerEvent(@RequestBody RegisterEvent request) {
+        return APIResponse.builder().code(1000).message(service.registerEvent(request)).build();
+    }
+    @PostMapping("unregister-event")
+    public APIResponse unregisterEvent(@RequestBody RegisterEvent request) {
+        return service.unregisterEvent(request);
+    }
+
+    @GetMapping("get-all-book-reservation")
+    public APIResponse<List<BookReservationResponse>> getAllBookReservation() {return service.getAllBookReservation();}
+    @PostMapping("cancel-book-reservation/{id}")
+    public APIResponse cancelBookReservation(@PathVariable String id){
+        return APIResponse.builder().code(1000).message(service.cancelBookReservation(id)).build();
+    }
+    @PostMapping("reserve-seat")
+    public APIResponse reserveSeat(@RequestBody ReservationSeatRequest request){
+        return APIResponse.builder().code(1000).message(service.reserveSeat(request)).build();
+    }
+    @PostMapping("cancel-seat-reservation/{id}")
+    public APIResponse cancelSeatReservation(@PathVariable String id){
+        return APIResponse.builder().code(1000).message(service.cancelSeatReservation(id)).build();
+    }
+    @GetMapping("get-all-seat-reservation")
+    public APIResponse<List<SeatReservationResponse>> getAllSeatReservation() {return service.getAllSeatReservation();}
 }

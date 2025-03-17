@@ -1,10 +1,9 @@
 package edu.utc.demo_01.service;
 
 import edu.utc.demo_01.dto.APIResponse;
-import edu.utc.demo_01.dto.patron.request.RequestDTO;
-import edu.utc.demo_01.dto.patron.request.ReservationBookRequest;
-import edu.utc.demo_01.dto.patron.request.ReviewBookRequest;
+import edu.utc.demo_01.dto.patron.request.*;
 import edu.utc.demo_01.dto.patron.response.*;
+import edu.utc.demo_01.dto.patron.response.BookReservationResponse;
 import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
@@ -18,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -35,6 +35,9 @@ public class PatronService {
     HelpTicketRepository helpTicketRepository;
     TicketResponseRepository ticketResponseRepository;
     UserAchievementRepository userAchievementRepository;
+    EventParticipantRepository eventParticipantRepository;
+    EventRepository eventRepository;
+    SeatReservationHistoryRepository seatReservationHistoryRepository;
 
 
     //region Dashboard
@@ -235,4 +238,86 @@ public class PatronService {
 
     //endregion
 
+    //region Event
+    public APIResponse<List<EventResponse>> getAllEvents(){
+        List<EventResponse> events = eventRepository.getAllEvents();
+        return APIResponse.<List<EventResponse>>builder().code(1000).result(events).build();
+    }
+    public APIResponse<List<EventResponse>> getAllAttendedEvents(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<EventResponse> events = eventParticipantRepository.getAllAttendedEvents(userID);
+        return APIResponse.<List<EventResponse>>builder().code(1000).result(events).build();
+    }
+    public String registerEvent(RegisterEvent request){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        if (eventParticipantRepository.isRegisted(userID, request.getEventID()) == 1) throw new AppException(ErrorCode.REGISTED_EVENT);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        Event event = eventRepository.findByEventID(request.getEventID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_EVENT));
+        if (event.getStartTime().isBefore(Instant.now())) throw new AppException(ErrorCode.EVENT_TOOK_PLACE);
+        EventParticipant eventParticipant = new EventParticipant();
+        eventParticipant.setUserID(user);
+        eventParticipant.setEventID(event);
+        eventParticipant.setRegistrationDate(Instant.now());
+        eventParticipant.setAttendanceStatus("Đã đăng ký");
+        eventParticipantRepository.save(eventParticipant);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return "Bạn đã đăng ký tham gia sự kiện " + event.getTitle() + " thành công. Sự kiện sẽ diễn ra vào " + event.getStartTime().atZone(ZoneId.of("Asia/Ho_Chi_Minh")).format(formatter) + " đến " + event.getEndTime().atZone(ZoneId.of("Asia/Ho_Chi_Minh")).format(formatter) + " tại " + event.getLocation() + ". Chúng tôi rất mong chờ sự có mặt của bạn.";
+    }
+
+    public APIResponse unregisterEvent(RegisterEvent request){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        if (eventParticipantRepository.isRegisted(userID, request.getEventID()) == 0) return APIResponse.builder().code(1014).message("Bạn chưa đăng ký tham gia sự kiện này !!!").build();
+        EventParticipant eventParticipant = eventParticipantRepository.findRegistedByUserIDAndEventID(userID, request.getEventID());
+        eventParticipant.setAttendanceStatus("Đã hủy đăng ký");
+        eventParticipantRepository.save(eventParticipant);
+        Event event = eventRepository.findByEventID(request.getEventID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_EVENT));
+        return APIResponse.builder().code(1000).message("Bạn đã hủy đăng ký tham gia sự kiện " + event.getTitle() + " thành công. Chúng tôi rất tiếc vì bạn không thể tham dự, hẹn gặp bạn ở những sự kiện sau.").build();
+    }
+    //endregion
+
+    //region Reservation
+    public APIResponse<List<BookReservationResponse>> getAllBookReservation(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<BookReservationResponse> results = bookReservationRepository.findAllByUserID(userID);
+        return APIResponse.<List<BookReservationResponse>>builder().code(1000).result(results).build();
+    }
+
+    public String cancelBookReservation(String reservationID){
+        BookReservation reservation = bookReservationRepository.findByReservationID(reservationID);
+        reservation.setStatus("Đã hủy đặt sách");
+        bookReservationRepository.save(reservation);
+        return "Bạn đã hủy đặt trước cuốn sách " + reservation.getBookID().getBookName() + " thành công!!";
+    }
+
+    public String reserveSeat(ReservationSeatRequest request){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        SeatReservationHistory seatReservationHistory = new SeatReservationHistory();
+        seatReservationHistory.setUserID(user);
+        seatReservationHistory.setSeatType(request.getSeatType());
+        seatReservationHistory.setReservationTime(request.getReservationTime().toInstant());
+        seatReservationHistory.setExpirationTime(Instant.now());
+        seatReservationHistory.setStatus("Đang chờ xử lý");
+        seatReservationHistoryRepository.save(seatReservationHistory);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        return "Yêu cầu đặt " + seatReservationHistory.getSeatType()+ " vào lúc " + seatReservationHistory.getReservationTime().atZone(ZoneId.of("Asia/Ho_Chi_Minh")).format(formatter) + " thành công. Chúng tôi sẽ xử lý yêu cầu của bạn sớm nhất có thể.";
+    }
+    public String cancelSeatReservation(String reservationID){
+        SeatReservationHistory seatReservationHistory =  seatReservationHistoryRepository.findByReservationID(reservationID);
+        seatReservationHistory.setStatus("Đã hủy đặt chỗ");
+        seatReservationHistoryRepository.save(seatReservationHistory);
+        return "Bạn đã hủy đặt " + seatReservationHistory.getSeatType() + " thành công. Hẹn bạn lần khác nhé !!";
+    }
+    public APIResponse<List<SeatReservationResponse>> getAllSeatReservation(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<SeatReservationResponse> result = seatReservationHistoryRepository.findAllByUserID(userID);
+        return APIResponse.<List<SeatReservationResponse>>builder().code(1000).result(result).build();
+    }
+    //endregion
 }

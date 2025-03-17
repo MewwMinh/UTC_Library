@@ -1,0 +1,69 @@
+/* src/styles/order.css */
+.row-processing {
+  background-color: rgba(76, 149, 108, 0.05);
+}
+.row-success {
+  background-color: rgba(27, 97, 60, 0.05);
+}
+.row-rejected {
+  background-color: rgba(255, 77, 79, 0.05);
+}
+
+/* Card header styles */
+.ant-card-head {
+  padding: 0 !important;
+}
+
+.ant-divider-horizontal.ant-divider-with-text-left::before,
+.ant-divider-horizontal.ant-divider-with-text-left::after {
+  border-top: 1px solid #b7e4c7 !important;
+}
+
+.ant-table-thead > tr > th {
+  background: #f0f9f1 !important;
+  color: #2c6e49 !important;
+}
+
+.ant-form-item-label > label {
+  color: #2c6e49 !important;
+}
+
+/* Header animation */
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(1) translateX(0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05) translateX(5%);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(1) translateX(0);
+  }
+}
+
+.header-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at 30% 40%,
+    rgba(216, 243, 220, 0.3) 0%,
+    rgba(45, 106, 79, 0) 50%
+  );
+  animation: pulse 5s ease-in-out infinite alternate;
+}
+
+.page-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header-content {
+  position: relative;
+  z-index: 1;
+}

@@ -1,118 +1,204 @@
-import { useState } from "react";
-import { Card, Table, Button, Modal, Tag, Typography } from "antd";
+// src/components/user/event/RegisteredEvents.jsx
+import { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Button,
+  Modal,
+  Tag,
+  Typography,
+  notification,
+  Spin,
+  Empty,
+  Tooltip,
+} from "antd";
+import {
+  CalendarOutlined,
+  EnvironmentOutlined,
+  ClockCircleOutlined,
+  InfoCircleOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
+import eventService from "/src/services/patron/eventService";
 
-const registeredEvents = [
-  {
-    key: "1",
-    name: "Hội thảo Công nghệ AI",
-    description: "Giới thiệu về AI và các ứng dụng thực tế.",
-    startTime: "2025-03-10 10:00",
-    endTime: "2025-03-10 12:00",
-    location: "Hội trường A1",
-    status: "Đã đăng ký",
-  },
-  {
-    key: "2",
-    name: "Hội chợ Sách 2025",
-    description: "Trưng bày và giới thiệu các đầu sách mới.",
-    startTime: "2025-02-15 09:00",
-    endTime: "2025-02-15 17:00",
-    location: "Nhà văn hóa TP",
-    status: "Đã tham gia",
-  },
-  {
-    key: "3",
-    name: "Cuộc thi Lập trình Hackathon",
-    description: "Cuộc thi lập trình dành cho sinh viên CNTT.",
-    startTime: "2025-04-20 08:00",
-    endTime: "2025-04-20 18:00",
-    location: "Trung tâm CNTT",
-    status: "Đã đăng ký",
-  },
-  {
-    key: "4",
-    name: "Diễn đàn Khởi nghiệp 2025",
-    description: "Nơi giao lưu của các startup và nhà đầu tư.",
-    startTime: "2025-01-25 14:00",
-    endTime: "2025-01-25 17:00",
-    location: "Khách sạn Grand",
-    status: "Đã hủy",
-  },
-  {
-    key: "5",
-    name: "Hội thảo An toàn Thông tin",
-    description: "Bảo vệ dữ liệu và an ninh mạng.",
-    startTime: "2025-05-10 09:00",
-    endTime: "2025-05-10 12:00",
-    location: "Tòa nhà Tech",
-    status: "Đã tham gia",
-  },
-];
+const { Title, Text, Paragraph } = Typography;
 
-const RegisteredEventsCard = () => {
+const RegisteredEvents = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [unregistering, setUnregistering] = useState(false);
+
+  useEffect(() => {
+    fetchRegisteredEvents();
+  }, []);
+
+  const fetchRegisteredEvents = async () => {
+    try {
+      setLoading(true);
+      const response = await eventService.getRegisteredEvents();
+
+      if (response.success) {
+        setEvents(response.data || []);
+      } else {
+        notification.error({
+          message: "Lỗi",
+          description:
+            response.message || "Không thể tải danh sách sự kiện đã đăng ký",
+          placement: "bottomRight",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching registered events:", error);
+      notification.error({
+        message: "Lỗi kết nối",
+        description: "Không thể kết nối đến máy chủ",
+        placement: "bottomRight",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const showModal = (event) => {
     setSelectedEvent(event);
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
+  const handleUnregister = async () => {
+    try {
+      setUnregistering(true);
+      const response = await eventService.unregisterEvent(
+        selectedEvent.eventID
+      );
+
+      if (response.success) {
+        notification.success({
+          message: "Hủy đăng ký thành công",
+          description: response.message,
+          placement: "bottomRight",
+        });
+        fetchRegisteredEvents(); // Refresh events list
+      } else {
+        notification.error({
+          message: "Hủy đăng ký thất bại",
+          description: response.message,
+          placement: "bottomRight",
+        });
+      }
+    } catch (error) {
+      console.error("Error unregistering from event:", error);
+      notification.error({
+        message: "Lỗi kết nối",
+        description: "Không thể kết nối đến máy chủ",
+        placement: "bottomRight",
+      });
+    } finally {
+      setUnregistering(false);
+      setIsModalVisible(false);
+    }
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
+  // Format date and time from ISO to readable format
+  const formatDateTime = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Get registration status color
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Đã đăng ký":
+        return "blue";
+      case "Đã tham gia":
+        return "green";
+      case "Đã hủy đăng ký":
+        return "orange";
+      case "Không tham gia":
+        return "red";
+      default:
+        return "default";
+    }
+  };
+
+  // Determine if an event is upcoming based on its end time
+  const isUpcomingEvent = (endTime) => {
+    const now = new Date();
+    const eventEndTime = new Date(endTime);
+    return eventEndTime > now;
+  };
+
   const columns = [
     {
       title: "Tên sự kiện",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "title",
+      key: "title",
+      render: (text) => <div style={{ fontWeight: "bold" }}>{text}</div>,
     },
     {
-      title: "Mô tả chi tiết",
-      dataIndex: "description",
-      key: "description",
-      width: "30%",
-    },
-    {
-      title: "Thời gian bắt đầu",
-      dataIndex: "startTime",
-      key: "startTime",
-    },
-    {
-      title: "Thời gian kết thúc",
-      dataIndex: "endTime",
-      key: "endTime",
+      title: "Thời gian",
+      key: "time",
+      render: (_, record) => (
+        <div>
+          <div>
+            <ClockCircleOutlined style={{ marginRight: 8 }} />
+            <Text>{formatDateTime(record.startTime)}</Text>
+          </div>
+          <div>
+            <Text type="secondary">đến {formatDateTime(record.endTime)}</Text>
+          </div>
+        </div>
+      ),
     },
     {
       title: "Địa điểm",
       dataIndex: "location",
       key: "location",
+      render: (text) => (
+        <Text>
+          <EnvironmentOutlined style={{ marginRight: 8 }} />
+          {text}
+        </Text>
+      ),
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
       render: (status) => {
-        let color =
-          status === "Đã tham gia"
-            ? "green"
-            : status === "Đã hủy"
-            ? "red"
-            : "blue";
-        return <Tag color={color}>{status}</Tag>;
+        return <Tag color={getStatusColor(status)}>{status}</Tag>;
       },
+    },
+    {
+      title: "Thông tin",
+      key: "info",
+      render: (_, record) => (
+        <Tooltip title="Xem chi tiết">
+          <Button
+            type="text"
+            icon={<InfoCircleOutlined />}
+            onClick={() => showModal(record)}
+          />
+        </Tooltip>
+      ),
     },
     {
       title: "Hành động",
       key: "action",
       render: (_, record) =>
-        record.status === "Đã đăng ký" ? (
-          <Button type="danger" onClick={() => showModal(record)}>
+        isUpcomingEvent(record.endTime) && record.status === "Đã đăng ký" ? (
+          <Button danger onClick={() => showModal(record)}>
             Hủy đăng ký
           </Button>
         ) : null,
@@ -122,45 +208,150 @@ const RegisteredEventsCard = () => {
   return (
     <Card
       title={
-        <Typography.Title level={3} style={{ textAlign: "center", margin: 0 }}>
-          Các sự kiện đã đăng ký/tham gia
-        </Typography.Title>
+        <div style={{ textAlign: "center" }}>
+          <CheckCircleOutlined style={{ fontSize: 24, marginRight: 8 }} />
+          <Title
+            level={3}
+            style={{ margin: 0, display: "inline-block", color: "white" }}
+          >
+            Sự kiện đã đăng ký
+          </Title>
+        </div>
       }
       style={{
-        textAlign: "center",
-        background:
-          "url('https://www.transparenttextures.com/patterns/ravenna.png'), linear-gradient(rgba(245, 231, 236, 0.39) 0%,rgba(163, 171, 179, 0.81) 100%)",
-        marginTop: "20px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        borderRadius: "12px",
+        overflow: "hidden",
+      }}
+      headStyle={{
+        background: "linear-gradient(135deg, #52c41a 0%, #1890ff 100%)",
+        color: "white",
+        borderRadius: "12px 12px 0 0",
+        padding: "16px",
+      }}
+      bodyStyle={{
+        padding: "24px",
       }}
     >
-      {registeredEvents.length > 0 ? (
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "40px 0" }}>
+          <Spin size="large" />
+          <div style={{ marginTop: 16 }}>Đang tải dữ liệu...</div>
+        </div>
+      ) : events.length > 0 ? (
         <Table
           columns={columns}
-          dataSource={registeredEvents}
-          pagination={{ pageSize: 3 }}
+          dataSource={events.map((event) => ({ ...event, key: event.eventID }))}
+          pagination={{
+            pageSize: 5,
+            showSizeChanger: false,
+            showQuickJumper: false,
+            simple: true,
+          }}
+          rowKey="eventID"
         />
       ) : (
-        <p>Bạn chưa đăng ký tham gia sự kiện nào</p>
+        <Empty description="Bạn chưa đăng ký tham gia sự kiện nào" />
       )}
+
       <Modal
-        title="Xác nhận hủy đăng ký"
-        visible={isModalVisible}
-        onOk={handleOk}
+        title={
+          <div>
+            <CalendarOutlined style={{ marginRight: 8 }} />
+            Chi tiết sự kiện đã đăng ký
+          </div>
+        }
+        open={isModalVisible}
+        onOk={
+          isUpcomingEvent(selectedEvent?.endTime) &&
+          selectedEvent?.status === "Đã đăng ký"
+            ? handleUnregister
+            : handleCancel
+        }
         onCancel={handleCancel}
-        okText="Đồng ý"
-        cancelText="Hủy"
+        okText={
+          isUpcomingEvent(selectedEvent?.endTime) &&
+          selectedEvent?.status === "Đã đăng ký"
+            ? "Hủy đăng ký"
+            : "Đóng"
+        }
+        okButtonProps={{
+          danger:
+            isUpcomingEvent(selectedEvent?.endTime) &&
+            selectedEvent?.status === "Đã đăng ký",
+          style: {
+            display:
+              isUpcomingEvent(selectedEvent?.endTime) &&
+              selectedEvent?.status === "Đã đăng ký"
+                ? "inline-block"
+                : "none",
+          },
+        }}
+        cancelText="Đóng"
+        confirmLoading={unregistering}
       >
         {selectedEvent && (
-          <p>
-            Bạn có chắc chắn muốn hủy đăng ký{" "}
-            <strong>{selectedEvent.name}</strong> vào lúc{" "}
-            <strong>{selectedEvent.startTime.split(" ")[1]}</strong>, ngày{" "}
-            <strong>{selectedEvent.startTime.split(" ")[0]}</strong> ?
-          </p>
+          <div>
+            <Title level={4}>{selectedEvent.title}</Title>
+            <div style={{ margin: "16px 0" }}>
+              <Tag color={getStatusColor(selectedEvent.status)}>
+                {selectedEvent.status}
+              </Tag>
+              <Tag
+                color={
+                  isUpcomingEvent(selectedEvent.endTime) ? "green" : "blue"
+                }
+              >
+                {isUpcomingEvent(selectedEvent.endTime)
+                  ? "Sắp diễn ra"
+                  : "Đã diễn ra"}
+              </Tag>
+            </div>
+
+            <div style={{ margin: "8px 0" }}>
+              <ClockCircleOutlined style={{ marginRight: 8 }} />
+              <Text strong>Thời gian:</Text>
+              <div style={{ marginLeft: 24 }}>
+                <Text>Bắt đầu: {formatDateTime(selectedEvent.startTime)}</Text>
+                <br />
+                <Text>Kết thúc: {formatDateTime(selectedEvent.endTime)}</Text>
+              </div>
+            </div>
+
+            <div style={{ margin: "8px 0" }}>
+              <EnvironmentOutlined style={{ marginRight: 8 }} />
+              <Text strong>Địa điểm:</Text> {selectedEvent.location}
+            </div>
+
+            <div style={{ margin: "16px 0" }}>
+              <InfoCircleOutlined style={{ marginRight: 8 }} />
+              <Text strong>Mô tả:</Text>
+              <Paragraph style={{ marginLeft: 24, marginTop: 8 }}>
+                {selectedEvent.description}
+              </Paragraph>
+            </div>
+
+            {isUpcomingEvent(selectedEvent.endTime) &&
+              selectedEvent.status === "Đã đăng ký" && (
+                <div
+                  style={{
+                    marginTop: 16,
+                    padding: 12,
+                    background: "#fff2e8",
+                    border: "1px solid #ffbb96",
+                    borderRadius: 4,
+                  }}
+                >
+                  <Text>
+                    Bạn có chắc chắn muốn hủy đăng ký tham gia sự kiện này?
+                  </Text>
+                </div>
+              )}
+          </div>
         )}
       </Modal>
     </Card>
   );
 };
 
-export default RegisteredEventsCard;
+export default RegisteredEvents;
