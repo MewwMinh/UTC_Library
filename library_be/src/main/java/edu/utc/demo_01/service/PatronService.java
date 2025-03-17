@@ -38,6 +38,8 @@ public class PatronService {
     EventParticipantRepository eventParticipantRepository;
     EventRepository eventRepository;
     SeatReservationHistoryRepository seatReservationHistoryRepository;
+    PointHistoryRepository pointHistoryRepository;
+    MembershipRepository membershipRepository;
 
 
     //region Dashboard
@@ -234,7 +236,37 @@ public class PatronService {
     //endregion
 
     //region Achievement & Violation
+    public APIResponse<List<PointHistoryResponse>> getPatronPointHistory(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<PointHistoryResponse> result = pointHistoryRepository.getPatronPointHistory(userID);
+        return APIResponse.<List<PointHistoryResponse>>builder().code(1000).result(result).build();
+    }
+    public APIResponse<List<AchievementResponse>> getPatronAchievements(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        List<AchievementResponse> result = userAchievementRepository.getPatronAchievements(userID);
+        return APIResponse.<List<AchievementResponse>>builder().code(1000).result(result).build();
+    }
+    public CommonAchievement getCommonAchievement(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        Membership membership = membershipRepository.findByUserID(user);
+        CommonAchievement result = new CommonAchievement();
+        result.setPoints(user.getMemberPoints());
+        result.setRank(membership.getMembershipType());
+        if ( membership.getMembershipType().equals("Đồng")){
+            result.setNextRank("Bạc");
+            result.setPointsToNextRank(500 - user.getMemberPoints());
+        } else if (membership.getMembershipType().equals("Bạc")) {
+            result.setNextRank("Vàng");
+            result.setPointsToNextRank(1000 - user.getMemberPoints());
+        } else {
 
+        }
+        return result;
+    }
 
     //endregion
 

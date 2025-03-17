@@ -37,8 +37,8 @@ function UserSideBar() {
       icon: <TeamOutlined />,
     },
     {
-      key: "violation",
-      label: "Vi Phạm",
+      key: "achievement",
+      label: "Thành tựu",
       icon: <WarningOutlined />,
     },
     {

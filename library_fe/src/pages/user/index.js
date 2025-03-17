@@ -6,4 +6,4 @@ export { default as Event } from "./Event";
 export { default as Order } from "./Order";
 export { default as RequestDetails } from "./RequestDetails";
 export { default as SupportRequests } from "./SupportRequests";
-export { default as ViolationManagement } from "./ViolationManagement";
+export { default as Achievement } from "./Achievement";

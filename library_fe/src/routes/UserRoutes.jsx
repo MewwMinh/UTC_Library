@@ -5,7 +5,7 @@ import {
   BookSearch,
   BookDetails,
   BorrowReturn,
-  ViolationManagement,
+  Achievement,
   SupportRequests,
   RequestDetails,
   Order,
@@ -21,7 +21,7 @@ const UserRoutes = () => {
         <Route path="searchBook" element={<BookSearch />} />
         <Route path="bookDetails/:id" element={<BookDetails />} />
         <Route path="borrowReturnBook" element={<BorrowReturn />} />
-        <Route path="violation" element={<ViolationManagement />} />
+        <Route path="achievement" element={<Achievement />} />
         <Route path="request" element={<SupportRequests />} />
         <Route path="request/:requestId" element={<RequestDetails />} />
         <Route path="order" element={<Order />} />

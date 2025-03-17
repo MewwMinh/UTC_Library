@@ -145,4 +145,13 @@ public class PatronController {
     }
     @GetMapping("get-all-seat-reservation")
     public APIResponse<List<SeatReservationResponse>> getAllSeatReservation() {return service.getAllSeatReservation();}
+
+    @GetMapping("get-patron-point-history")
+    public APIResponse<List<PointHistoryResponse>> getPatronPointHistory() {return service.getPatronPointHistory();}
+    @GetMapping("get-patron-achievement")
+    public APIResponse<List<AchievementResponse>> getPatronAchievements() {return service.getPatronAchievements();}
+    @GetMapping("get-common-achievement")
+    public APIResponse<CommonAchievement> getCommonAchievement() {
+        return APIResponse.<CommonAchievement>builder().code(1000).result(service.getCommonAchievement()).build();
+    }
 }
