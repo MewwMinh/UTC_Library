@@ -18,15 +18,6 @@ src/styles/order.css .row-processing {
   border-top: 1px solid #b7e4c7 !important;
 }
 
-.ant-table-thead > tr > th {
-  background: #f0f9f1 !important;
-  color: #2c6e49 !important;
-}
-
-.ant-form-item-label > label {
-  color: #2c6e49 !important;
-}
-
 /* Header animation */
 @keyframes pulse {
   0% {

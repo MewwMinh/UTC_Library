@@ -6,15 +6,7 @@ import {
   LogoutOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import {
-  Layout,
-  Input,
-  Avatar,
-  Dropdown,
-  Typography,
-  message,
-  Modal,
-} from "antd";
+import { Layout, Input, Avatar, Dropdown, message, Modal } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout, logoutManual } from "/src/redux/features/authSlice";
@@ -27,36 +19,31 @@ import {
 import "./UserHeader.css";
 
 const { Header } = Layout;
-const { Text } = Typography;
 
-function UserHeader() {
-  const [isScrolled, setIsScrolled] = useState(false);
+function SimplifiedLibraryHeader() {
+  const [searchValue, setSearchValue] = useState("");
 
-  // Lấy data từ Redux store
+  // Obtener datos de Redux
   const { token, isAuthenticated } = useSelector((state) => state.auth);
   const userInfo = useSelector(selectUserInfo);
   const userLoading = useSelector(selectUserLoading);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
-    };
+  // Manejar búsqueda
+  const handleSearch = (value) => {
+    if (value.trim()) {
+      navigate(`/user/searchBook?q=${encodeURIComponent(value.trim())}`);
+    }
+  };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Fetch thông tin người dùng khi component được mount và token thay đổi
+  // Obtener información del usuario
   useEffect(() => {
     if (token && isAuthenticated) {
       dispatch(fetchUserInfo())
         .unwrap()
         .catch((error) => {
-          // Xử lý lỗi nếu cần
           if (error.code === 9998 || error.code === 9999) {
-            // Token hết hạn hoặc không hợp lệ
             message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
             handleLogout();
           } else {
@@ -69,7 +56,7 @@ function UserHeader() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, isAuthenticated, dispatch]);
 
-  // Xử lý đăng xuất
+  // Manejar cierre de sesión
   const handleLogout = () => {
     Modal.confirm({
       title: "Đăng xuất",
@@ -78,7 +65,6 @@ function UserHeader() {
       cancelText: "Hủy",
       onOk: async () => {
         try {
-          // Dispatch action logout từ Redux
           await dispatch(logout()).unwrap();
           message.success("Đăng xuất thành công");
           navigate("/login");
@@ -86,7 +72,6 @@ function UserHeader() {
           console.error("Lỗi khi đăng xuất:", error);
           message.error("Có lỗi xảy ra khi đăng xuất");
 
-          // Nếu có lỗi, thực hiện logout thủ công
           dispatch(logoutManual());
           dispatch(resetUserInfo());
           navigate("/login");
@@ -95,7 +80,7 @@ function UserHeader() {
     });
   };
 
-  // Xử lý các action từ menu
+  // Menú de usuario
   const handleMenuClick = ({ key }) => {
     switch (key) {
       case "logout":
@@ -129,92 +114,54 @@ function UserHeader() {
   ];
 
   return (
-    <Header
-      className={`modern-header ${isScrolled ? "scrolled" : ""}`}
-      style={{
-        height: "64px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 20px",
-        position: "fixed",
-        top: 0,
-        width: "100%",
-        zIndex: 1000,
-        backgroundColor: "#1565c0",
-        color: "#fff",
-        transition: "all 0.3s ease",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-      }}
-    >
-      {/* Logo và tên thư viện */}
-      <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+    <Header className="library-header">
+      {/* Logo y nombre de la biblioteca */}
+      <div className="header-logo">
         <img
           src="/public/logo-utc.png"
           alt="Library Logo"
-          style={{ height: "40px" }}
+          className="logo-image"
         />
-        <div
-          style={{
-            fontWeight: 700,
-            fontSize: "20px",
-            letterSpacing: "0.5px",
-          }}
-        >
-          TRUNG TÂM THÔNG TIN - THƯ VIỆN
-        </div>
+        <div className="library-name">TRUNG TÂM THÔNG TIN - THƯ VIỆN</div>
       </div>
 
-      {/* Thanh tìm kiếm */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          maxWidth: "400px",
-          margin: "0 20px",
-        }}
-      >
-        <Input
-          prefix={<SearchOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />}
+      {/* Barra de búsqueda */}
+      <div className="search-container">
+        <Input.Search
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          prefix={
+            <SearchOutlined style={{ color: "rgba(255, 255, 255, 0.6)" }} />
+          }
           placeholder="Tìm kiếm sách, tác giả..."
-          style={{
-            borderRadius: "4px",
-            backgroundColor: "#ffffff",
-          }}
           className="search-input"
+          onSearch={handleSearch}
+          enterButton
         />
       </div>
 
-      {/* Phần xin chào và avatar người dùng */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <Text
-          style={{ color: "#ffffff", fontSize: "14px", marginRight: "8px" }}
-        >
-          Xin chào, {userLoading ? "..." : userInfo.userName || "Người dùng"}
-        </Text>
-
-        <Dropdown
-          menu={{
-            items: userMenuItems,
-            onClick: handleMenuClick,
-          }}
-          trigger={["click"]}
-          placement="bottomRight"
-        >
-          <Avatar
-            style={{
-              backgroundColor: "#ffffff",
-              color: "#1565c0",
-              cursor: "pointer",
+      {/* Thông tin người dùng */}
+      <div className="user-info">
+        <span className="welcome-text">
+          Xin chào, {userLoading ? "..." : userInfo?.userName || "Người dùng"}
+          <Dropdown
+            menu={{
+              items: userMenuItems,
+              onClick: handleMenuClick,
             }}
-            src={userInfo.userImage}
-            icon={<UserOutlined />}
-          />
-        </Dropdown>
+            trigger={["click"]}
+            placement="bottomRight"
+          >
+            <Avatar
+              className="user-avatar"
+              src={userInfo?.userImage}
+              icon={<UserOutlined />}
+            />
+          </Dropdown>
+        </span>
       </div>
     </Header>
   );
 }
 
-export default UserHeader;
+export default SimplifiedLibraryHeader;

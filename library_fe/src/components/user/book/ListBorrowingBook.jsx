@@ -6,10 +6,17 @@ import {
   Empty,
   Skeleton,
   Avatar,
-  Badge,
   notification,
+  Spin,
+  Button,
+  Tag,
+  Space,
 } from "antd";
-import { BookOutlined } from "@ant-design/icons";
+import {
+  BookOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
 import borrowReturnService from "/src/services/patron/borrowReturnService";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -73,6 +80,12 @@ export default function ListBorrowingBook() {
     return diffDays;
   };
 
+  const getDueDateStatus = (remainingDays) => {
+    if (remainingDays < 0) return "error";
+    if (remainingDays <= 3) return "warning";
+    return "success";
+  };
+
   const columns = [
     {
       title: "Sách",
@@ -85,57 +98,94 @@ export default function ListBorrowingBook() {
             alignItems: "center",
             cursor: "pointer",
           }}
-          onClick={() => navigate(`/user/bookDetails/${record.bookID}`)}
         >
           <Avatar
             shape="square"
             size={64}
             src={record.bookImage}
             icon={!record.bookImage && <BookOutlined />}
-            style={{ marginRight: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+            style={{
+              marginRight: 12,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              borderRadius: "4px",
+            }}
           />
           <div>
             <Text strong style={{ display: "block", color: "#1890ff" }}>
               {text}
             </Text>
+            {record.author && (
+              <Text type="secondary" style={{ fontSize: "13px" }}>
+                {record.author}
+              </Text>
+            )}
           </div>
         </div>
       ),
     },
     {
-      title: "Ngày mượn",
+      title: (
+        <span>
+          <CalendarOutlined /> Ngày mượn
+        </span>
+      ),
       dataIndex: "borrowDate",
       key: "borrowDate",
-      render: (date) => formatDate(date),
+      render: (date) => <Text>{formatDate(date)}</Text>,
+      width: 140,
     },
     {
-      title: "Ngày đến hạn",
+      title: (
+        <span>
+          <ClockCircleOutlined /> Ngày đến hạn
+        </span>
+      ),
       dataIndex: "dueDate",
       key: "dueDate",
       render: (date) => {
         const remainingDays = calculateRemainingDays(date);
+        const status = getDueDateStatus(remainingDays);
+
         return (
-          <div>
+          <Space direction="vertical" size={2}>
             <Text>{formatDate(date)}</Text>
-            <br />
-            <Badge
-              status={remainingDays <= 3 ? "warning" : "success"}
-              text={
-                <Text
-                  type={remainingDays <= 3 ? "warning" : "success"}
-                  style={{ fontSize: 12 }}
-                >
-                  {remainingDays <= 0
-                    ? "Đã quá hạn"
-                    : `Còn ${remainingDays} ngày`}
-                </Text>
-              }
-            />
-          </div>
+            <Tag
+              color={status}
+              style={{
+                borderRadius: "12px",
+                padding: "0 8px",
+                marginRight: 0,
+              }}
+            >
+              {remainingDays <= 0 ? "Đã quá hạn" : `Còn ${remainingDays} ngày`}
+            </Tag>
+          </Space>
         );
       },
+      width: 140,
     },
   ];
+
+  // Simple centered header
+  const cardTitle = (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px 0",
+        width: "100%",
+        backgroundColor: "#1890ff",
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+      }}
+    >
+      <BookOutlined style={{ fontSize: 24, color: "#fff", marginRight: 12 }} />
+      <Title level={3} style={{ margin: 0, color: "#fff" }}>
+        Sách đang mượn
+      </Title>
+    </div>
+  );
 
   return (
     <motion.div
@@ -144,60 +194,81 @@ export default function ListBorrowingBook() {
       transition={{ duration: 0.5 }}
     >
       <Card
-        title={
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <BookOutlined style={{ marginRight: 8, color: "#1890ff" }} />
-            <Title level={4} style={{ margin: 0, color: "#1890ff" }}>
-              Sách đang mượn
-            </Title>
-          </div>
-        }
+        title={cardTitle}
         style={{
           boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          borderRadius: 8,
+          borderRadius: 12,
           height: "100%",
-          background: "linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)",
+          background: "#ffffff",
         }}
-        bodyStyle={{ padding: "12px 16px" }}
+        styles={{
+          body: { padding: "16px" },
+          header: { borderBottom: "1px solid #f0f0f0" },
+        }}
       >
-        {loading ? (
-          <Skeleton active paragraph={{ rows: 4 }} />
-        ) : borrowedBooks.length > 0 ? (
-          <Table
-            columns={columns}
-            dataSource={borrowedBooks.map((book, index) => ({
-              ...book,
-              key: index,
-            }))}
-            pagination={{
-              current: currentPage,
-              pageSize: pageSize,
-              onChange: (page) => setCurrentPage(page),
-              total: borrowedBooks.length,
-              showSizeChanger: false,
-              showTotal: (total) => `Tổng ${total} cuốn sách`,
-              hideOnSinglePage: borrowedBooks.length <= pageSize,
-            }}
-            rowKey="key"
-            size="middle"
-          />
-        ) : (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={
-              <Text strong style={{ fontSize: 16 }}>
-                Bạn đang không mượn cuốn sách nào
-              </Text>
-            }
-            style={{ padding: "20px 0" }}
-          />
-        )}
+        <div style={{ position: "relative", minHeight: "200px" }}>
+          {loading ? (
+            <div style={{ padding: "20px 0" }}>
+              <Spin spinning={true}>
+                <Skeleton active paragraph={{ rows: 4 }} />
+              </Spin>
+            </div>
+          ) : borrowedBooks.length > 0 ? (
+            <Table
+              columns={columns}
+              dataSource={borrowedBooks.map((book, index) => ({
+                ...book,
+                key: index,
+              }))}
+              pagination={{
+                current: currentPage,
+                pageSize: pageSize,
+                onChange: (page) => setCurrentPage(page),
+                total: borrowedBooks.length,
+                showSizeChanger: false,
+                showTotal: (total) => `Tổng ${total} cuốn sách`,
+                hideOnSinglePage: borrowedBooks.length <= pageSize,
+              }}
+              rowKey="key"
+              size="middle"
+              bordered={false}
+              onRow={(record) => ({
+                style: {
+                  cursor: "pointer",
+                  transition: "background-color 0.3s",
+                },
+                onMouseEnter: (e) => {
+                  e.currentTarget.style.backgroundColor = "#f0f7ff";
+                },
+                onMouseLeave: (e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                },
+                onClick: () => {
+                  navigate(`/user/bookDetails/${record.bookID}`);
+                },
+              })}
+            />
+          ) : (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <div style={{ padding: "20px 0" }}>
+                  <Text strong style={{ fontSize: 16 }}>
+                    Bạn đang không mượn cuốn sách nào
+                  </Text>
+                  <div style={{ marginTop: 16 }}>
+                    <Button
+                      type="primary"
+                      onClick={() => navigate("/user/searchBooks")}
+                    >
+                      Tìm sách
+                    </Button>
+                  </div>
+                </div>
+              }
+            />
+          )}
+        </div>
       </Card>
     </motion.div>
   );

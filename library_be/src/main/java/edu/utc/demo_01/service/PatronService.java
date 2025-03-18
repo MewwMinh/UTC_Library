@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -50,11 +51,11 @@ public class PatronService {
         return APIResponse.<PatronInformation>builder().code(1000).result(result).build();
     }
 
-    public APIResponse<List<BorrowBookResponse>> get5RecentBorrowBooks(){
+    public APIResponse<List<BorrowBookResponse1>> get5RecentBorrowBooks(){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-        List<BorrowBookResponse> bookResponseList = borrowRecordRepository.get5RecentBorrowBooks(userID);
-        return APIResponse.<List<BorrowBookResponse>>builder().code(1000).result(bookResponseList).build();
+        List<BorrowBookResponse1> bookResponseList = borrowRecordRepository.get5RecentBorrowBooks(userID);
+        return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(bookResponseList).build();
     }
 
 
@@ -220,11 +221,11 @@ public class PatronService {
         return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
     }
 
-    public APIResponse<List<BorrowBookResponse1>> getNearAndOverDueBooks(){
+    public APIResponse<List<BorrowBookResponse2>> getNearAndOverDueBooks(){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-        List<BorrowBookResponse1> result = borrowRecordRepository.getNearAndOverDueBooks(userID);
-        return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
+        List<BorrowBookResponse2> result = borrowRecordRepository.getNearAndOverDueBooks(userID);
+        return APIResponse.<List<BorrowBookResponse2>>builder().code(1000).result(result).build();
     }
 
     public APIResponse<List<BorrowBookResponse1>> getBorrowRecordsHistory(){
@@ -232,6 +233,15 @@ public class PatronService {
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
         List<BorrowBookResponse1> result = borrowRecordRepository.getBorrowRecordsHistory(userID);
         return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
+    }
+
+    public APIResponse renewBook(String recordID){
+        BorrowRecord record = borrowRecordRepository.findByRecordID(recordID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
+        record.setExtendCount(record.getExtendCount() + 1);
+        record.setExtendedDate(Instant.now());
+        record.setDueDate(Instant.now().plus(60, ChronoUnit.DAYS));
+        borrowRecordRepository.save(record);
+        return APIResponse.builder().code(1000).message("Bạn đã gia hạn thành công cuốn " + record.getBookID().getBookName()).build();
     }
     //endregion
 

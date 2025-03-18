@@ -12,7 +12,7 @@ import {
   Badge,
 } from "antd";
 import { SearchOutlined, BookOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import bookService from "/src/services/patronService.js";
 import styles from "/src/styles/books/SearchCard.module.css";
 
@@ -26,6 +26,18 @@ function SearchCard() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Đọc query parameter khi component được tải
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const queryTerm = queryParams.get("q");
+
+    if (queryTerm) {
+      setSearchTerm(queryTerm);
+      handleSearch(queryTerm);
+    }
+  }, [location.search]);
 
   // Khi có kết quả tìm kiếm hoặc trang thay đổi, cập nhật dữ liệu hiển thị
   useEffect(() => {
@@ -77,6 +89,16 @@ function SearchCard() {
     // updateDisplayedData() sẽ được gọi tự động qua useEffect
   };
 
+  // Cập nhật URL khi tìm kiếm từ trang này
+  const handleLocalSearch = (value) => {
+    setSearchTerm(value);
+    // Cập nhật URL để phản ánh tìm kiếm hiện tại
+    navigate(`/user/searchBook?q=${encodeURIComponent(value)}`, {
+      replace: true,
+    });
+    handleSearch(value);
+  };
+
   return (
     <Card
       title={
@@ -96,10 +118,9 @@ function SearchCard() {
           </>
         }
         size="large"
-        onSearch={(value) => {
-          setSearchTerm(value);
-          handleSearch(value);
-        }}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onSearch={handleLocalSearch}
         className={styles.searchInput}
       />
 

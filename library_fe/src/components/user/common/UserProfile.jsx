@@ -51,11 +51,6 @@ function UserProfile() {
     }
   };
 
-  // Function to get gender text in Vietnamese
-  const getGenderText = (gender) => {
-    return gender === "Male" ? "Nam" : gender === "Female" ? "Nữ" : "Khác";
-  };
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -163,7 +158,8 @@ function UserProfile() {
                       </Col>
                       <Col>
                         <Text style={{ color: "white" }}>
-                          <IdcardOutlined /> MSSV: {userData?.userID || "N/A"}
+                          <IdcardOutlined /> Mã bạn đọc:{" "}
+                          {userData?.userID || "N/A"}
                         </Text>
                       </Col>
                     </Row>

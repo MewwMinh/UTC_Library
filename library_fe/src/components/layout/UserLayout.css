@@ -1,58 +1,76 @@
-.fixed-sider {
-  position: fixed;
-  left: 0;
-  top: 64px;
-  bottom: 0;
-  background: #fff;
-  border-right: 1px solid #ddd;
+/* Container chính */
+.main-content-wrapper {
+  margin-left: 250px; /* Cố định margin trái theo chiều rộng của sidebar */
+  padding-top: 64px; /* Tương ứng với chiều cao của header */
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  width: calc(
+    100% - 250px
+  ); /* Đảm bảo chiếm toàn bộ phần còn lại của màn hình */
+  flex: 1;
+  overflow-x: hidden;
 }
 
-.layout-container {
+/* Wrapper cho phần cuộn chung */
+.scrollable-content {
   display: flex;
   flex: 1;
-  height: calc(100vh - 64px); /* Trừ đi chiều cao của Header */
-  margin-left: 230px;
-  margin-top: 64px;
-  width: clamp(500px, calc(100vw - 230px), 100vw) !important;
-  background: #ffffff;
+  overflow-y: auto; /* Thanh cuộn dọc chung */
+  height: calc(100vh - 64px); /* Chiều cao còn lại sau header */
+  overflow-x: hidden; /* Ngăn thanh cuộn ngang */
+  width: 100%;
 }
 
-.scrollable-sider {
-  width: 300px;
-  background: #ffffff;
-  padding: 16px;
-  margin-top: 10px;
-  transition: all 0.3s ease;
-}
-
+/* Phần content chính */
 .content-area {
-  background: #ffffff;
-  margin-top: 20px;
-  margin-left: 20px;
-  min-height: calc(100vh - 64px);
-  flex-grow: 1;
+  flex: 1;
+  padding: 20px;
+  min-width: 0; /* Cho phép co lại khi cần thiết */
 }
 
-.content-placeholder {
-  height: 500px;
-  background: rgba(0, 0, 0, 0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+/* Right sidebar */
+.right-sidebar {
+  width: 300px;
+  padding: 20px 16px;
+  background-color: #fff;
+  flex-shrink: 0; /* Không co lại */
 }
 
-@media (max-width: 1024px) {
-  .scrollable-sider {
+/* Card trong right sidebar */
+.right-sidebar > div {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive styling */
+@media (max-width: 1200px) {
+  .right-sidebar {
     display: none;
+  }
+
+  .content-area {
+    flex: 1;
   }
 }
 
-.scrollable-sider .card {
-  margin-top: 10px;
-  margin-right: 10px;
-  /* background: "linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%)";
-  border-radius: "12px";
-  box-shadow: "0px 4px 10px rgba(0, 0, 0, 0.1)";
-  color: "#338"; */
+@media (max-width: 768px) {
+  .content-area {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .content-area {
+    padding: 10px;
+  }
+}
+
+/* Đảm bảo kích thước tối thiểu */
+@media screen and (max-width: 1000px) {
+  .main-content-wrapper {
+    min-width: 750px;
+  }
 }

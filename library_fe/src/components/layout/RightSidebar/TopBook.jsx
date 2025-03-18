@@ -1,41 +1,31 @@
-import { useState, useEffect } from "react";
-import {
-  Card,
-  List,
-  Avatar,
-  Skeleton,
-  Tooltip,
-  Empty,
-  Typography,
-  notification,
-  theme,
-} from "antd";
+import { useState, useEffect, useRef } from "react";
+import { Card, Skeleton, Empty, Typography, notification } from "antd";
 import { FireFilled } from "@ant-design/icons";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import userService from "/src/services/userService";
+
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+
+// Import component styles
+import "./TopBook.css";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
 function TopBook() {
   const [topBooks, setTopBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
-  const { token } = theme.useToken();
+  const swiperRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTopBooks();
   }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPage((prevPage) =>
-        prevPage < Math.ceil(topBooks.length / pageSize) ? prevPage + 1 : 1
-      );
-    }, 10000); // Automatically change page every 10 seconds
-
-    return () => clearInterval(interval);
-  }, [topBooks.length]);
 
   const fetchTopBooks = async () => {
     try {
@@ -64,185 +54,178 @@ function TopBook() {
     }
   };
 
-  const headerStyle = {
-    background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPrimaryActive} 100%)`,
-    color: "white",
-    borderBottom: "none",
-    borderRadius: "12px 12px 0 0",
-    padding: "16px",
-    marginTop: "-1px",
-    marginLeft: "-1px",
-    marginRight: "-1px",
-  };
-
-  const bodyStyle = {
-    flex: 1,
-    overflow: "hidden",
-    padding: "12px 24px",
-  };
-
-  // Không cần hàm renderRankBadge nữa vì chúng ta chỉ hiển thị số
-
-  return (
-    <motion.div
-      initial={{ backgroundPosition: "0% 50%" }}
-      animate={{
-        backgroundPosition: "100% 50%",
-        transition: {
-          repeat: Infinity,
-          repeatType: "reverse",
-          duration: 10,
+  const getRankStyles = (index) => {
+    if (index === 0) {
+      return {
+        barStyle: {
+          background: "#FFD700", // Gold
         },
-      }}
-    >
-      <Card
-        title={
-          <Title
-            level={4}
-            style={{ textAlign: "center", margin: 0, color: "white" }}
-          >
-            Sách được mượn nhiều nhất
-          </Title>
-        }
-        styles={{
-          header: headerStyle,
-          body: bodyStyle,
-        }}
+        rankColor: "#FFD700",
+      };
+    } else if (index === 1) {
+      return {
+        barStyle: {
+          background: "#C0C0C0", // Silver
+        },
+        rankColor: "#C0C0C0",
+      };
+    } else if (index === 2) {
+      return {
+        barStyle: {
+          background: "#CD7F32", // Bronze
+        },
+        rankColor: "#CD7F32",
+      };
+    } else {
+      return {
+        barStyle: {
+          background: "#1677ff", // Default
+        },
+        rankColor: "#999",
+      };
+    }
+  };
+
+  const renderBookCard = (book, index) => {
+    const styles = getRankStyles(index);
+    const defaultCover = "https://i.imgur.com/uDYejhJ.png"; // Placeholder for books without image
+
+    const navigateToBookDetails = () => {
+      navigate(`/user/bookDetails/${book.bookID}`);
+    };
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3, delay: index * 0.1 }}
         style={{
-          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-          borderRadius: "12px",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.08)",
-          height: "440px",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          border: "none",
+          padding: "6px 0",
+          width: "100%",
         }}
       >
-        {loading ? (
-          <div className="loading-container">
-            {[...Array(5)].map((_, index) => (
-              <Skeleton
-                key={index}
-                active
-                avatar
-                paragraph={{ rows: 0 }}
-                style={{ marginBottom: 16 }}
-              />
-            ))}
+        <div
+          className="book-card book-card-hover"
+          onClick={navigateToBookDetails}
+        >
+          <div className="book-card-bar" style={styles.barStyle} />
+
+          <div className="book-rank-number" style={{ color: styles.rankColor }}>
+            {index + 1}
           </div>
-        ) : topBooks.length === 0 ? (
-          <Empty
-            description="Không có dữ liệu"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            style={{ marginTop: 60 }}
+
+          <img
+            src={book.bookImage || defaultCover}
+            alt={book.bookName}
+            className="book-cover"
           />
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentPage}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              style={{ height: "100%" }}
-            >
-              <List
-                itemLayout="horizontal"
-                dataSource={topBooks.slice(
-                  (currentPage - 1) * pageSize,
-                  currentPage * pageSize
-                )}
-                renderItem={(book, index) => {
-                  const globalIndex = (currentPage - 1) * pageSize + index;
-                  return (
-                    <List.Item
-                      style={{
-                        background:
-                          globalIndex === 0
-                            ? "rgba(255, 215, 0, 0.08)"
-                            : globalIndex === 1
-                            ? "rgba(192, 192, 192, 0.08)"
-                            : globalIndex === 2
-                            ? "rgba(205, 127, 50, 0.08)"
-                            : "",
-                        borderRadius: "8px",
-                        marginBottom: "8px",
-                        padding: "8px 16px",
-                      }}
-                    >
-                      <List.Item.Meta
-                        avatar={
-                          <Avatar
-                            style={{
-                              backgroundColor:
-                                globalIndex === 0
-                                  ? "#FFD700" // Gold
-                                  : globalIndex === 1
-                                  ? "#C0C0C0" // Silver
-                                  : globalIndex === 2
-                                  ? "#CD7F32" // Bronze
-                                  : "#1677ff", // Primary blue for others
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontWeight: "bold",
-                              color: "#fff",
-                            }}
-                          >
-                            {globalIndex + 1}
-                          </Avatar>
-                        }
-                        title={
-                          <Tooltip title={book.bookName}>
-                            <Text
-                              strong
-                              ellipsis={{ tooltip: book.bookName }}
-                              style={{ maxWidth: "calc(100% - 20px)" }}
-                            >
-                              {book.bookName}
-                            </Text>
-                          </Tooltip>
-                        }
-                        description={
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <Text type="secondary">
-                              <Tooltip title="Số lượt mượn">
-                                <span style={{ marginRight: 4 }}>
-                                  <FireFilled
-                                    style={{
-                                      color: "#ff4d4f",
-                                      fontSize: "12px",
-                                      marginRight: 4,
-                                    }}
-                                  />
-                                  {book.borrowedTimesCount} lượt mượn
-                                </span>
-                              </Tooltip>
-                            </Text>
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  );
-                }}
-                pagination={{
-                  pageSize,
-                  current: currentPage,
-                  onChange: (page) => setCurrentPage(page),
-                  total: topBooks.length,
-                  hideOnSinglePage: true,
-                  size: "small",
-                  simple: true,
-                }}
-              />
-            </motion.div>
-          </AnimatePresence>
-        )}
-      </Card>
-    </motion.div>
+
+          <div className="book-info">
+            <div className="book-name-container">
+              <Text strong className="book-name">
+                {book.bookName}
+              </Text>
+            </div>
+
+            <div className="book-stats">
+              <FireFilled className="borrow-icon" />
+              <Text type="secondary" className="borrow-count">
+                {book.borrowedTimesCount} lượt mượn
+              </Text>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  return (
+    <Card
+      title={
+        <Title level={4} className="top-book-title">
+          Sách được mượn nhiều
+        </Title>
+      }
+      styles={{
+        header: {
+          background: "#1677ff",
+          color: "white",
+          borderBottom: "none",
+          borderRadius: "12px 12px 0 0",
+          padding: "16px",
+          marginTop: "-1px",
+          marginLeft: "-1px",
+          marginRight: "-1px",
+        },
+        body: {
+          flex: 1,
+          overflow: "hidden",
+          padding: "16px 12px 24px 12px",
+        },
+      }}
+      className="top-book-card"
+    >
+      {loading ? (
+        <div className="loading-container">
+          {[...Array(5)].map((_, index) => (
+            <Skeleton
+              key={index}
+              active
+              avatar={{ size: 56, shape: "square" }}
+              paragraph={{ rows: 1, width: "60%" }}
+              style={{ padding: "0 10px" }}
+            />
+          ))}
+        </div>
+      ) : topBooks.length === 0 ? (
+        <Empty
+          description="Không có dữ liệu"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          style={{ marginTop: 60 }}
+        />
+      ) : (
+        <div style={{ height: "100%" }}>
+          <Swiper
+            ref={swiperRef}
+            modules={[Autoplay, Pagination, Navigation]}
+            spaceBetween={0}
+            slidesPerView={1}
+            autoplay={{
+              delay: 15000, // 15 seconds
+              disableOnInteraction: false,
+            }}
+            pagination={{
+              clickable: true,
+              dynamicBullets: false,
+              bulletActiveClass: "swiper-pagination-bullet-active",
+            }}
+            style={{ paddingBottom: "25px" }}
+          >
+            {/* Chia danh sách sách thành 2 trang, mỗi trang 5 cuốn */}
+            {[0, 5].map((startIndex) => (
+              <SwiperSlide key={`slide-${startIndex}`}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
+                    padding: "10px 0",
+                  }}
+                >
+                  {topBooks
+                    .slice(startIndex, startIndex + 5)
+                    .map((book, idx) => (
+                      <div key={`book-${startIndex + idx}-${book.id || idx}`}>
+                        {renderBookCard(book, startIndex + idx)}
+                      </div>
+                    ))}
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      )}
+    </Card>
   );
 }
 

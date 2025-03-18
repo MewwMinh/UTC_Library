@@ -4,29 +4,35 @@ import {
   Card,
   List,
   Typography,
-  Tag,
   Skeleton,
   Empty,
   notification,
   Tooltip,
+  Avatar,
   Space,
+  Badge,
+  theme,
 } from "antd";
 import {
   BookOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
-  WarningOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import patronService from "/src/services/patronService";
 
 const { Title, Text } = Typography;
+const { useToken } = theme;
 
 function RecentBorrowedBooks() {
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { token } = useToken();
 
   // Format date string to DD/MM/YYYY
   const formatDate = (dateString) => {
@@ -54,37 +60,9 @@ function RecentBorrowedBooks() {
     };
   };
 
-  // Get status tag for book
-  const getStatusTag = (book) => {
-    if (book.returnDate) {
-      return (
-        <Tag icon={<CheckCircleOutlined />} color="success">
-          Đã trả
-        </Tag>
-      );
-    }
-
-    const { days, isOverdue } = calculateDaysRemaining(book.dueDate);
-
-    if (isOverdue) {
-      return (
-        <Tag icon={<WarningOutlined />} color="error">
-          Quá hạn {days} ngày
-        </Tag>
-      );
-    } else if (days <= 2) {
-      return (
-        <Tag icon={<ClockCircleOutlined />} color="warning">
-          Còn {days} ngày
-        </Tag>
-      );
-    } else {
-      return (
-        <Tag icon={<ClockCircleOutlined />} color="processing">
-          Còn {days} ngày
-        </Tag>
-      );
-    }
+  // Navigate to book details page
+  const goToBookDetails = (bookID) => {
+    navigate(`/user/bookDetails/${bookID}`);
   };
 
   useEffect(() => {
@@ -122,14 +100,32 @@ function RecentBorrowedBooks() {
     fetchBorrowedBooks();
   }, [isAuthenticated]);
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 12,
+      },
+    },
+  };
+
   return (
     <Card
-      title={
-        <Title level={4} style={{ margin: 0 }}>
-          <BookOutlined style={{ marginRight: 8 }} />
-          Sách mượn gần đây
-        </Title>
-      }
       style={{
         borderRadius: "12px",
         overflow: "hidden",
@@ -138,81 +134,149 @@ function RecentBorrowedBooks() {
       }}
       loading={loading}
     >
+      <div
+        style={{
+          position: "relative",
+          paddingBottom: "12px",
+          marginBottom: "20px",
+        }}
+      >
+        <Space align="center">
+          <BookOutlined
+            style={{ fontSize: "22px", color: token.colorPrimary }}
+          />
+          <Title level={4} style={{ margin: 0 }}>
+            Sách mượn gần đây
+          </Title>
+        </Space>
+        <div
+          style={{
+            position: "absolute",
+            height: "3px",
+            width: "60px",
+            background: token.colorPrimary,
+            bottom: 0,
+            left: 0,
+            borderRadius: "3px",
+          }}
+        />
+      </div>
       {loading ? (
         <Skeleton active paragraph={{ rows: 5 }} />
       ) : borrowedBooks.length > 0 ? (
-        <List
-          dataSource={borrowedBooks}
-          renderItem={(book) => (
-            <List.Item
-              key={`${book.bookName}-${book.borrowDate}`}
-              style={{
-                padding: "16px",
-                borderRadius: "8px",
-                marginBottom: "8px",
-                backgroundColor: book.returnDate
-                  ? "#f9f9f9"
-                  : calculateDaysRemaining(book.dueDate).isOverdue
-                  ? "#fff2f0"
-                  : calculateDaysRemaining(book.dueDate).days <= 2
-                  ? "#fffbe6"
-                  : "#fff",
-                border: "1px solid #f0f0f0",
-              }}
-            >
-              <List.Item.Meta
-                title={
-                  <Space>
-                    <Text strong style={{ fontSize: "16px" }}>
-                      {book.bookName}
-                    </Text>
-                    {getStatusTag(book)}
-                  </Space>
-                }
-                description={
-                  <Space
-                    direction="vertical"
-                    size={2}
-                    style={{ width: "100%" }}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <List
+            dataSource={borrowedBooks}
+            renderItem={(book) => {
+              const { isOverdue, days } = calculateDaysRemaining(book.dueDate);
+              return (
+                <motion.div variants={itemVariants}>
+                  <Badge.Ribbon
+                    text={
+                      book.returnDate
+                        ? "Đã trả"
+                        : isOverdue
+                        ? `Quá hạn ${days} ngày`
+                        : `Còn ${days} ngày`
+                    }
+                    color={
+                      book.returnDate
+                        ? "green"
+                        : isOverdue
+                        ? "red"
+                        : days <= 2
+                        ? "orange"
+                        : "blue"
+                    }
                   >
-                    <Space size={16}>
-                      <Tooltip title="Ngày mượn">
-                        <Text type="secondary">
-                          <CalendarOutlined /> Mượn:{" "}
-                          {formatDate(book.borrowDate)}
-                        </Text>
-                      </Tooltip>
-                      <Tooltip title="Hạn trả">
-                        <Text
-                          type={
-                            calculateDaysRemaining(book.dueDate).isOverdue
-                              ? "danger"
-                              : "secondary"
-                          }
-                        >
-                          <ClockCircleOutlined /> Hạn:{" "}
-                          {formatDate(book.dueDate)}
-                        </Text>
-                      </Tooltip>
-                    </Space>
-                    {book.returnDate && (
-                      <Tooltip title="Ngày trả">
-                        <Text type="success">
-                          <CheckCircleOutlined /> Đã trả:{" "}
-                          {formatDate(book.returnDate)}
-                        </Text>
-                      </Tooltip>
-                    )}
-                  </Space>
-                }
-              />
-            </List.Item>
-          )}
-        />
+                    <Card
+                      hoverable
+                      style={{
+                        marginBottom: 16,
+                        borderRadius: 8,
+                        overflow: "hidden",
+                        transition: "all 0.3s ease",
+                        backgroundColor: book.returnDate
+                          ? "#f9f9f9"
+                          : isOverdue
+                          ? "#fff2f0"
+                          : days <= 2
+                          ? "#fffbe6"
+                          : "#fff",
+                      }}
+                      onClick={() => goToBookDetails(book.bookID)}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <Avatar
+                          shape="square"
+                          size={64}
+                          src={book.bookImage}
+                          style={{
+                            marginRight: 16,
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                            border: "1px solid #f0f0f0",
+                          }}
+                          icon={!book.bookImage && <BookOutlined />}
+                        />
+                        <div style={{ flex: 1 }}>
+                          <div style={{ marginBottom: 8 }}>
+                            <Text strong style={{ fontSize: "16px" }}>
+                              {book.bookName}
+                            </Text>
+                          </div>
+                          <Space wrap size={16}>
+                            <Tooltip title="Ngày mượn">
+                              <Text type="secondary">
+                                <CalendarOutlined />{" "}
+                                {formatDate(book.borrowDate)}
+                              </Text>
+                            </Tooltip>
+                            <Tooltip title="Hạn trả">
+                              <Text
+                                type={isOverdue ? "danger" : "secondary"}
+                                style={isOverdue ? { fontWeight: "bold" } : {}}
+                              >
+                                <ClockCircleOutlined />{" "}
+                                {formatDate(book.dueDate)}
+                              </Text>
+                            </Tooltip>
+                            {book.returnDate && (
+                              <Tooltip title="Ngày trả">
+                                <Text type="success">
+                                  <CheckCircleOutlined />{" "}
+                                  {formatDate(book.returnDate)}
+                                </Text>
+                              </Tooltip>
+                            )}
+                          </Space>
+                        </div>
+                      </div>
+                    </Card>
+                  </Badge.Ribbon>
+                </motion.div>
+              );
+            }}
+          />
+        </motion.div>
       ) : (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="Bạn chưa mượn sách nào gần đây"
+          description={
+            <div style={{ padding: "20px 0" }}>
+              <Text style={{ fontSize: "16px" }}>
+                Bạn chưa mượn sách nào gần đây
+              </Text>
+              <div style={{ marginTop: "12px" }}>
+                <Text type="secondary">
+                  Khi bạn mượn sách, chúng sẽ hiển thị ở đây
+                </Text>
+              </div>
+            </div>
+          }
         />
       )}
     </Card>

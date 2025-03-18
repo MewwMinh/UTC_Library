@@ -88,6 +88,35 @@ const borrowReturnService = {
       };
     }
   },
+
+  renewBook: async (borrowRecordID) => {
+    try {
+      const response = await apiClient.post(
+        `/patron/renew-book/${borrowRecordID}`
+      );
+
+      if (response.data.code === 1000) {
+        return {
+          success: true,
+          message: response.data.message || "Gia hạn sách thành công",
+          code: response.data.code,
+        };
+      } else {
+        return {
+          success: false,
+          message: response.data.message || "Không thể gia hạn sách",
+          code: response.data.code,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Không thể kết nối đến máy chủ",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
 };
 
 export default borrowReturnService;

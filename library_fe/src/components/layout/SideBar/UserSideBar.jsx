@@ -1,52 +1,91 @@
-import { Menu } from "antd";
-import Sider from "antd/es/layout/Sider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Layout } from "antd";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   DashboardOutlined,
   BookOutlined,
   SearchOutlined,
-  WarningOutlined,
-  ImportOutlined,
-  ProductOutlined,
-  TeamOutlined,
+  ShoppingCartOutlined,
+  CalendarOutlined,
+  TrophyOutlined,
+  CommentOutlined,
 } from "@ant-design/icons";
+import CustomMenuItem from "../Menu/CustomMenuItem";
 import "./UserSideBar.css";
-import { useNavigate } from "react-router-dom";
+
+const { Sider } = Layout;
 
 function UserSideBar() {
-  const [selectedMenu, setSelectedMenu] = useState("dashboard");
   const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedKey, setSelectedKey] = useState("dashboard");
+
+  // Xác định menu đang được chọn dựa trên đường dẫn hiện tại
+  useEffect(() => {
+    const pathSegments = location.pathname.split("/");
+    const currentPath = pathSegments[pathSegments.length - 1];
+
+    if (
+      currentPath === "" ||
+      currentPath === "user" ||
+      currentPath === "dashboard"
+    ) {
+      setSelectedKey("dashboard");
+    } else {
+      setSelectedKey(currentPath);
+    }
+  }, [location]);
 
   const menuItems = [
-    { key: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
+    {
+      key: "dashboard",
+      label: "Dashboard",
+      icon: <DashboardOutlined />,
+      path: "/user/dashboard",
+    },
     {
       key: "borrowReturnBook",
       label: "Mượn & Trả Sách",
       icon: <BookOutlined />,
+      path: "/user/borrowReturnBook",
     },
-    { key: "searchBook", label: "Tìm kiếm Sách", icon: <SearchOutlined /> },
-
+    {
+      key: "searchBook",
+      label: "Tìm kiếm Sách",
+      icon: <SearchOutlined />,
+      path: "/user/searchBook",
+    },
     {
       key: "order",
-      label: "Đặt sách & đặt chỗ",
-      icon: <ProductOutlined />,
+      label: "Đặt sách & Đặt chỗ",
+      icon: <ShoppingCartOutlined />,
+      path: "/user/order",
     },
     {
       key: "event",
-      label: "Sự kiện & hội thảo",
-      icon: <TeamOutlined />,
+      label: "Sự kiện & Hội thảo",
+      icon: <CalendarOutlined />,
+      path: "/user/event",
     },
     {
       key: "achievement",
       label: "Thành tựu",
-      icon: <WarningOutlined />,
+      icon: <TrophyOutlined />,
+      path: "/user/achievement",
     },
     {
       key: "request",
       label: "Góp ý & Yêu cầu",
-      icon: <ImportOutlined />,
+      icon: <CommentOutlined />,
+      path: "/user/request",
     },
   ];
+
+  // Xử lý khi click vào menu
+  const handleMenuClick = (item) => {
+    setSelectedKey(item.key);
+    navigate(item.path);
+  };
 
   return (
     <Sider
@@ -54,23 +93,20 @@ function UserSideBar() {
       width={250}
       style={{
         top: 64,
-        background: "#fff",
+        overflowX: "hidden",
       }}
     >
-      <Menu
-        mode="inline"
-        selectedKeys={[selectedMenu]}
-        onClick={(e) => {
-          setSelectedMenu(e.key);
-          navigate(`/user/${e.key}`); // Điều hướng đến /user/key
-        }}
-        items={menuItems}
-        style={{
-          fontSize: "16px",
-          fontWeight: "500",
-          borderRight: "none",
-        }}
-      />
+      <div className="sidebar-container">
+        {menuItems.map((item) => (
+          <CustomMenuItem
+            key={item.key}
+            icon={item.icon}
+            label={item.label}
+            selected={selectedKey === item.key}
+            onClick={() => handleMenuClick(item)}
+          />
+        ))}
+      </div>
     </Sider>
   );
 }

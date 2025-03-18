@@ -1,45 +1,141 @@
-/* UserHeader.css */
-.modern-header {
-  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+/* SimplifiedUserHeader.css */
+.library-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+  color: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.modern-header.scrolled {
-  height: 56px !important;
-  background-color: #1976d2 !important; /* Màu xanh dương hơi sáng hơn khi scroll */
+/* Logo y nombre de la biblioteca - sección izquierda */
+.header-logo {
+  flex: 0 0 auto; /* No crecer, no encoger, tamaño base automático */
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.modern-header.scrolled div {
-  font-size: 18px !important;
+.logo-image {
+  height: 40px;
+}
+
+.library-name {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* Barra de búsqueda - sección central */
+.search-container {
+  flex: 1; /* Crecer y tomar el espacio disponible */
+  display: flex;
+  justify-content: center; /* Centrar la barra de búsqueda */
+  padding: 0 20px;
 }
 
 .search-input {
+  max-width: 500px; /* Ancho máximo para el control de búsqueda */
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
   transition: all 0.2s ease;
 }
 
+/* Estilo para el input */
+.search-input .ant-input {
+  border-radius: 4px 0 0 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.search-input .ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Estilo para el botón de búsqueda */
+.search-input .ant-input-search-button {
+  border-radius: 0 4px 4px 0;
+  margin-left: -1px; /* Eliminar espacio entre input y botón */
+}
+
 .search-input:hover,
-.search-input:focus {
+.search-input:focus-within {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
-/* Đảm bảo layout responsive */
+/* Thông tin người dùng - phần bên phải */
+.user-info {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  white-space: nowrap;
+  min-width: 150px;
+}
+
+.welcome-text {
+  color: #ffffff;
+  font-size: 14px;
+  margin-right: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.user-avatar {
+  background-color: #ffffff;
+  color: #1565c0;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  margin-left: 5px;
+}
+
+/* Estilos responsive */
 @media (max-width: 1200px) {
-  .modern-header div {
-    font-size: 18px !important;
+  .library-name {
+    font-size: 18px;
   }
 }
 
 @media (max-width: 992px) {
-  .modern-header div {
-    font-size: 16px !important;
+  .library-name {
+    font-size: 16px;
   }
 }
 
 @media (max-width: 768px) {
-  .modern-header {
-    padding: 0 10px !important;
+  .library-header {
+    padding: 0 10px;
   }
 
   .search-container {
-    max-width: 180px !important;
+    max-width: 50%;
+  }
+
+  .welcome-text {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .library-name {
+    font-size: 14px;
+  }
+
+  .logo-image {
+    height: 32px;
+  }
+
+  .search-container {
+    max-width: 40%;
   }
 }

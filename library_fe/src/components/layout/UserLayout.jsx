@@ -5,38 +5,48 @@ import { TopBook, TopUser } from "./RightSidebar";
 import UserHeader from "./Header/UserHeader";
 import UserSideBar from "./SideBar/UserSideBar";
 import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
 
-const { Sider, Content } = Layout;
+const { Content } = Layout;
 
 const UserLayout = () => {
+  const [showRightSidebar, setShowRightSidebar] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1200) {
+        setShowRightSidebar(false);
+      } else {
+        setShowRightSidebar(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <UserHeader />
       <Layout hasSider>
         <UserSideBar />
-        <Layout className="layout-container" style={{ top: "64px" }}>
-          <Content
-            className="content-area"
-            // style={{ background: "linear-gradient(180deg, #E3F2FD, #F3E5F5)" }}
-          >
-            <Outlet></Outlet>
-          </Content>
-          <Sider width={300} className="scrollable-sider">
-            <TopUser />
-            <TopBook />
-          </Sider>
-        </Layout>
+        <div className="main-content-wrapper">
+          <div className="scrollable-content">
+            <Content className="content-area">
+              <Outlet />
+            </Content>
+
+            {showRightSidebar && (
+              <div className="right-sidebar">
+                <TopUser />
+                <TopBook />
+              </div>
+            )}
+          </div>
+        </div>
       </Layout>
-      {/* <Footer
-        style={{
-          textAlign: "center",
-          background: "#ffffff",
-          padding: "10px",
-          // marginTop: "250px",
-        }}
-      >
-        Library Management ©2025
-      </Footer> */}
     </Layout>
   );
 };

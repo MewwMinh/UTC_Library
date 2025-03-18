@@ -7,3 +7,4 @@ export { default as ListCloseToDueBook } from "./ListCloseToDueBook";
 export { default as TechBooks } from "./TechBooks";
 export { default as SuggestedBooks } from "./SuggestedBooks";
 export { default as SearchCard } from "./SearchCard";
+export { default as BookBorrowReturnHeader } from "./BookBorrowReturnHeader";

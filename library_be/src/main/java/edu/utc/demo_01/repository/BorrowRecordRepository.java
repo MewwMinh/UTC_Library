@@ -1,7 +1,7 @@
 package edu.utc.demo_01.repository;
 
-import edu.utc.demo_01.dto.patron.response.BorrowBookResponse;
 import edu.utc.demo_01.dto.patron.response.BorrowBookResponse1;
+import edu.utc.demo_01.dto.patron.response.BorrowBookResponse2;
 import edu.utc.demo_01.dto.patron.response.TopBookResponse;
 import edu.utc.demo_01.entity.BorrowRecord;
 import edu.utc.demo_01.entity.User;
@@ -27,17 +27,19 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
     """, nativeQuery = true)
     Optional<String> findBorrowRecordIDByBookIDAndUserID(@Param("bookID") String bookID, @Param("userID") String userID);
     @Query(value = """
-        SELECT b.BookName AS bookName, 
+        SELECT b.BookID AS bookID,
+        b.BookName AS bookName, 
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
-               br.ReturnDate AS returnDate
+               br.ReturnDate AS returnDate,
+               b.CoverImage AS bookImage
         FROM BorrowRecords br
         JOIN Books b ON br.bookID = b.bookID
         WHERE br.userID = :id
         ORDER BY br.BorrowDate DESC 
         LIMIT 5
     """, nativeQuery = true)
-    List<BorrowBookResponse> get5RecentBorrowBooks(@Param("id") String id);
+    List<BorrowBookResponse1> get5RecentBorrowBooks(@Param("id") String id);
     @Query(value = """
         SELECT COUNT(*)
         FROM BorrowRecords
@@ -47,9 +49,10 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
     """, nativeQuery = true)
     int countNearDueDateByUserID(@Param("id") String id);
     @Query(value = """
-    SELECT b.BookID AS bookID, 
+    SELECT b.BookID AS bookID,
            bk.BookName AS bookName, 
-           COUNT(*) AS borrowedTimesCount
+           COUNT(*) AS borrowedTimesCount,
+           bk.CoverImage AS bookImage
     FROM BorrowRecords b
     JOIN Books bk ON b.BookID = bk.BookID
     GROUP BY b.BookID, bk.BookName
@@ -72,7 +75,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
 """, nativeQuery = true)
     List<BorrowBookResponse1> findBorrowingBooks(@Param("id") String id);
     @Query(value = """
-    SELECT b.BookID AS bookID,
+    SELECT br.RecordID AS borrowRecordID,
+        b.BookID AS bookID,
         b.BookName AS bookName, 
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
@@ -85,7 +89,7 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
         AND br.ReturnDate IS NULL
         ORDER BY br.DueDate ASC 
 """, nativeQuery = true)
-    List<BorrowBookResponse1> getNearAndOverDueBooks(@Param("id") String id);
+    List<BorrowBookResponse2> getNearAndOverDueBooks(@Param("id") String id);
     @Query(value = """
     SELECT b.BookID AS bookID,
         b.BookName AS bookName, 

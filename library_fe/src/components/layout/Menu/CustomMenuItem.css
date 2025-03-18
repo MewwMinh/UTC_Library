@@ -1,0 +1,74 @@
+.custom-menu-item {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  margin: 8px 12px;
+  padding: 0 16px;
+  border-radius: 8px;
+  color: #333333;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: visible;
+  transition: all 0.3s ease;
+}
+
+.custom-menu-item:hover {
+  background-color: #f0f7ff;
+  color: #1565c0;
+}
+
+.custom-menu-item:hover .menu-icon {
+  color: #1565c0;
+}
+
+.custom-menu-item.selected {
+  background-color: #e6f7ff;
+  color: #1565c0;
+  font-weight: 600;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.menu-icon {
+  font-size: 18px;
+  margin-right: 12px;
+  color: #666666;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.custom-menu-item.selected .menu-icon {
+  color: #1565c0;
+}
+
+.menu-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.left-indicator {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 24px;
+  width: 4px;
+  background: #1565c0;
+  border-radius: 0 4px 4px 0;
+}
+
+.right-arrow {
+  position: absolute;
+  right: -20px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 24px solid transparent;
+  border-bottom: 24px solid transparent;
+  border-left: 20px solid #e6f7ff;
+  z-index: 2;
+}

@@ -23,7 +23,7 @@ public class PatronController {
         return service.getPatronInformation();
     }
     @GetMapping("get-5-recent-borrow-books")
-    public APIResponse<List<BorrowBookResponse>> get5RecentBorrowBooks(){
+    public APIResponse<List<BorrowBookResponse1>> get5RecentBorrowBooks(){
         return service.get5RecentBorrowBooks();
     }
     @GetMapping("get-patron-statistics")
@@ -104,12 +104,16 @@ public class PatronController {
         return service.getBorrowingBooks();
     }
     @GetMapping("get-near-and-over-due-books")
-    public APIResponse<List<BorrowBookResponse1>> getNearAndOverDueBooks() {
+    public APIResponse<List<BorrowBookResponse2>> getNearAndOverDueBooks() {
         return service.getNearAndOverDueBooks();
     }
     @GetMapping("get-borrow-records-history")
     public APIResponse<List<BorrowBookResponse1>> getBorrowRecordsHistory() {
         return service.getBorrowRecordsHistory();
+    }
+    @PostMapping("renew-book/{id}")
+    public APIResponse renewBook(@PathVariable String id){
+        return service.renewBook(id);
     }
 
     @GetMapping("get-all-events")

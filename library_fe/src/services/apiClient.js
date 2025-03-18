@@ -98,11 +98,12 @@ apiClient.interceptors.response.use(
         // Gọi API refresh token
         const response = await axios.post(
           "http://localhost:8088/auth/refresh-token",
-          { refreshToken }
+          { token: refreshToken }
         );
 
         if (response.data.code === 1000) {
           const { token, refreshToken: newRefreshToken } = response.data.result;
+          console.log("Refresh token");
 
           // Lưu token mới vào localStorage thay vì dispatch action
           localStorage.setItem("token", token);
