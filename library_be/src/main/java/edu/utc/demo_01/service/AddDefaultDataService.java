@@ -28,13 +28,13 @@ public class AddDefaultDataService {
 //
 //        List<Role> roles = new ArrayList<>();
 //
-//        roles.add(createRole("Manager", "Quản lý"));
-//        roles.add(createRole("Librarian", "Thủ thư"));
-//        roles.add(createRole("Coordinator", "Quản lý phòng đọc"));
-//        roles.add(createRole("Teacher", "Giảng viên"));
-//        roles.add(createRole("Student", "Sinh viên"));
-//        roles.add(createRole("Researcher", "Nghiên cứu sinh"));
-//        roles.add(createRole("Patron", "Bạn đọc"));
+//        roles.add(createRole("MANAGER", "Quản lý"));
+//        roles.add(createRole("LIBRARIAN", "Thủ thư"));
+//        roles.add(createRole("COORDINATOR", "Quản lý phòng đọc"));
+//        roles.add(createRole("TEACHER", "Giảng viên"));
+//        roles.add(createRole("STUDENT", "Sinh viên"));
+//        roles.add(createRole("RESEARCHER", "Nghiên cứu sinh"));
+//        roles.add(createRole("PATRON", "Bạn đọc"));
 //
 //        // Save all roles
 //        roleRepository.saveAll(roles);

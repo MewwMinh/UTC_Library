@@ -69,15 +69,15 @@ const LoginForm = () => {
       const scope = result.payload.scope;
 
       // Điều hướng dựa vào scope
-      if (scope === "Librarian" || scope === "Coordinator") {
+      if (scope === "LIBRARIAN" || scope === "COORDINATOR") {
         navigate("/staff/dashboard");
-      } else if (scope === "Manager") {
+      } else if (scope === "MANAGER") {
         navigate("/admin/dashboard");
       } else if (
-        scope === "Teacher" ||
-        scope === "Student" ||
-        scope === "Researcher" ||
-        scope === "Patron"
+        scope === "TEACHER" ||
+        scope === "STUDENT" ||
+        scope === "RESEARCHER" ||
+        scope === "PATRON"
       ) {
         navigate("/user/dashboard");
       } else {

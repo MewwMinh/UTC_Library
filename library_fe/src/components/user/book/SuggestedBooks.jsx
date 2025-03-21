@@ -1,16 +1,28 @@
-import { useState, useEffect, useRef } from "react";
-import { Card, Typography, notification, Skeleton, Tooltip } from "antd";
-import { LeftOutlined, RightOutlined, FireOutlined } from "@ant-design/icons";
+import { useState, useEffect } from "react";
+import { Card, Typography, notification, Skeleton } from "antd";
+import { FireFilled } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import {
+  Navigation,
+  Pagination,
+  Autoplay,
+  EffectCoverflow,
+} from "swiper/modules";
 import bookService from "/src/services/patronService.js";
-import styles from "/src/styles/books/SuggestedBooks.module.css";
 
-const { Title, Text } = Typography;
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-coverflow";
+import styles from "/src/styles/books/SuggestedBooks.module.css"; // Import CSS Modules
+
+const { Text } = Typography;
 
 function SuggestedBooks() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,41 +53,16 @@ function SuggestedBooks() {
     }
   };
 
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -240, behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 240, behavior: "smooth" });
-    }
-  };
-
   return (
     <Card
       title={
-        <Title level={4} style={{ margin: 0 }}>
-          <FireOutlined style={{ marginRight: 8, color: "#ff4d4f" }} />
+        <div className={styles.cardTitle}>
+          <FireFilled style={{ marginRight: 12, color: "#FF4500" }} />
           Sách gợi ý cho bạn
-        </Title>
-      }
-      extra={
-        <div className={styles.navigationControls}>
-          <Tooltip title="Cuộn sang trái">
-            <div onClick={scrollLeft} className={styles.navigationButton}>
-              <LeftOutlined />
-            </div>
-          </Tooltip>
-          <Tooltip title="Cuộn sang phải">
-            <div onClick={scrollRight} className={styles.navigationButton}>
-              <RightOutlined />
-            </div>
-          </Tooltip>
         </div>
       }
       className={styles.suggestedCard}
+      bodyStyle={{ padding: "24px 24px 32px" }}
     >
       {loading ? (
         <div className={styles.loadingContainer}>
@@ -91,44 +78,84 @@ function SuggestedBooks() {
           ))}
         </div>
       ) : (
-        <div ref={scrollContainerRef} className={styles.scrollContainer}>
-          {books.map((book) => (
-            <Card
-              key={book.bookID}
-              hoverable
-              className={styles.bookCard}
-              bodyStyle={{ padding: 12 }}
-              onClick={() => navigate(`/user/bookDetails/${book.bookID}`)}
-            >
-              <div className={styles.bookCover}>
-                <img
-                  alt={book.bookName}
-                  src={book.bookImage || "/images/book-placeholder.png"}
-                  className={styles.bookImage}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/images/book-placeholder.png";
-                  }}
-                />
-              </div>
-              <div className={styles.bookCardBody}>
-                <Text
-                  strong
-                  ellipsis={{ rows: 2 }}
-                  className={styles.bookTitle}
+        <div className={styles.swiperContainer}>
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay, EffectCoverflow]}
+            effect="coverflow"
+            grabCursor={true}
+            centeredSlides={true}
+            loop={true}
+            slidesPerView="auto"
+            coverflowEffect={{
+              rotate: 0,
+              stretch: 0,
+              depth: 100,
+              modifier: 1.5,
+              slideShadows: true,
+            }}
+            pagination={{ clickable: true, dynamicBullets: true }}
+            navigation={true}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }}
+            className="swiper-suggested" // Class mặc định của Swiper
+            breakpoints={{
+              320: {
+                slidesPerView: 1,
+              },
+              480: {
+                slidesPerView: 2,
+              },
+              768: {
+                slidesPerView: 3,
+              },
+              1024: {
+                slidesPerView: 4,
+                centeredSlides: false,
+                effect: "slide",
+              },
+              1280: {
+                slidesPerView: 5,
+                centeredSlides: false,
+                effect: "slide",
+              },
+            }}
+          >
+            {books.map((book) => (
+              <SwiperSlide key={book.bookID} className={styles.swiperSlide}>
+                <div
+                  className={styles.bookCard}
+                  onClick={() => navigate(`/user/bookDetails/${book.bookID}`)}
                 >
-                  {book.bookName}
-                </Text>
-                <Text
-                  type="secondary"
-                  ellipsis={{ rows: 1 }}
-                  className={styles.bookAuthor}
-                >
-                  {book.bookAuthor}
-                </Text>
-              </div>
-            </Card>
-          ))}
+                  <div className={styles.bookCover}>
+                    <img
+                      alt={book.bookName}
+                      src={book.bookImage || "/images/book-placeholder.png"}
+                      className={styles.bookImage}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/images/book-placeholder.png";
+                      }}
+                    />
+                  </div>
+                  <div className={styles.bookDetails}>
+                    <Text strong className={styles.bookTitle}>
+                      {book.bookName}
+                    </Text>
+                    <Text
+                      type="secondary"
+                      ellipsis={{ rows: 1 }}
+                      className={styles.bookAuthor}
+                    >
+                      {book.bookAuthor}
+                    </Text>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       )}
     </Card>

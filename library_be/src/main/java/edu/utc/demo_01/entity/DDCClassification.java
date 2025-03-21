@@ -29,7 +29,7 @@ public class DDCClassification {
     @Size(max = 255)
     @NotNull
     @Column(name = "DDCName", nullable = false)
-    private String dDCName;
+    private String ddcName;
 
     @Column(name = "Description")
     private String description;

@@ -1,6 +1,9 @@
 package edu.utc.demo_01.service;
 
+import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.librarian.request.AddBookRequest;
 import edu.utc.demo_01.dto.librarian.request.LendBookRequest;
+import edu.utc.demo_01.dto.librarian.response.BookResponse;
 import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
@@ -11,10 +14,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,9 @@ public class LibrarianService {
     BorrowRecordRepository borrowRecordRepository;
     UserViolationRepository userViolationRepository;
     UserAchievementRepository userAchievementRepository;
+    DDCClassificationRepository ddcClassificationRepository;
+    CloudinaryService cloudinaryService;
+
 
     public boolean lendBook(LendBookRequest request) {
         User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -82,6 +90,49 @@ public class LibrarianService {
 
         }
         return true;
+    }
+
+    public APIResponse addBook(AddBookRequest request) {
+        DDCClassification classification = ddcClassificationRepository.findByDDCName(request.getDdcName()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_CLASSIFICATION));
+        if (bookRepository.existsByIsbn(request.getIsbn())) throw new AppException(ErrorCode.ISBN_EXSITED);
+        Book book = new Book();
+        book.setBookName(request.getBookName());
+        book.setAuthor(request.getAuthor());
+        book.setBookType(request.getBookType());
+        book.setIsbn(request.getIsbn());
+        book.setTotalCopies(request.getTotalCopies());
+        book.setAvailableCopies(request.getTotalCopies());
+        book.setPublicationYear(request.getPublicationYear());
+        book.setLanguage(request.getLanguage());
+        book.setPageCount(request.getPageCount());
+        book.setFormat(request.getFormat());
+        book.setDescription(request.getDescription());
+        book.setCoverImage(request.getCoverImage());
+        book.setDDCCode(classification);
+        bookRepository.save(book);
+        return APIResponse.builder().code(1000).message("Tạo mới thành công sách " + book.getBookName()).build();
+    }
+
+    public APIResponse<List<BookResponse>> getAllBooks() {
+        return APIResponse.<List<BookResponse>>builder()
+                .code(1000)
+                .result(bookRepository.getAllBooks())
+                .build();
+    }
+
+    public APIResponse<Book> getBook(String bookID) {
+        return APIResponse.<Book>builder().code(1000).result(bookRepository.findById(bookID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK))).build();
+    }
+
+    public APIResponse changeBookInformation(Book book){
+        bookRepository.save(book);
+        return APIResponse.builder().code(1000).message("Sửa đổi thành công thông tin cuốn " + book.getBookName()).build();
+    }
+
+
+    public String uploadCover(MultipartFile coverImage) {
+        return cloudinaryService.uploadBookCover(coverImage, "123");
+
     }
 
 

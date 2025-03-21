@@ -34,7 +34,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         httpSecurity.authorizeHttpRequests(requests -> requests
                 .requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
-                .requestMatchers(HttpMethod.POST, "/coordinator/create_user").hasAnyRole("Manager", "Coordinator")
+                .requestMatchers(HttpMethod.POST, "/coordinator/create_user").hasAnyRole("MANAGER", "COORDINATOR")
+                .requestMatchers(HttpMethod.GET, "/patron/get-borrow-records-history").hasAnyRole("PATRON", "STUDENT", "RESEARCHER", "TEACHER")
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated());
 

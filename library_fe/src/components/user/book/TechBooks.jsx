@@ -1,57 +1,35 @@
-// src/components/BookSearch/TechBooks.jsx
 import { useState, useEffect, useRef } from "react";
-import { Card, Typography, notification, Skeleton, Tooltip } from "antd";
-import { LeftOutlined, RightOutlined, LaptopOutlined } from "@ant-design/icons";
+import { Card, Typography, notification, Skeleton } from "antd";
+import { LaptopOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import {
+  Navigation,
+  Pagination,
+  Autoplay,
+  EffectCoverflow,
+} from "swiper/modules";
 import bookService from "/src/services/patronService.js";
-import styles from "/src/styles/books/TechBooks.module.css";
 
-const { Title, Text } = Typography;
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-coverflow";
+import styles from "/src/styles/books/TechBooks.module.css"; // Sử dụng CSS modules
+
+const { Text } = Typography;
 
 function TechBooks() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
-
-  // Auto scroll effect
-  const [scrollPosition, setScrollPosition] = useState(0);
+  const swiperRef = useRef(null);
   const [isAutoScrolling, setIsAutoScrolling] = useState(true);
-  const autoScrollIntervalRef = useRef(null);
 
   useEffect(() => {
     fetchTechBooks();
   }, []);
-
-  // Setup auto-scrolling when books are loaded
-  useEffect(() => {
-    if (books.length > 0 && isAutoScrolling) {
-      autoScrollIntervalRef.current = setInterval(() => {
-        if (scrollContainerRef.current) {
-          const containerWidth = scrollContainerRef.current.scrollWidth;
-          const viewportWidth = scrollContainerRef.current.clientWidth;
-          const maxScrollPosition = containerWidth - viewportWidth;
-
-          // Calculate new scroll position
-          let newPosition = scrollPosition + 2; // Scroll 2px at a time for smooth effect
-
-          // Reset to beginning when reaching the end
-          if (newPosition >= maxScrollPosition) {
-            newPosition = 0;
-          }
-
-          scrollContainerRef.current.scrollLeft = newPosition;
-          setScrollPosition(newPosition);
-        }
-      }, 50); // Adjust timing for smoother or faster scroll
-    }
-
-    return () => {
-      if (autoScrollIntervalRef.current) {
-        clearInterval(autoScrollIntervalRef.current);
-      }
-    };
-  }, [books, scrollPosition, isAutoScrolling]);
 
   const fetchTechBooks = async () => {
     try {
@@ -77,58 +55,41 @@ function TechBooks() {
     }
   };
 
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      setIsAutoScrolling(false); // Pause auto-scrolling when manual scrolling
-      scrollContainerRef.current.scrollBy({ left: -240, behavior: "smooth" });
-      setScrollPosition(scrollContainerRef.current.scrollLeft - 240);
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      setIsAutoScrolling(false); // Pause auto-scrolling when manual scrolling
-      scrollContainerRef.current.scrollBy({ left: 240, behavior: "smooth" });
-      setScrollPosition(scrollContainerRef.current.scrollLeft + 240);
-    }
-  };
-
-  // Handle mouse events for the scroll container
+  // Xử lý khi chuột vào vùng sách
   const handleMouseEnter = () => {
-    setIsAutoScrolling(false); // Pause auto-scrolling on hover
-    if (autoScrollIntervalRef.current) {
-      clearInterval(autoScrollIntervalRef.current);
+    if (swiperRef.current && swiperRef.current.autoplay) {
+      swiperRef.current.autoplay.stop();
+      setIsAutoScrolling(false);
     }
   };
 
+  // Xử lý khi chuột ra khỏi vùng sách
   const handleMouseLeave = () => {
-    setIsAutoScrolling(true); // Resume auto-scrolling when mouse leaves
-    setScrollPosition(scrollContainerRef.current?.scrollLeft || 0);
+    if (swiperRef.current && swiperRef.current.autoplay) {
+      swiperRef.current.autoplay.start();
+      setIsAutoScrolling(true);
+    }
   };
+
+  // Xử lý khi component unmount
+  useEffect(() => {
+    return () => {
+      if (swiperRef.current && swiperRef.current.autoplay) {
+        swiperRef.current.autoplay.stop();
+      }
+    };
+  }, []);
 
   return (
     <Card
       title={
-        <Title level={4} style={{ margin: 0 }}>
-          <LaptopOutlined style={{ marginRight: 8, color: "#1677ff" }} />
+        <div className={styles.cardTitle}>
+          <LaptopOutlined style={{ marginRight: 12 }} />
           Sách chủ đề công nghệ
-        </Title>
-      }
-      extra={
-        <div className={styles.navigationControls}>
-          <Tooltip title="Cuộn sang trái">
-            <div onClick={scrollLeft} className={styles.navigationButton}>
-              <LeftOutlined />
-            </div>
-          </Tooltip>
-          <Tooltip title="Cuộn sang phải">
-            <div onClick={scrollRight} className={styles.navigationButton}>
-              <RightOutlined />
-            </div>
-          </Tooltip>
         </div>
       }
       className={styles.techCard}
+      bodyStyle={{ padding: "24px 24px 32px" }}
     >
       {loading ? (
         <div className={styles.loadingContainer}>
@@ -145,48 +106,91 @@ function TechBooks() {
         </div>
       ) : (
         <div
-          ref={scrollContainerRef}
-          className={styles.scrollContainer}
+          className={styles.swiperContainer}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {books.map((book) => (
-            <Card
-              key={book.bookID}
-              hoverable
-              className={styles.bookCard}
-              bodyStyle={{ padding: 12 }}
-              onClick={() => navigate(`/user/bookDetails/${book.bookID}`)}
-            >
-              <div className={styles.bookCover}>
-                <img
-                  alt={book.bookName}
-                  src={book.bookImage || "/images/book-placeholder.png"}
-                  className={styles.bookImage}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/images/book-placeholder.png";
-                  }}
-                />
-              </div>
-              <div className={styles.bookCardBody}>
-                <Text
-                  strong
-                  ellipsis={{ rows: 2 }}
-                  className={styles.bookTitle}
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay, EffectCoverflow]}
+            effect="coverflow"
+            grabCursor={true}
+            centeredSlides={true}
+            loop={true}
+            slidesPerView="auto"
+            coverflowEffect={{
+              rotate: 0,
+              stretch: 0,
+              depth: 100,
+              modifier: 1.5,
+              slideShadows: true,
+            }}
+            pagination={{ clickable: true, dynamicBullets: true }}
+            navigation={true}
+            autoplay={{
+              delay: 2000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false,
+            }}
+            speed={1000}
+            className="swiper-tech" // Class mặc định cho Swiper
+            breakpoints={{
+              320: {
+                slidesPerView: 1,
+              },
+              480: {
+                slidesPerView: 2,
+              },
+              768: {
+                slidesPerView: 3,
+              },
+              1024: {
+                slidesPerView: 4,
+                centeredSlides: false,
+                effect: "slide",
+              },
+              1280: {
+                slidesPerView: 5,
+                centeredSlides: false,
+                effect: "slide",
+              },
+            }}
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+          >
+            {books.map((book) => (
+              <SwiperSlide key={book.bookID} className={styles.swiperSlide}>
+                <div
+                  className={styles.bookCard}
+                  onClick={() => navigate(`/user/bookDetails/${book.bookID}`)}
                 >
-                  {book.bookName}
-                </Text>
-                <Text
-                  type="secondary"
-                  ellipsis={{ rows: 1 }}
-                  className={styles.bookAuthor}
-                >
-                  {book.bookAuthor}
-                </Text>
-              </div>
-            </Card>
-          ))}
+                  <div className={styles.bookCover}>
+                    <img
+                      alt={book.bookName}
+                      src={book.bookImage || "/images/book-placeholder.png"}
+                      className={styles.bookImage}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/images/book-placeholder.png";
+                      }}
+                    />
+                  </div>
+                  <div className={styles.bookDetails}>
+                    <Text strong className={styles.bookTitle}>
+                      {book.bookName}
+                    </Text>
+                    <Text
+                      type="secondary"
+                      ellipsis={{ rows: 1 }}
+                      className={styles.bookAuthor}
+                    >
+                      {book.bookAuthor}
+                    </Text>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
       )}
     </Card>

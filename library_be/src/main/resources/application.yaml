@@ -45,3 +45,8 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operations-sorter: method
+
+cloudinary:
+  cloud-name: dw7ri9wfm
+  api-key: 851322127267361
+  api-secret: _darmodvcpmOgfWq5oSDBK7ct64

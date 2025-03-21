@@ -1,116 +1,194 @@
+/* TechBooks.module.css */
 .techCard {
-  margin-bottom: 24px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.scrollContainer {
-  display: flex;
-  overflow-x: auto;
-  padding-bottom: 8px;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
-}
-
-.scrollContainer::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-.navigationButton {
-  font-size: 16px;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s;
-}
-
-.navigationButton:hover {
-  background-color: #e0e0e0;
-}
-
-.navigationControls {
-  display: flex;
-  gap: 8px;
-}
-
-.bookCard {
-  width: 160px;
-  margin-right: 16px;
-  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  flex: 0 0 auto;
-  height: 280px;
+  margin-bottom: 24px;
+  background-color: #f4f8ff;
+  background-image: url("https://www.transparenttextures.com/patterns/cartographer.png");
+}
+
+.cardTitle {
+  width: 100%;
+  text-align: center;
+  padding: 16px 0;
+  margin: 0 !important;
+  background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
+  color: white;
+  font-size: 24px !important;
+  border-radius: 8px 8px 0 0;
+}
+
+.loadingContainer {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 4px;
+}
+
+.skeletonCard {
+  min-width: 180px;
+  box-shadow: none;
+  border: 1px solid #f0f0f0;
+}
+
+.swiperContainer {
+  position: relative;
+  padding: 30px 0;
+  transition: all 0.3s ease;
+}
+
+.swiperContainer:hover {
+  cursor: grab;
+}
+
+.swiperContainer:active {
+  cursor: grabbing;
+}
+
+/* Class toàn cục cho Swiper */
+:global(.swiper-tech) {
+  padding-bottom: 50px !important;
+  padding-top: 10px !important;
+}
+
+/* Styling cho slides */
+.swiperSlide {
+  width: 220px;
+  height: 380px;
+  transition: transform 0.3s ease;
+  padding: 0 10px; /* Thêm khoảng cách giữa các slide */
+}
+
+/* Card sách */
+.bookCard {
+  height: 100%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 0 5px; /* Thêm margin để tăng khoảng cách */
 }
 
 .bookCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-}
-
-.bookCardBody {
-  padding: 12px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  transform: translateY(-8px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
 }
 
 .bookCover {
+  height: 280px;
+  overflow: hidden;
   position: relative;
-  height: 200px;
 }
 
 .bookImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: all 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
 .bookCard:hover .bookImage {
   transform: scale(1.05);
 }
 
+.bookDetails {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
 .bookTitle {
-  margin-bottom: 4px;
-  display: block;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  display: -ms-box; /* Cho IE */
+  display: box;
+  -webkit-line-clamp: 3; /* Hiển thị 3 dòng */
+  line-clamp: 3; /* Thuộc tính tiêu chuẩn */
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  overflow: hidden;
+  min-height: 63px; /* Đủ cho 3 dòng với line-height 1.5 */
+  max-height: 63px; /* Giới hạn tối đa */
+  text-overflow: ellipsis;
+  word-wrap: break-word;
 }
 
 .bookAuthor {
   font-size: 12px;
+  margin-top: auto;
 }
 
-.availableBadge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+/* Styling các nút điều hướng và phân trang - sử dụng :global vì đây là classes mà Swiper sử dụng */
+:global(.swiper-button-next),
+:global(.swiper-button-prev) {
+  color: #1677ff;
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.availableCount {
-  background-color: #52c41a;
+:global(.swiper-button-next:after),
+:global(.swiper-button-prev:after) {
+  font-size: 16px;
+  font-weight: bold;
 }
 
-.unavailableCount {
-  background-color: #ff4d4f;
+:global(.swiper-button-next:hover),
+:global(.swiper-button-prev:hover) {
+  background-color: #fff;
+  color: #0958d9;
 }
 
-.loadingContainer {
-  display: flex;
-  gap: 16px;
-  overflow-x: hidden;
+:global(.swiper-pagination-bullet) {
+  background: #1677ff;
+  opacity: 0.6;
+  transition: all 0.3s ease;
 }
 
-.skeletonCard {
-  width: 160px;
-  height: 280px;
-  margin-right: 16px;
-  flex: 0 0 auto;
+:global(.swiper-pagination-bullet-active) {
+  opacity: 1;
+  width: 20px;
+  border-radius: 4px;
+}
+
+/* Phần responsive */
+@media (max-width: 768px) {
+  .swiperSlide {
+    width: 180px;
+    height: 340px;
+  }
+
+  .bookCover {
+    height: 240px;
+  }
+
+  .bookDetails {
+    padding: 8px;
+  }
+}
+
+/* Hiệu ứng card bị mờ khi không active */
+:global(.swiper-slide:not(.swiper-slide-active)) {
+  opacity: 0.7;
+}
+
+@media (min-width: 1024px) {
+  :global(.swiper-slide:not(.swiper-slide-active)) {
+    opacity: 1;
+  }
 }
