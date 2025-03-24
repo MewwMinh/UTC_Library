@@ -41,6 +41,7 @@ public class PatronService {
     SeatReservationHistoryRepository seatReservationHistoryRepository;
     PointHistoryRepository pointHistoryRepository;
     MembershipRepository membershipRepository;
+    RecentTransactionRepository recentTransactionRepository;
 
 
     //region Dashboard
@@ -127,6 +128,7 @@ public class PatronService {
         return APIResponse.<Boolean>builder().code(1000).result(true).build();
     }
 
+    @Transactional
     public APIResponse<Boolean> reserveBook(ReservationBookRequest request){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
@@ -142,6 +144,15 @@ public class PatronService {
         bookReservation.setStatus("Đang đợi xử lý");
         bookReservation.setPickupDate(pickupDate);
         bookReservationRepository.save(bookReservation);
+
+        RecentTransaction transaction = new RecentTransaction();
+        transaction.setRecordID(bookReservation.getReservationID());
+        transaction.setPatron(bookReservation.getUserID().getFullName());
+        transaction.setAction("đặt mượn");
+        transaction.setBookName(bookReservation.getBookID().getBookName());
+        transaction.setTransactionTime(Instant.now());
+        recentTransactionRepository.save(transaction);
+
         return APIResponse.<Boolean>builder().code(1000).result(true).build();
     }
 

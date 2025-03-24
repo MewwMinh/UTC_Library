@@ -1,5 +1,6 @@
 package edu.utc.demo_01.repository;
 
+import edu.utc.demo_01.dto.librarian.response.BorrowReturnWeekly;
 import edu.utc.demo_01.dto.patron.response.BorrowBookResponse1;
 import edu.utc.demo_01.dto.patron.response.BorrowBookResponse2;
 import edu.utc.demo_01.dto.patron.response.TopBookResponse;
@@ -104,4 +105,36 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
         ORDER BY br.BorrowDate DESC 
 """, nativeQuery = true)
     List<BorrowBookResponse1> getBorrowRecordsHistory(@Param("id") String id);
+    @Query(value = """
+    WITH DateSeries AS (
+        SELECT CURDATE() - INTERVAL n DAY AS Date
+        FROM (
+            SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 
+            UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7
+        ) AS Numbers
+    )
+    SELECT 
+        ds.Date AS date,
+        COALESCE(SUM(b.BorrowedBooks), 0) AS borrowedBooks,
+        COALESCE(SUM(b.ReturnedBooks), 0) AS returnedBooks
+    FROM DateSeries ds
+    LEFT JOIN (
+        -- Lấy số lượng sách mượn theo ngày
+        SELECT DATE(BorrowDate) AS Date, COUNT(*) AS BorrowedBooks, 0 AS ReturnedBooks
+        FROM BorrowRecords
+        WHERE BorrowDate >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+        GROUP BY Date
+    
+        UNION ALL
+    
+        -- Lấy số lượng sách trả theo ngày
+        SELECT DATE(ReturnDate) AS Date, 0 AS BorrowedBooks, COUNT(*) AS ReturnedBooks
+        FROM BorrowRecords
+        WHERE ReturnDate IS NOT NULL AND ReturnDate >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY Date
+    ) b ON ds.Date = b.Date
+    GROUP BY ds.Date
+    ORDER BY ds.Date DESC; 
+""", nativeQuery = true)
+    List<BorrowReturnWeekly> getWeeklyBorrowReturn();
 }

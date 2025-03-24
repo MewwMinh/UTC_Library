@@ -4,6 +4,9 @@ import edu.utc.demo_01.dto.APIResponse;
 import edu.utc.demo_01.dto.librarian.request.AddBookRequest;
 import edu.utc.demo_01.dto.librarian.request.LendBookRequest;
 import edu.utc.demo_01.dto.librarian.response.BookResponse;
+import edu.utc.demo_01.dto.librarian.response.BorrowReturnWeekly;
+import edu.utc.demo_01.dto.librarian.response.PatronRecentActivity;
+import edu.utc.demo_01.dto.patron.response.PatronInformation;
 import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
@@ -31,9 +34,10 @@ public class LibrarianService {
     UserViolationRepository userViolationRepository;
     UserAchievementRepository userAchievementRepository;
     DDCClassificationRepository ddcClassificationRepository;
+    RecentTransactionRepository recentTransactionRepository;
     CloudinaryService cloudinaryService;
 
-
+    @Transactional
     public boolean lendBook(LendBookRequest request) {
         User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Book book = bookRepository.findByBookID(request.getBookID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
@@ -51,6 +55,14 @@ public class LibrarianService {
         borrowRecord.setApprovedBy(librarian);
 
         borrowRecordRepository.save(borrowRecord);
+
+        RecentTransaction transaction = new RecentTransaction();
+        transaction.setRecordID(borrowRecord.getRecordID());
+        transaction.setPatron(borrowRecord.getUserID().getFullName());
+        transaction.setAction("mượn");
+        transaction.setBookName(borrowRecord.getBookID().getBookName());
+        transaction.setTransactionTime(Instant.now());
+        recentTransactionRepository.save(transaction);
         return true;
     }
 
@@ -66,6 +78,14 @@ public class LibrarianService {
         borrowRecord.setReturnApprovedBy(librarian);
         borrowRecord.setReturnDate(Instant.now());
         borrowRecordRepository.save(borrowRecord);
+
+        RecentTransaction transaction = new RecentTransaction();
+        transaction.setRecordID(borrowRecord.getRecordID());
+        transaction.setPatron(borrowRecord.getUserID().getFullName());
+        transaction.setAction("trả");
+        transaction.setBookName(borrowRecord.getBookID().getBookName());
+        transaction.setTransactionTime(Instant.now());
+        recentTransactionRepository.save(transaction);
 
         if (Instant.now().isAfter(borrowRecord.getDueDate())) {
             User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -127,6 +147,21 @@ public class LibrarianService {
     public APIResponse changeBookInformation(Book book){
         bookRepository.save(book);
         return APIResponse.builder().code(1000).message("Sửa đổi thành công thông tin cuốn " + book.getBookName()).build();
+    }
+
+    public APIResponse<List<BorrowReturnWeekly>> getBorrowReturnWeekly() {
+        return APIResponse.<List<BorrowReturnWeekly>>builder().code(1000).result(borrowRecordRepository.getWeeklyBorrowReturn()).build();
+    }
+
+    public APIResponse<List<PatronRecentActivity>> getSomePatronReasonActivities(){
+        return APIResponse.<List<PatronRecentActivity>>builder().code(1000).result(recentTransactionRepository.getSomePatronReasonActivities()).build();
+    }
+
+    public APIResponse<PatronInformation> getPatronInformation(String patronID){
+        return APIResponse.<PatronInformation>builder()
+                .code(1000)
+                .result(userRepository.getPatronInformationByUserID(patronID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION)))
+                .build();
     }
 
 
