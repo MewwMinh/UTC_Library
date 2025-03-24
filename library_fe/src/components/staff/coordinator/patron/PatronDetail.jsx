@@ -28,6 +28,7 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import PatronInformation from "./PatronInformation";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -358,7 +359,7 @@ const ThongTinSinhVien = ({ reader, onSave }) => {
           </Form>
         ) : (
           <Row gutter={[24, 0]}>
-            <Col xs={24} sm={24} md={8} style={{ textAlign: "center" }}>
+            {/* <Col xs={24} sm={24} md={8} style={{ textAlign: "center" }}>
               <div
                 style={{
                   background: "linear-gradient(to bottom, #1890ff, #096dd9)",
@@ -420,7 +421,8 @@ const ThongTinSinhVien = ({ reader, onSave }) => {
                   </div>
                 </Space>
               </div>
-            </Col>
+            </Col> */}
+            <PatronInformation />
 
             <Col xs={24} sm={24} md={16}>
               <div

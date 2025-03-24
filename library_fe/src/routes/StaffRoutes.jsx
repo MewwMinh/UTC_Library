@@ -16,7 +16,7 @@ const StaffRoutes = () => {
     <Routes>
       <Route element={<StaffLayout />} path="/">
         <Route path="manage-patron" element={<ManagePatron />} />
-        <Route path="aa" element={<PatronDetails />} />
+        <Route path="patron-details/:patronId" element={<PatronDetails />} />
         <Route path="manage-book" element={<ManageBook />} />
         <Route path="book-details" element={<BookDetails />} />
         <Route path="add-book" element={<AddBook />} />
