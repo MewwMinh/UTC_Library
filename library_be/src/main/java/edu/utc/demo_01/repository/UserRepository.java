@@ -22,6 +22,7 @@ public interface UserRepository extends JpaRepository<User, String> {
                        u.DOB AS dateOfBirth,
                        u.CreatedAt AS creationDate,
                        u.Expiry AS expirationDate,
+                       u.Status AS status,    
                        r.Description AS role,
                        ac.Email AS email,
                        m.MembershipType AS membershipType

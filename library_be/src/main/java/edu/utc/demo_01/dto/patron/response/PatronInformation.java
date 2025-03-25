@@ -19,6 +19,7 @@ public class PatronInformation {
     Date dateOfBirth;
     Date creationDate;
     Date expirationDate;
+    String status;
     String role;
     String email;
     String membershipType;

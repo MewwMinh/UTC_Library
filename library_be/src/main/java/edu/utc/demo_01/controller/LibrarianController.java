@@ -5,6 +5,8 @@ import edu.utc.demo_01.dto.librarian.request.AddBookRequest;
 import edu.utc.demo_01.dto.librarian.request.ChangeBookInfoRequest;
 import edu.utc.demo_01.dto.librarian.request.LendBookRequest;
 import edu.utc.demo_01.dto.librarian.response.BookResponse;
+import edu.utc.demo_01.dto.librarian.response.PatronBorrowInformation;
+import edu.utc.demo_01.entity.Book;
 import edu.utc.demo_01.service.CloudinaryService;
 import edu.utc.demo_01.service.LibrarianService;
 import lombok.AccessLevel;
@@ -23,14 +25,11 @@ import java.util.List;
 public class LibrarianController {
     LibrarianService service;
     CloudinaryService cloudinaryService;
-    @PostMapping("lend-book")
-    public boolean lendBook(@RequestBody LendBookRequest request) {
-        return service.lendBook(request);
-    }
-    @PostMapping("accept-book-return")
-    public boolean acceptBookReturn(@RequestBody LendBookRequest request) {
-        return service.acceptBookReturn(request);
-    }
+
+//    @PostMapping("accept-book-return")
+//    public boolean acceptBookReturn(@RequestBody LendBookRequest request) {
+//        return service.acceptBookReturn(request);
+//    }
 
 
     //region Manage Books
@@ -68,4 +67,18 @@ public class LibrarianController {
     }
     //endregion
 
+    //region Manage Borrow Return
+    @GetMapping("get-patron-borrow-information/{id}")
+    public APIResponse<PatronBorrowInformation> getPatronBorrowInformation(@PathVariable String id) {
+        return service.getPatronBorrowInformation(id);
+    }
+    @GetMapping("get-book-by-code/{code}")
+    public APIResponse<Book> getBookByCode(@PathVariable String code) {
+        return service.getBookByCode(code);
+    }
+    @PostMapping("lend-book")
+    public APIResponse lendBook(@RequestBody LendBookRequest request) {
+        return service.lendBook(request);
+    }
+    //endregion
 }

@@ -53,7 +53,7 @@ const StaffSidebar = () => {
         navigate("/staff/books");
         break;
       case "borrow":
-        navigate("/staff/borrow");
+        navigate("/staff/borrow-return");
         break;
       case "violations":
         navigate("/staff/violations");
