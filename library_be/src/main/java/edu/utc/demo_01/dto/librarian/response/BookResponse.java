@@ -22,6 +22,6 @@ public class BookResponse {
     String format;
     String description;
     String coverImage;
-    String ddcName;
+    String ddcCode;
 }
 

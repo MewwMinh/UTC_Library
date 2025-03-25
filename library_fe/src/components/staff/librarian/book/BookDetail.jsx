@@ -1,326 +1,263 @@
-import React, { useState } from "react";
+// src/components/librarian/book/LibrarianBookDetail.jsx
+import { useState, useEffect } from "react";
 import {
   Card,
-  Form,
-  Input,
-  Button,
-  Select,
-  InputNumber,
-  Typography,
-  Row,
   Col,
-  Divider,
+  Row,
+  Typography,
+  Image,
+  Tag,
   Space,
-  message,
-  Modal,
-  Descriptions,
+  Divider,
+  Skeleton,
+  notification,
+  Avatar,
   Badge,
-  Upload,
 } from "antd";
 import {
-  SaveOutlined,
-  DeleteOutlined,
-  ArrowLeftOutlined,
-  UploadOutlined,
+  BookOutlined,
+  CalendarOutlined,
+  TranslationOutlined,
+  FieldNumberOutlined,
+  FileTextOutlined,
+  RiseOutlined,
+  SolutionOutlined,
+  CodeOutlined,
+  FormOutlined,
 } from "@ant-design/icons";
+import bookService from "/src/services/librarian/bookService.js";
+import { useParams } from "react-router-dom";
+import styles from "/src/styles/books/BookDetail.module.css";
 
-const { Title, Text } = Typography;
-const { Option } = Select;
-const { TextArea } = Input;
+const { Title, Text, Paragraph } = Typography;
 
-const BookDetailAdmin = () => {
-  const [form] = Form.useForm();
-  const [isFormChanged, setIsFormChanged] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+function LibrarianBookDetail() {
+  const [book, setBook] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { bookId } = useParams();
 
-  // Thông tin chi tiết sách (giả lập dữ liệu từ API)
-  const initialBookData = {
-    id: "B12345",
-    isbn: "978-604-316-789-5",
-    title: "Thiết kế và quản lý giao thông",
-    author: "Nguyễn Văn A",
-    language: "Tiếng Việt",
-    classification: "GTV-001",
-    publishYear: 2022,
-    publisher: "NXB Giao thông vận tải",
-    pages: 350,
-    size: "17x24 cm",
-    category: "Giao thông",
-    description:
-      "Sách tổng hợp các kiến thức quan trọng về thiết kế và quản lý hệ thống giao thông đô thị. Phân tích các mô hình, phương pháp và giải pháp tiên tiến trong lĩnh vực giao thông.",
-    availableCopies: 5,
-    totalCopies: 8,
-    coverImage: "https://via.placeholder.com/300x400",
-    location: "Kệ A5, Tầng 2",
-    importDate: "2023-05-15",
-    status: "active", // active, inactive
-  };
+  useEffect(() => {
+    fetchBookData();
+  }, [bookId]);
 
-  // Khởi tạo form với dữ liệu ban đầu
-  useState(() => {
-    form.setFieldsValue(initialBookData);
-  }, []);
-
-  // Xử lý sự kiện khi form thay đổi
-  const handleFormChange = () => {
-    setIsFormChanged(true);
-  };
-
-  // Xử lý lưu thông tin sách
-  const handleSaveBook = async () => {
+  const fetchBookData = async () => {
     try {
-      const values = await form.validateFields();
-      console.log("Thông tin sách đã cập nhật:", values);
+      setLoading(true);
+      const response = await bookService.getBookDetail(bookId);
 
-      // Giả lập gọi API lưu dữ liệu
-      setTimeout(() => {
-        message.success("Đã lưu thông tin sách thành công!");
-        setIsFormChanged(false);
-      }, 500);
-    } catch (errorInfo) {
-      console.log("Lỗi xác thực:", errorInfo);
+      if (response.success) {
+        setBook(response.data);
+      } else {
+        notification.error({
+          message: "Lỗi",
+          description: response.message || "Không thể tải thông tin sách",
+          placement: "topRight",
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching book data:", error);
+      notification.error({
+        message: "Lỗi kết nối",
+        description: "Không thể kết nối đến máy chủ",
+        placement: "topRight",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Xử lý xóa sách
-  const handleDeleteBook = () => {
-    // Giả lập gọi API xóa sách
-    setTimeout(() => {
-      message.success("Đã xóa sách thành công!");
-      setIsDeleting(false);
-      // Trong thực tế, sẽ chuyển về trang danh sách sách
-    }, 500);
-  };
+  if (loading) {
+    return (
+      <Card className={styles.bookCard}>
+        <Skeleton active avatar paragraph={{ rows: 10 }} />
+      </Card>
+    );
+  }
 
-  // Xử lý quay lại trang danh sách
-  const handleGoBack = () => {
-    console.log("Quay lại trang danh sách sách");
-    // Trong thực tế sẽ điều hướng về trang danh sách sách
+  if (!book) {
+    return (
+      <Card
+        className={styles.bookCard}
+        style={{ textAlign: "center", padding: 24 }}
+      >
+        <Title level={3}>Không tìm thấy thông tin sách</Title>
+        <Text type="secondary">
+          Sách bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
+        </Text>
+      </Card>
+    );
+  }
+
+  // Xác định phân loại sách
+  const getBookTypeTag = (bookType) => {
+    if (!bookType) return null;
+
+    switch (bookType.toLowerCase()) {
+      case "giáo trình":
+        return <Tag color="gold">Giáo trình</Tag>;
+      case "tham khảo":
+        return <Tag color="blue">Tham khảo</Tag>;
+      case "sách ngoại văn":
+        return <Tag color="purple">Ngoại văn</Tag>;
+      default:
+        return <Tag color="green">{bookType}</Tag>;
+    }
   };
 
   return (
-    <div style={{ padding: "24px" }}>
-      <Card>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 16,
-          }}
-        >
-          <Space>
-            <Button icon={<ArrowLeftOutlined />} onClick={handleGoBack}>
-              Quay lại
-            </Button>
-            <Title level={4} style={{ margin: 0 }}>
-              Chi tiết sách
+    <Card className={styles.bookCard} variant="borderless">
+      {/* Banner phía trên */}
+      <div className={styles.bookBanner}>
+        <Row align="middle" justify="space-between">
+          <Col>
+            <Space size="middle">
+              <Avatar
+                size={64}
+                icon={<BookOutlined />}
+                className={styles.bookAvatar}
+              />
+              <Title level={2} style={{ color: "white", margin: 0 }}>
+                Thông tin sách
+              </Title>
+            </Space>
+          </Col>
+          <Col>
+            <Badge
+              count={book.availableCopies > 0 ? "Còn sách" : "Hết sách"}
+              style={{
+                backgroundColor:
+                  book.availableCopies > 0 ? "#52c41a" : "#f5222d",
+                fontSize: "14px",
+                padding: "0 10px",
+              }}
+            />
+          </Col>
+        </Row>
+      </div>
+
+      <Row gutter={[24, 24]} className={styles.bookContent}>
+        {/* Ảnh bìa sách */}
+        <Col xs={24} sm={24} md={8} lg={7} xl={6}>
+          <div className={styles.bookCoverContainer}>
+            <div className={styles.bookCoverWrapper}>
+              <Image
+                src={book.coverImage || "/placeholder-book.jpg"}
+                alt={book.bookName}
+                className={styles.bookCover}
+                fallback="/placeholder-book.jpg"
+                preview={false}
+              />
+            </div>
+            <div className={styles.bookStats}>
+              <div className={styles.statItem}>
+                <Title level={5}>Tổng số</Title>
+                <div className={styles.statValue}>{book.totalCopies}</div>
+              </div>
+              <div className={styles.statItem}>
+                <Title level={5}>Có sẵn</Title>
+                <div className={styles.statValue}>{book.availableCopies}</div>
+              </div>
+            </div>
+          </div>
+        </Col>
+
+        {/* Thông tin sách */}
+        <Col xs={24} sm={24} md={16} lg={17} xl={18}>
+          <div className={styles.bookInfo}>
+            <Title level={2} className={styles.bookTitle}>
+              {book.bookName}
+              {getBookTypeTag(book.bookType)}
             </Title>
-          </Space>
-          <Space>
-            <Button
-              type="primary"
-              icon={<SaveOutlined />}
-              onClick={handleSaveBook}
-              disabled={!isFormChanged}
-            >
-              Lưu thay đổi
-            </Button>
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => setIsDeleting(true)}
-            >
-              Xóa sách
-            </Button>
-          </Space>
-        </div>
 
-        <Divider />
-
-        <Form form={form} layout="vertical" onValuesChange={handleFormChange}>
-          <Row gutter={24}>
-            <Col span={8}>
-              <Card title="Hình ảnh sách" style={{ marginBottom: 16 }}>
-                <div style={{ textAlign: "center", marginBottom: 16 }}>
-                  <img
-                    src={initialBookData.coverImage}
-                    alt={initialBookData.title}
-                    style={{ maxWidth: "100%", maxHeight: 300 }}
-                  />
-                </div>
-                <Form.Item name="coverImage" label="URL hình ảnh">
-                  <Input placeholder="Nhập đường dẫn hình ảnh" />
-                </Form.Item>
-                <Upload>
-                  <Button icon={<UploadOutlined />}>
-                    Tải lên hình ảnh mới
-                  </Button>
-                </Upload>
-              </Card>
-
-              <Card title="Thông tin tình trạng">
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item label="Mã sách">
-                    {initialBookData.id}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Ngày nhập">
-                    {initialBookData.importDate}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Trạng thái">
-                    <Badge
-                      status={
-                        initialBookData.status === "active"
-                          ? "success"
-                          : "error"
-                      }
-                      text={
-                        initialBookData.status === "active"
-                          ? "Đang hoạt động"
-                          : "Không hoạt động"
-                      }
-                    />
-                  </Descriptions.Item>
-                </Descriptions>
-              </Card>
-            </Col>
-
-            <Col span={16}>
-              <Row gutter={16}>
-                <Col span={24}>
-                  <Form.Item
-                    name="title"
-                    label="Tên sách"
-                    rules={[
-                      { required: true, message: "Vui lòng nhập tên sách!" },
-                    ]}
-                  >
-                    <Input placeholder="Nhập tên sách" />
-                  </Form.Item>
+            <div className={styles.bookMeta}>
+              <Row gutter={[24, 16]}>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <SolutionOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">Tác giả</Text>
+                    <div className={styles.infoValue}>{book.author}</div>
+                  </div>
                 </Col>
-
-                <Col span={12}>
-                  <Form.Item
-                    name="author"
-                    label="Tác giả"
-                    rules={[
-                      { required: true, message: "Vui lòng nhập tên tác giả!" },
-                    ]}
-                  >
-                    <Input placeholder="Nhập tên tác giả" />
-                  </Form.Item>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <FieldNumberOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">ISBN</Text>
+                    <div className={styles.infoValue}>{book.isbn}</div>
+                  </div>
                 </Col>
-
-                <Col span={12}>
-                  <Form.Item
-                    name="isbn"
-                    label="ISBN"
-                    rules={[
-                      { required: true, message: "Vui lòng nhập mã ISBN!" },
-                    ]}
-                  >
-                    <Input placeholder="Nhập mã ISBN" />
-                  </Form.Item>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <CalendarOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">Năm xuất bản</Text>
+                    <div className={styles.infoValue}>
+                      {book.publicationYear}
+                    </div>
+                  </div>
                 </Col>
-
-                <Col span={12}>
-                  <Form.Item name="publisher" label="Nhà xuất bản">
-                    <Input placeholder="Nhập tên nhà xuất bản" />
-                  </Form.Item>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <TranslationOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">Ngôn ngữ</Text>
+                    <div className={styles.infoValue}>{book.language}</div>
+                  </div>
                 </Col>
-
-                <Col span={12}>
-                  <Form.Item name="publishYear" label="Năm xuất bản">
-                    <InputNumber
-                      style={{ width: "100%" }}
-                      min={1900}
-                      max={2100}
-                    />
-                  </Form.Item>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <FileTextOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">Số trang</Text>
+                    <div className={styles.infoValue}>{book.pageCount}</div>
+                  </div>
                 </Col>
-
-                <Col span={12}>
-                  <Form.Item name="language" label="Ngôn ngữ">
-                    <Input placeholder="Nhập ngôn ngữ" />
-                  </Form.Item>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <FormOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">Khổ sách</Text>
+                    <div className={styles.infoValue}>{book.format}</div>
+                  </div>
                 </Col>
-
-                <Col span={12}>
-                  <Form.Item name="category" label="Loại sách">
-                    <Input placeholder="Nhập loại sách" />
-                  </Form.Item>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <CodeOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">Danh mục</Text>
+                    <div className={styles.infoValue}>{book.ddcCode}</div>
+                  </div>
                 </Col>
-
-                <Col span={12}>
-                  <Form.Item name="classification" label="Chỉ số phân loại">
-                    <Input placeholder="Nhập chỉ số phân loại" />
-                  </Form.Item>
-                </Col>
-
-                <Col span={12}>
-                  <Form.Item name="pages" label="Số trang">
-                    <InputNumber style={{ width: "100%" }} min={1} />
-                  </Form.Item>
-                </Col>
-
-                <Col span={12}>
-                  <Form.Item name="size" label="Khổ cỡ">
-                    <Input placeholder="Nhập khổ cỡ sách" />
-                  </Form.Item>
-                </Col>
-
-                <Col span={12}>
-                  <Form.Item name="location" label="Vị trí">
-                    <Input placeholder="Nhập vị trí sách" />
-                  </Form.Item>
-                </Col>
-
-                <Col span={8}>
-                  <Form.Item name="availableCopies" label="Số bản có sẵn">
-                    <InputNumber style={{ width: "100%" }} min={0} />
-                  </Form.Item>
-                </Col>
-
-                <Col span={8}>
-                  <Form.Item name="totalCopies" label="Tổng số bản">
-                    <InputNumber style={{ width: "100%" }} min={0} />
-                  </Form.Item>
-                </Col>
-
-                <Col span={8}>
-                  <Form.Item name="status" label="Trạng thái">
-                    <Select>
-                      <Option value="active">Đang hoạt động</Option>
-                      <Option value="inactive">Không hoạt động</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-
-                <Col span={24}>
-                  <Form.Item name="description" label="Mô tả">
-                    <TextArea rows={4} placeholder="Nhập mô tả sách" />
-                  </Form.Item>
+                <Col xs={24} md={12} className={styles.infoItem}>
+                  <RiseOutlined className={styles.infoIcon} />
+                  <div>
+                    <Text type="secondary">Tình trạng</Text>
+                    <div className={styles.infoValue}>
+                      <Tag
+                        color={book.availableCopies > 0 ? "success" : "error"}
+                      >
+                        {book.availableCopies > 0 ? "Còn sách" : "Hết sách"}
+                      </Tag>
+                      <Text type="secondary">
+                        ({book.availableCopies}/{book.totalCopies})
+                      </Text>
+                    </div>
+                  </div>
                 </Col>
               </Row>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
+            </div>
 
-      {/* Modal xác nhận xóa sách */}
-      <Modal
-        title="Xác nhận xóa sách"
-        open={isDeleting}
-        onOk={handleDeleteBook}
-        onCancel={() => setIsDeleting(false)}
-        okText="Xóa"
-        cancelText="Hủy"
-        okButtonProps={{ danger: true }}
-      >
-        <p>Bạn có chắc chắn muốn xóa sách "{initialBookData.title}"?</p>
-        <p>Hành động này không thể hoàn tác.</p>
-      </Modal>
-    </div>
+            <Divider style={{ margin: "24px 0", borderColor: "#f0f0f0" }} />
+
+            {/* Mô tả sách */}
+            <div className={styles.bookDescription}>
+              <Title level={4}>
+                <FileTextOutlined style={{ marginRight: 8 }} />
+                Mô tả
+              </Title>
+              <Paragraph className={styles.description}>
+                {book.description || "Không có mô tả."}
+              </Paragraph>
+            </div>
+          </div>
+        </Col>
+      </Row>
+    </Card>
   );
-};
+}
 
-export default BookDetailAdmin;
+export default LibrarianBookDetail;

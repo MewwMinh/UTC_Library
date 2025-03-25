@@ -2,11 +2,9 @@ package edu.utc.demo_01.service;
 
 import edu.utc.demo_01.dto.APIResponse;
 import edu.utc.demo_01.dto.librarian.request.AddBookRequest;
+import edu.utc.demo_01.dto.librarian.request.ChangeBookInfoRequest;
 import edu.utc.demo_01.dto.librarian.request.LendBookRequest;
 import edu.utc.demo_01.dto.librarian.response.BookResponse;
-import edu.utc.demo_01.dto.librarian.response.BorrowReturnWeekly;
-import edu.utc.demo_01.dto.librarian.response.PatronRecentActivity;
-import edu.utc.demo_01.dto.patron.response.PatronInformation;
 import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
@@ -28,16 +26,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LibrarianService {
+    CloudinaryService cloudinaryService;
     UserRepository userRepository;
     BookRepository bookRepository;
     BorrowRecordRepository borrowRecordRepository;
     UserViolationRepository userViolationRepository;
     UserAchievementRepository userAchievementRepository;
     DDCClassificationRepository ddcClassificationRepository;
-    RecentTransactionRepository recentTransactionRepository;
-    CloudinaryService cloudinaryService;
+    BookReviewRepository bookReviewRepository;
 
-    @Transactional
+
     public boolean lendBook(LendBookRequest request) {
         User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Book book = bookRepository.findByBookID(request.getBookID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
@@ -55,14 +53,6 @@ public class LibrarianService {
         borrowRecord.setApprovedBy(librarian);
 
         borrowRecordRepository.save(borrowRecord);
-
-        RecentTransaction transaction = new RecentTransaction();
-        transaction.setRecordID(borrowRecord.getRecordID());
-        transaction.setPatron(borrowRecord.getUserID().getFullName());
-        transaction.setAction("mượn");
-        transaction.setBookName(borrowRecord.getBookID().getBookName());
-        transaction.setTransactionTime(Instant.now());
-        recentTransactionRepository.save(transaction);
         return true;
     }
 
@@ -78,14 +68,6 @@ public class LibrarianService {
         borrowRecord.setReturnApprovedBy(librarian);
         borrowRecord.setReturnDate(Instant.now());
         borrowRecordRepository.save(borrowRecord);
-
-        RecentTransaction transaction = new RecentTransaction();
-        transaction.setRecordID(borrowRecord.getRecordID());
-        transaction.setPatron(borrowRecord.getUserID().getFullName());
-        transaction.setAction("trả");
-        transaction.setBookName(borrowRecord.getBookID().getBookName());
-        transaction.setTransactionTime(Instant.now());
-        recentTransactionRepository.save(transaction);
 
         if (Instant.now().isAfter(borrowRecord.getDueDate())) {
             User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -112,8 +94,82 @@ public class LibrarianService {
         return true;
     }
 
+
+    //region Manage Books
+    public APIResponse<List<BookResponse>> getAllBooks() {
+        return APIResponse.<List<BookResponse>>builder()
+                .code(1000)
+                .result(bookRepository.getAllBooks())
+                .build();
+    }
+
+    public APIResponse<BookResponse> getBook(String bookID) {
+        Book book = (bookRepository.findById(bookID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK)));
+        BookResponse result = new BookResponse();
+        result.setBookID(book.getBookID());
+        result.setBookName(book.getBookName());
+        result.setAuthor(book.getAuthor());
+        result.setBookType(book.getBookType());
+        result.setIsbn(book.getIsbn());
+        result.setTotalCopies(book.getTotalCopies());
+        result.setAvailableCopies(book.getAvailableCopies());
+        result.setPublicationYear(book.getPublicationYear());
+        result.setLanguage(book.getLanguage());
+        result.setPageCount(book.getPageCount());
+        result.setFormat(book.getFormat());
+        result.setDescription(book.getDescription());
+        result.setCoverImage(book.getCoverImage());
+        result.setDdcCode(book.getDDCCode().getDDCCode());
+        return APIResponse.<BookResponse>builder().code(1000).result(result).build();
+    }
+
+    public APIResponse changeBookInformation(String bookID, ChangeBookInfoRequest request){
+        Book book =  bookRepository.findByBookID(bookID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
+        book.setBookName(request.getBookName());
+        book.setAuthor(request.getAuthor());
+        book.setBookType(request.getBookType());
+        book.setIsbn(request.getIsbn());
+        int bookAdd = request.getTotalCopies() - book.getTotalCopies();
+        book.setTotalCopies(request.getTotalCopies());
+        book.setAvailableCopies(book.getAvailableCopies() + bookAdd);
+        book.setPublicationYear(request.getPublicationYear());
+        book.setLanguage(request.getLanguage());
+        if (request.getPageCount() != null) book.setPageCount(request.getPageCount());
+        if (request.getFormat() != null) book.setFormat(request.getFormat());
+        if (request.getDescription() != null) book.setDescription(request.getDescription());
+        DDCClassification classification = ddcClassificationRepository.findByDDCCode(request.getDdcCode());
+        book.setDDCCode(classification);
+        bookRepository.save(book);
+        return APIResponse.builder().code(1000).message("Sửa đổi thành công thông tin cuốn " + book.getBookName()).build();
+    }
+
+    public APIResponse changeBookCover(MultipartFile coverImage, String isbn) {
+        Book book = bookRepository.findByIsbn(isbn).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
+        book.setCoverImage(cloudinaryService.uploadBookCover(coverImage, isbn));
+        bookRepository.save(book);
+        return APIResponse.builder()
+                .code(1000)
+                .message("Thay đổi ảnh thành công!!")
+                .build();
+    }
+
+    public APIResponse deleteBook(String bookID) {
+        Book book =  bookRepository.findByBookID(bookID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
+        String bookName = book.getBookName();
+        bookRepository.deleteById(bookID);
+        return APIResponse.builder().code(1000).message("Xóa thành công sách " + bookName).build();
+    }
+
+    public APIResponse<String> uploadBookCover(MultipartFile coverImage, String isbn) {
+        return APIResponse.<String>builder()
+                .code(1000)
+                .message("Tải lên ảnh thành công!!")
+                .result(cloudinaryService.uploadBookCover(coverImage, isbn))
+                .build();
+    }
+
     public APIResponse addBook(AddBookRequest request) {
-        DDCClassification classification = ddcClassificationRepository.findByDDCName(request.getDdcName()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_CLASSIFICATION));
+        DDCClassification classification = ddcClassificationRepository.findByDDCCode(request.getDdcCode());
         if (bookRepository.existsByIsbn(request.getIsbn())) throw new AppException(ErrorCode.ISBN_EXSITED);
         Book book = new Book();
         book.setBookName(request.getBookName());
@@ -130,45 +186,21 @@ public class LibrarianService {
         book.setCoverImage(request.getCoverImage());
         book.setDDCCode(classification);
         bookRepository.save(book);
-        return APIResponse.builder().code(1000).message("Tạo mới thành công sách " + book.getBookName()).build();
-    }
-
-    public APIResponse<List<BookResponse>> getAllBooks() {
-        return APIResponse.<List<BookResponse>>builder()
+        return APIResponse.builder()
                 .code(1000)
-                .result(bookRepository.getAllBooks())
+                .message("Tạo mới thành công sách " + book.getBookName())
                 .build();
     }
 
-    public APIResponse<Book> getBook(String bookID) {
-        return APIResponse.<Book>builder().code(1000).result(bookRepository.findById(bookID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK))).build();
-    }
-
-    public APIResponse changeBookInformation(Book book){
-        bookRepository.save(book);
-        return APIResponse.builder().code(1000).message("Sửa đổi thành công thông tin cuốn " + book.getBookName()).build();
-    }
-
-    public APIResponse<List<BorrowReturnWeekly>> getBorrowReturnWeekly() {
-        return APIResponse.<List<BorrowReturnWeekly>>builder().code(1000).result(borrowRecordRepository.getWeeklyBorrowReturn()).build();
-    }
-
-    public APIResponse<List<PatronRecentActivity>> getSomePatronReasonActivities(){
-        return APIResponse.<List<PatronRecentActivity>>builder().code(1000).result(recentTransactionRepository.getSomePatronReasonActivities()).build();
-    }
-
-    public APIResponse<PatronInformation> getPatronInformation(String patronID){
-        return APIResponse.<PatronInformation>builder()
+    public APIResponse deleteBookReview(String reviewID) {
+        BookReview review = bookReviewRepository.findByReviewID(reviewID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK_REVIEW));
+        String patron = review.getUserID().getFullName();
+        String book = review.getBookID().getBookName();
+        bookReviewRepository.delete(review);
+        return APIResponse.builder()
                 .code(1000)
-                .result(userRepository.getPatronInformationByUserID(patronID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION)))
+                .message("Xóa thành công bình luận của " + patron + " về cuốn sách " + book)
                 .build();
     }
-
-
-    public String uploadCover(MultipartFile coverImage) {
-        return cloudinaryService.uploadBookCover(coverImage, "123");
-
-    }
-
-
+    //endregion
 }

@@ -7,19 +7,24 @@ import {
 } from "/src/pages/staff/coordinator";
 import {
   ManageBook,
-  BookDetails,
-  AddBook,
   LibrarianDashboard,
+  BookCatalogPage,
+  BookEditPage,
+  BookAddPage,
+  BookDetailsPage,
 } from "/src/pages/staff/librarian";
 const StaffRoutes = () => {
   return (
     <Routes>
       <Route element={<StaffLayout />} path="/">
+        <Route path="books" element={<BookCatalogPage />} />
         <Route path="manage-patron" element={<ManagePatron />} />
         <Route path="patron-details/:patronId" element={<PatronDetails />} />
         <Route path="manage-book" element={<ManageBook />} />
-        <Route path="book-details" element={<BookDetails />} />
-        <Route path="add-book" element={<AddBook />} />
+        <Route path="books/details/:bookId" element={<BookDetailsPage />} />
+
+        <Route path="books/edit/:bookId" element={<BookEditPage />} />
+        <Route path="add-book" element={<BookAddPage />} />
         <Route index element={<LibrarianDashboard />} />
         <Route path="dashboard" element={<LibrarianDashboard />} />
         <Route

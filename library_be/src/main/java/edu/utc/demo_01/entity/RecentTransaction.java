@@ -3,25 +3,20 @@ package edu.utc.demo_01.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 
 import java.time.Instant;
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@DynamicInsert
+@Getter
+@Setter
 @Entity
 @Table(name = "RecentTransactions")
 public class RecentTransaction {
     @Id
-    @Size(max = 36)
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Size(max = 36)
     @Column(name = "TransactionID", nullable = false, length = 36)
     private String transactionID;
 

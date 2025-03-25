@@ -11,7 +11,9 @@ import java.sql.Date;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookReviewResponse {
+    String reviewID;
     String fullName;
+    String userImage;
     Integer rating;
     String comment;
     Date createdAt;

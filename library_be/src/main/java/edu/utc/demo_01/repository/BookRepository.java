@@ -13,7 +13,9 @@ import java.util.Optional;
 
 public interface BookRepository extends JpaRepository < Book,
         String > {
-    Optional < Book > findByBookID(String bookID);@Query(value = """
+    Optional < Book > findByBookID(String bookID);
+    Optional<Book> findByIsbn(String isbn);
+    @Query(value = """
         SELECT b.BookName AS bookName,
                        b.Author AS author,
                        b.BookType AS bookType,

@@ -1,0 +1,43 @@
+.footer {
+  padding: 12px 24px;
+  background: #fff;
+  text-align: center;
+  height: auto;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.footerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.copyright {
+  font-size: 14px;
+}
+
+.links {
+  display: flex;
+  gap: 24px;
+}
+
+.link {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.link:hover {
+  color: #1677ff;
+}
+
+@media (max-width: 768px) {
+  .footerContent {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .links {
+    gap: 16px;
+  }
+}
