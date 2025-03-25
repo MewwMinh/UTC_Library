@@ -1,96 +1,186 @@
-import { Menu } from "antd";
-import Sider from "antd/es/layout/Sider";
 import { useState } from "react";
+import { Layout, Menu } from "antd";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   DashboardOutlined,
   BookOutlined,
-  SearchOutlined,
+  SwapOutlined,
+  HomeOutlined,
+  ScheduleOutlined,
+  CalendarOutlined,
+  TeamOutlined,
+  QuestionCircleOutlined,
+  BarChartOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
-import "/src/styles/Sider.css";
-import { useNavigate } from "react-router-dom";
+import styles from "/src/styles/layout/staff/StaffSidebar.module.css";
 
-function StaffSideBar() {
-  const [selectedMenu, setSelectedMenu] = useState("dashboard");
+const { Sider } = Layout;
+
+const StaffSidebar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const { scope } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const menuItems = [
-    { key: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
-    {
-      key: "manage-patron",
-      label: "Quản lý người dùng",
-      icon: <BookOutlined />,
-    },
-    {
-      key: "create-user",
-      label: "Tạo người dùng mới",
-      icon: <SearchOutlined />,
-    },
-    {
-      key: "handle-support-request",
-      label: "Xử lý yêu cầu hỗ trợ",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "manage-reading-room",
-      label: "Check-in / Check-out",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "lib-used-history",
-      label: "Lịch sử sử dụng thư viện",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "",
-      label: "Mượn / Trả sách",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "manage-violation",
-      label: "Quản lý vi phạm nội quy",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "activity-logs",
-      label: "Phân tích & Báo cáo",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "lib-event",
-      label: "Sự kiện Thư viện",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "manage-book",
-      label: "Quản lý Sách",
-      icon: <WarningOutlined />,
-    },
-    {
-      key: "activity-logs",
-      label: "Phê duyệt Tài liệu Đặc biệt",
-      icon: <WarningOutlined />,
-    },
-  ];
+  const isLibrarian = scope === "LIBRARIAN";
+  const isCoordinator = scope === "COORDINATOR";
+
+  // Get the current selected key based on path
+  const getSelectedKey = () => {
+    const path = location.pathname;
+    if (path.includes("/staff/dashboard")) return "dashboard";
+    if (path.includes("/staff/books")) return "books";
+    if (path.includes("/staff/borrow")) return "borrow";
+    if (path.includes("/staff/violations")) return "violations";
+    if (path.includes("/staff/reading-room")) return "reading-room";
+    if (path.includes("/staff/seat-reservations")) return "seat-reservations";
+    if (path.includes("/staff/events")) return "events";
+    if (path.includes("/staff/members")) return "members";
+    if (path.includes("/staff/support-requests")) return "support-requests";
+    if (path.includes("/staff/reports")) return "reports";
+    if (path.includes("/staff/profile")) return "profile";
+    return "dashboard";
+  };
+
+  const handleMenuClick = (e) => {
+    switch (e.key) {
+      case "dashboard":
+        navigate("/staff/dashboard");
+        break;
+      case "books":
+        navigate("/staff/books");
+        break;
+      case "borrow":
+        navigate("/staff/borrow");
+        break;
+      case "violations":
+        navigate("/staff/violations");
+        break;
+      case "reading-room":
+        navigate("/staff/reading-room");
+        break;
+      case "seat-reservations":
+        navigate("/staff/seat-reservations");
+        break;
+      case "events":
+        navigate("/staff/events");
+        break;
+      case "members":
+        navigate("/staff/members");
+        break;
+      case "support-requests":
+        navigate("/staff/support-requests");
+        break;
+      case "reports":
+        navigate("/staff/reports");
+        break;
+      default:
+        navigate("/staff/dashboard");
+    }
+  };
 
   return (
-    <Sider className="side-bar" width={250}>
+    <Sider
+      collapsible
+      collapsed={collapsed}
+      onCollapse={setCollapsed}
+      className={styles.sidebar}
+      width={256}
+      theme="light"
+      trigger={null}
+    >
       <Menu
+        theme="light"
         mode="inline"
-        selectedKeys={[selectedMenu]}
-        onClick={(e) => {
-          setSelectedMenu(e.key);
-          navigate(`/staff/${e.key}`);
-        }}
-        items={menuItems}
-        style={{
-          fontSize: "16px",
-          fontWeight: "500",
-          borderRight: "none",
-        }}
+        selectedKeys={[getSelectedKey()]}
+        onClick={handleMenuClick}
+        className={styles.menu}
+        items={[
+          {
+            key: "dashboard",
+            icon: <DashboardOutlined />,
+            label: "Dashboard",
+          },
+
+          // Các menu dành cho Thủ thư
+          ...(isLibrarian
+            ? [
+                {
+                  key: "librarian-group",
+                  type: "group",
+                  label: "Quản lý sách",
+                },
+                {
+                  key: "books",
+                  icon: <BookOutlined />,
+                  label: "Danh mục sách",
+                },
+                {
+                  key: "borrow",
+                  icon: <SwapOutlined />,
+                  label: "Mượn & trả sách",
+                },
+                {
+                  key: "violations",
+                  icon: <WarningOutlined />,
+                  label: "Quản lý vi phạm",
+                },
+              ]
+            : []),
+
+          // Các menu dành cho Nhân viên phòng đọc
+          ...(isCoordinator
+            ? [
+                {
+                  key: "coordinator-group",
+                  type: "group",
+                  label: "Quản lý phòng đọc",
+                },
+                {
+                  key: "reading-room",
+                  icon: <HomeOutlined />,
+                  label: "Phòng đọc",
+                },
+                {
+                  key: "seat-reservations",
+                  icon: <ScheduleOutlined />,
+                  label: "Đặt chỗ",
+                },
+                {
+                  key: "events",
+                  icon: <CalendarOutlined />,
+                  label: "Sự kiện",
+                },
+                {
+                  key: "members",
+                  icon: <TeamOutlined />,
+                  label: "Quản lý thành viên",
+                },
+              ]
+            : []),
+
+          // Menu chung
+          {
+            key: "common-group",
+            type: "group",
+            label: "Chung",
+          },
+          {
+            key: "support-requests",
+            icon: <QuestionCircleOutlined />,
+            label: "Yêu cầu hỗ trợ",
+          },
+          {
+            key: "reports",
+            icon: <BarChartOutlined />,
+            label: "Báo cáo thống kê",
+          },
+        ]}
       />
     </Sider>
   );
-}
+};
 
-export default StaffSideBar;
+export default StaffSidebar;

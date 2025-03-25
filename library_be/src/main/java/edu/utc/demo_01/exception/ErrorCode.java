@@ -22,6 +22,7 @@ public enum ErrorCode {
     REGISTED_EVENT("Bạn đã đăng ký tham gia sự kiện này rồi !!", 1013, HttpStatus.BAD_REQUEST),
     EVENT_TOOK_PLACE("Sự kiễn này đã diễn ra rồi !!", 1013, HttpStatus.BAD_REQUEST),
     ISBN_EXSITED("Mã ISBN bị trùng với một cuốn sách khác !!", 1014, HttpStatus.BAD_REQUEST),
+    CAN_NOT_FIND_BOOK_REVIEW("Không thể tìm thấy bình luận này !!", 1015, HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, int code, HttpStatusCode httpStatusCode) {

@@ -9,12 +9,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookReviewRepository extends JpaRepository<BookReview, String> {
     int countBookReviewsByUserID(User userID);
     boolean existsByBookIDAndUserID(Book bookID, User userID);
+    Optional<BookReview> findByReviewID(String reviewID);
     @Query(value = """
-        SELECT u.fullName AS fullName, 
+        SELECT br.ReviewID AS reviewID,
+                u.fullName AS fullName,
+                    u.UserImage AS userImage,
                br.rating AS rating, 
                br.comment AS comment, 
                br.createdAt AS createdAt

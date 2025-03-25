@@ -8,17 +8,17 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AddBookRequest {
+public class ChangeBookInfoRequest {
     String bookName;
     String author;
     String bookType;
     String isbn;
-    int totalCopies;
-    int publicationYear;
+    Integer totalCopies;
+    Integer publicationYear;
     String language;
-    int pageCount;
+    Integer pageCount;
     String format;
     String description;
-    String coverImage;
     String ddcCode;
 }
+

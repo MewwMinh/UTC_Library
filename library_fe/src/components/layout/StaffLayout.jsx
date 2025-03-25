@@ -1,18 +1,25 @@
-import { Layout } from "antd";
-import UserHeader from "./Header/UserHeader";
-import "/src/styles/Layout.css";
-import AdminSideBar from "./SideBar/AdminSideBar";
 import { Outlet } from "react-router-dom";
-import StaffSideBar from "./SideBar/StaffSideBar";
+import { Layout } from "antd";
+import StaffHeader from "./Header/StaffHeader";
+import StaffSidebar from "./SideBar/StaffSideBar";
+import StaffFooter from "./Footer/StaffFooter";
+import styles from "/src/styles/layout/staff/StaffLayout.module.css";
+
+const { Content } = Layout;
 
 const StaffLayout = () => {
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <UserHeader />
-      <Layout className="container">
-        <StaffSideBar />
-        <Layout className="content">
-          <Outlet />
+    <Layout className={styles.layout}>
+      <StaffHeader />
+      <Layout>
+        <StaffSidebar />
+        <Layout className={styles.siteLayout}>
+          <Content className={styles.siteContent}>
+            <div className={styles.contentWrapper}>
+              <Outlet />
+            </div>
+          </Content>
+          <StaffFooter />
         </Layout>
       </Layout>
     </Layout>

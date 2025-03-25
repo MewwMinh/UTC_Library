@@ -1,280 +1,218 @@
+// src/components/staff/librarian/book/BookList.jsx
 import { useState, useEffect } from "react";
 import {
   Table,
   Input,
   Button,
+  Select,
+  DatePicker,
   Space,
   Tag,
-  Card,
   Typography,
+  Row,
+  Col,
+  Card,
   Tooltip,
+  Empty,
+  notification,
+  Spin,
 } from "antd";
 import {
   SearchOutlined,
-  BookOutlined,
-  HeartOutlined,
-  HeartFilled,
+  EditOutlined,
+  EyeOutlined,
+  FilterOutlined,
+  ClearOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import bookService from "/src/services/librarian/bookService";
 
-const { Title } = Typography;
+const { Option } = Select;
+const { Text } = Typography;
 
 const BookList = () => {
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [filteredBooks, setFilteredBooks] = useState([]);
-  const [favorites, setFavorites] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [allBooks, setAllBooks] = useState([]);
+  const [filteredBooks, setFilteredBooks] = useState([]);
+  const [keyword, setKeyword] = useState("");
+  const [bookType, setBookType] = useState("");
+  const [language, setLanguage] = useState("");
+  const [publicationYear, setPublicationYear] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Giả lập dữ liệu sách từ API
   useEffect(() => {
-    const fetchBooks = async () => {
-      setLoading(true);
-      try {
-        // Trong thực tế, thay thế bằng URL API thực
-        // const response = await axios.get('/api/books');
-        // setBooks(response.data);
-
-        // Dữ liệu mẫu cho mục đích demo
-        const mockData = [
-          {
-            id: 1,
-            isbn: "978-3-16-148410-0",
-            title: "Kỹ thuật xây dựng cầu đường",
-            author: "Nguyễn Văn A",
-            category: "Kỹ thuật",
-            language: "Tiếng Việt",
-            publishYear: 2020,
-            pages: 350,
-            size: "21x28 cm",
-            availableCopies: 5,
-            totalCopies: 10,
-            coverImage: "https://via.placeholder.com/150",
-          },
-          {
-            id: 2,
-            isbn: "978-3-16-148410-1",
-            title: "Cơ sở dữ liệu phân tán",
-            author: "Trần Thị B",
-            category: "Công nghệ thông tin",
-            language: "Tiếng Việt",
-            publishYear: 2021,
-            pages: 250,
-            size: "20x25 cm",
-            availableCopies: 3,
-            totalCopies: 8,
-            coverImage: "https://via.placeholder.com/150",
-          },
-          {
-            id: 3,
-            isbn: "978-3-16-148410-2",
-            title: "Quản lý dự án xây dựng",
-            author: "Lê Văn C",
-            category: "Quản lý",
-            language: "Tiếng Việt",
-            publishYear: 2019,
-            pages: 300,
-            size: "20x27 cm",
-            availableCopies: 0,
-            totalCopies: 6,
-            coverImage: "https://via.placeholder.com/150",
-          },
-          {
-            id: 4,
-            isbn: "978-3-16-148410-3",
-            title: "Logistics và vận tải đa phương thức",
-            author: "Phạm Thị D",
-            category: "Vận tải",
-            language: "Tiếng Việt",
-            publishYear: 2022,
-            pages: 280,
-            size: "19x26 cm",
-            availableCopies: 7,
-            totalCopies: 10,
-            coverImage: "https://via.placeholder.com/150",
-          },
-          {
-            id: 5,
-            isbn: "978-3-16-148410-4",
-            title: "Artificial Intelligence for Transportation",
-            author: "John Smith",
-            category: "Công nghệ thông tin",
-            language: "Tiếng Anh",
-            publishYear: 2023,
-            pages: 420,
-            size: "21x29 cm",
-            availableCopies: 2,
-            totalCopies: 5,
-            coverImage: "https://via.placeholder.com/150",
-          },
-        ];
-
-        setBooks(mockData);
-        setFilteredBooks(mockData);
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu sách:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBooks();
   }, []);
 
-  // Xử lý tìm kiếm
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      const response = await bookService.getBooks();
+
+      if (response.success) {
+        setAllBooks(response.data);
+        setFilteredBooks(response.data);
+      } else {
+        notification.error({
+          message: "Lỗi",
+          description: response.message || "Không thể tải danh sách sách",
+        });
+      }
+    } catch (error) {
+      notification.error({
+        message: "Lỗi kết nối",
+        description: "Không thể kết nối đến máy chủ",
+      });
+      console.error("Error fetching books:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewDetails = (bookId) => {
+    navigate(`/staff/books/details/${bookId}`);
+  };
+
   const handleSearch = () => {
-    const filtered = books.filter(
-      (book) =>
-        book.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchText.toLowerCase()) ||
-        book.isbn.toLowerCase().includes(searchText.toLowerCase()) ||
-        book.category.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredBooks(filtered);
-  };
+    let results = [...allBooks];
 
-  // Xử lý khi nhấn Enter trong ô tìm kiếm
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
+    // Lọc theo từ khóa (tìm trong tên sách hoặc tác giả)
+    if (keyword) {
+      const lowerKeyword = keyword.toLowerCase();
+      results = results.filter(
+        (book) =>
+          book.bookName.toLowerCase().includes(lowerKeyword) ||
+          book.author.toLowerCase().includes(lowerKeyword) ||
+          (book.isbn && book.isbn.toLowerCase().includes(lowerKeyword))
+      );
     }
-  };
 
-  // Xử lý thêm/xóa sách khỏi danh sách yêu thích
-  const toggleFavorite = (bookId) => {
-    if (favorites.includes(bookId)) {
-      setFavorites(favorites.filter((id) => id !== bookId));
-    } else {
-      setFavorites([...favorites, bookId]);
+    // Lọc theo loại sách
+    if (bookType) {
+      results = results.filter((book) => book.bookType === bookType);
     }
+
+    // Lọc theo ngôn ngữ
+    if (language) {
+      results = results.filter((book) => book.language === language);
+    }
+
+    // Lọc theo năm xuất bản
+    if (publicationYear) {
+      const year = publicationYear.year();
+      results = results.filter((book) => book.publicationYear === year);
+    }
+
+    setFilteredBooks(results);
   };
 
-  // Định nghĩa các cột cho bảng dữ liệu
+  const handleReset = () => {
+    setKeyword("");
+    setBookType("");
+    setLanguage("");
+    setPublicationYear(null);
+    setFilteredBooks(allBooks);
+  };
+
+  const getAvailabilityTagColor = (availableCopies, totalCopies) => {
+    const ratio = availableCopies / totalCopies;
+    if (ratio === 0) return "error";
+    if (ratio < 0.3) return "warning";
+    return "success";
+  };
+
   const columns = [
     {
-      title: "Ảnh bìa",
-      dataIndex: "coverImage",
-      key: "coverImage",
-      width: 80,
-      render: (image) => (
-        <img
-          src={image}
-          alt="Ảnh bìa sách"
-          style={{ width: 60, height: 80, objectFit: "cover" }}
-        />
-      ),
+      title: "ISBN",
+      dataIndex: "isbn",
+      key: "isbn",
+      width: 130,
+      ellipsis: true,
     },
     {
       title: "Tên sách",
-      dataIndex: "title",
-      key: "title",
-      render: (text, record) => (
-        <Space direction="vertical" size={0}>
-          <span style={{ fontWeight: "bold" }}>{text}</span>
-          <span style={{ fontSize: "12px", color: "#666" }}>
-            ISBN: {record.isbn}
-          </span>
-        </Space>
+      dataIndex: "bookName",
+      key: "bookName",
+      ellipsis: true,
+      render: (text) => (
+        <Text strong style={{ fontSize: "16px" }}>
+          {text}
+        </Text>
       ),
-      sorter: (a, b) => a.title.localeCompare(b.title),
     },
     {
       title: "Tác giả",
       dataIndex: "author",
       key: "author",
-      sorter: (a, b) => a.author.localeCompare(b.author),
+      width: 200,
+      ellipsis: true,
     },
     {
       title: "Loại sách",
-      dataIndex: "category",
-      key: "category",
-      render: (category) => <Tag color="blue">{category}</Tag>,
-      filters: [
-        { text: "Kỹ thuật", value: "Kỹ thuật" },
-        { text: "Công nghệ thông tin", value: "Công nghệ thông tin" },
-        { text: "Quản lý", value: "Quản lý" },
-        { text: "Vận tải", value: "Vận tải" },
-      ],
-      onFilter: (value, record) => record.category === value,
+      dataIndex: "bookType",
+      key: "bookType",
+      width: 130,
+      ellipsis: true,
+    },
+    {
+      title: "Năm XB",
+      dataIndex: "publicationYear",
+      key: "publicationYear",
+      width: 90,
+      align: "center",
     },
     {
       title: "Ngôn ngữ",
       dataIndex: "language",
       key: "language",
-      filters: [
-        { text: "Tiếng Việt", value: "Tiếng Việt" },
-        { text: "Tiếng Anh", value: "Tiếng Anh" },
-      ],
-      onFilter: (value, record) => record.language === value,
+      width: 120,
+      ellipsis: true,
     },
     {
-      title: "Năm XB",
-      dataIndex: "publishYear",
-      key: "publishYear",
-      sorter: (a, b) => a.publishYear - b.publishYear,
-    },
-    {
-      title: "Số trang",
-      dataIndex: "pages",
-      key: "pages",
-    },
-    {
-      title: "Khổ cỡ",
-      dataIndex: "size",
-      key: "size",
-    },
-    {
-      title: "Số bản",
+      title: "Số lượng",
       key: "copies",
+      width: 100,
+      align: "center",
       render: (_, record) => (
-        <span>
-          <span
-            style={{
-              color: record.availableCopies === 0 ? "red" : "green",
-              fontWeight: "bold",
-            }}
+        <Tooltip
+          title={`Có sẵn: ${record.availableCopies}/${record.totalCopies}`}
+        >
+          <Tag
+            color={getAvailabilityTagColor(
+              record.availableCopies,
+              record.totalCopies
+            )}
           >
-            {record.availableCopies}
-          </span>
-          /{record.totalCopies}
-        </span>
+            {record.availableCopies}/{record.totalCopies}
+          </Tag>
+        </Tooltip>
       ),
-      sorter: (a, b) => a.availableCopies - b.availableCopies,
     },
     {
-      title: "Thao tác",
+      title: "Hành động",
       key: "action",
+      width: 120,
+      align: "center",
       render: (_, record) => (
         <Space size="small">
           <Tooltip title="Xem chi tiết">
             <Button
               type="primary"
               shape="circle"
-              icon={<BookOutlined />}
+              icon={<EyeOutlined />}
               size="small"
-              onClick={() => navigate("/staff/book-details")}
+              onClick={() => handleViewDetails(record.bookID)}
             />
           </Tooltip>
-          <Tooltip
-            title={
-              favorites.includes(record.id)
-                ? "Xóa khỏi yêu thích"
-                : "Thêm vào yêu thích"
-            }
-          >
+          <Tooltip title="Chỉnh sửa">
             <Button
               type="default"
               shape="circle"
-              icon={
-                favorites.includes(record.id) ? (
-                  <HeartFilled style={{ color: "red" }} />
-                ) : (
-                  <HeartOutlined />
-                )
-              }
+              icon={<EditOutlined />}
               size="small"
-              onClick={() => toggleFavorite(record.id)}
+              onClick={() => navigate(`/staff/books/edit/${record.bookID}`)}
             />
           </Tooltip>
         </Space>
@@ -282,40 +220,131 @@ const BookList = () => {
     },
   ];
 
-  return (
-    <Card>
-      <Title level={2} style={{ marginBottom: 20 }}>
-        <BookOutlined style={{ marginRight: 8 }} />
-        Danh sách sách
-      </Title>
+  if (loading && allBooks.length === 0) {
+    return (
+      <div
+        className="loading-container"
+        style={{ textAlign: "center", padding: "40px 0" }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
-      <Table
-        loading={loading}
-        columns={columns}
-        dataSource={filteredBooks}
-        rowKey="id"
-        pagination={{
-          pageSize: 10,
-          showSizeChanger: true,
-          showTotal: (total, range) =>
-            `${range[0]}-${range[1]} trên ${total} mục`,
-        }}
-        scroll={{ x: 1200 }}
-        bordered
-        summary={() => (
-          <Table.Summary.Row>
-            <Table.Summary.Cell index={0} colSpan={9}>
-              <div style={{ textAlign: "right", fontWeight: "bold" }}>
-                Tổng số sách:
-              </div>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={1}>
-              <div style={{ fontWeight: "bold" }}>{filteredBooks.length}</div>
-            </Table.Summary.Cell>
-          </Table.Summary.Row>
-        )}
-      />
-    </Card>
+  return (
+    <div className="book-list">
+      <Card style={{ marginBottom: 16 }}>
+        <Row gutter={[16, 16]} align="middle" justify="start">
+          <Col xs={24} sm={24} md={16} lg={12}>
+            <Space>
+              <Input
+                placeholder="Tìm kiếm sách..."
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                prefix={<SearchOutlined />}
+                allowClear
+                size="large"
+                onPressEnter={handleSearch}
+              />
+              <Button
+                type="primary"
+                onClick={handleSearch}
+                icon={<SearchOutlined />}
+              >
+                Tìm kiếm
+              </Button>
+              <Button
+                onClick={() => setShowFilters(!showFilters)}
+                icon={<FilterOutlined />}
+              >
+                {showFilters ? "Ẩn bộ lọc" : "Hiện bộ lọc"}
+              </Button>
+              <Button onClick={handleReset} icon={<ClearOutlined />}>
+                Đặt lại
+              </Button>
+            </Space>
+          </Col>
+          <Col xs={24} sm={24} md={8} lg={12}>
+            <Row justify="end" gutter={[8, 8]}>
+              <Col>
+                <Space>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => navigate("/staff/add-books")}
+                  >
+                    Thêm sách mới
+                  </Button>
+                </Space>
+              </Col>
+            </Row>
+          </Col>
+
+          {showFilters && (
+            <>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Select
+                  placeholder="Loại sách"
+                  style={{ width: "100%" }}
+                  value={bookType || undefined}
+                  onChange={(value) => setBookType(value)}
+                  allowClear
+                >
+                  <Option value="Giáo trình">Giáo trình</Option>
+                  <Option value="Tài liệu tham khảo">Tài liệu tham khảo</Option>
+                </Select>
+              </Col>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <Select
+                  placeholder="Ngôn ngữ"
+                  style={{ width: "100%" }}
+                  value={language || undefined}
+                  onChange={(value) => setLanguage(value)}
+                  allowClear
+                >
+                  <Option value="Tiếng Việt">Tiếng Việt</Option>
+                  <Option value="Tiếng Anh">Tiếng Anh</Option>
+                  <Option value="Tiếng Pháp">Tiếng Pháp</Option>
+                  <Option value="Tiếng Trung">Tiếng Trung</Option>
+                  <Option value="Tiếng Nhật">Tiếng Nhật</Option>
+                </Select>
+              </Col>
+              <Col xs={24} sm={12} md={8} lg={6}>
+                <DatePicker
+                  placeholder="Năm xuất bản"
+                  style={{ width: "100%" }}
+                  picker="year"
+                  value={publicationYear}
+                  onChange={(date) => setPublicationYear(date)}
+                />
+              </Col>
+            </>
+          )}
+        </Row>
+      </Card>
+
+      {filteredBooks.length === 0 ? (
+        <Empty
+          description="Không tìm thấy sách nào"
+          style={{ margin: "40px 0" }}
+        />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={filteredBooks}
+          rowKey="bookID"
+          loading={loading}
+          pagination={{
+            showSizeChanger: true,
+            showTotal: (total) => `Tổng cộng ${total} sách`,
+            defaultPageSize: 10,
+            pageSizeOptions: ["10", "20", "50", "100"],
+          }}
+          scroll={{ x: 800 }}
+          size="middle"
+        />
+      )}
+    </div>
   );
 };
 

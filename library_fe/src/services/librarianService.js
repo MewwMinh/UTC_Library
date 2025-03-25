@@ -88,6 +88,35 @@ const librarianService = {
     }
   },
 
+  deleteComment: async (reviewId) => {
+    try {
+      const response = await apiClient.delete(
+        `/librarian/delete-comment/${reviewId}`
+      );
+
+      if (response.data.code === 1000) {
+        return {
+          success: true,
+          message: response.data.message || "Đã xóa bình luận thành công",
+        };
+      } else {
+        return {
+          success: false,
+          message: response.data.message || "Không thể xóa bình luận",
+          code: response.data.code,
+        };
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Không thể kết nối đến máy chủ",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
+
   // Thêm các dịch vụ khác dành cho librarian ở đây
 };
 

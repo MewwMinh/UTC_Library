@@ -14,4 +14,8 @@ public interface DDCClassificationRepository extends JpaRepository<DDCClassifica
 SELECT * FROM DDCClassification WHERE DDCName = :ddcName
 """, nativeQuery = true)
     Optional<DDCClassification> findByDDCName(@Param("ddcName") String ddcName);
+    @Query(value = """
+SELECT * FROM DDCClassification WHERE DDCCode = :ddcCode
+""", nativeQuery = true)
+    DDCClassification findByDDCCode(String ddcCode);
 }
