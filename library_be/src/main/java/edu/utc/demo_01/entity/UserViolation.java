@@ -11,7 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -60,6 +60,6 @@ public class UserViolation {
 
     @ColumnDefault("(now())")
     @Column(name = "ViolationDate")
-    private Instant violationDate;
+    private LocalDateTime violationDate;
 
 }

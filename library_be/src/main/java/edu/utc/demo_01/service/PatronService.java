@@ -3,7 +3,6 @@ package edu.utc.demo_01.service;
 import edu.utc.demo_01.dto.APIResponse;
 import edu.utc.demo_01.dto.patron.request.*;
 import edu.utc.demo_01.dto.patron.response.*;
-import edu.utc.demo_01.dto.patron.response.BookReservationResponse;
 import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
@@ -19,7 +18,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -246,14 +244,14 @@ public class PatronService {
         return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
     }
 
-    public APIResponse renewBook(String recordID){
-        BorrowRecord record = borrowRecordRepository.findByRecordID(recordID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
-        record.setExtendCount(record.getExtendCount() + 1);
-        record.setExtendedDate(Instant.now());
-        record.setDueDate(Instant.now().plus(60, ChronoUnit.DAYS));
-        borrowRecordRepository.save(record);
-        return APIResponse.builder().code(1000).message("Bạn đã gia hạn thành công cuốn " + record.getBookID().getBookName()).build();
-    }
+//    public APIResponse renewBook(String recordID){
+//        BorrowRecord record = borrowRecordRepository.findByRecordID(recordID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
+//        record.setExtendCount(record.getExtendCount() + 1);
+//        record.setExtendedDate(Instant.now());
+//        record.setDueDate(Instant.now().plus(60, ChronoUnit.DAYS));
+//        borrowRecordRepository.save(record);
+//        return APIResponse.builder().code(1000).message("Bạn đã gia hạn thành công cuốn " + record.getBookID().getBookName()).build();
+//    }
     //endregion
 
     //region Achievement & Violation

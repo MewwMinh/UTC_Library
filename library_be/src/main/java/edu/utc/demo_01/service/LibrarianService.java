@@ -22,7 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,6 +33,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LibrarianService {
     CloudinaryService cloudinaryService;
+    LibrarySettingsService librarySettingsService;
     UserRepository userRepository;
     BookRepository bookRepository;
     BorrowRecordRepository borrowRecordRepository;
@@ -37,47 +41,8 @@ public class LibrarianService {
     UserAchievementRepository userAchievementRepository;
     DDCClassificationRepository ddcClassificationRepository;
     BookReviewRepository bookReviewRepository;
-
-
-
-
-//    @Transactional
-//    public boolean acceptBookReturn(LendBookRequest request) {
-//        String librarianID = SecurityContextHolder.getContext().getAuthentication().getName();
-//        if (librarianID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-//        User librarian = userRepository.findByUserID(librarianID).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//
-//        String borrowRecordID = borrowRecordRepository.findBorrowRecordIDByBookIDAndUserID(request.getBookID(), request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
-//        BorrowRecord borrowRecord = borrowRecordRepository.findByRecordID(borrowRecordID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
-//
-//        borrowRecord.setReturnApprovedBy(librarian);
-//        borrowRecord.setReturnDate(Instant.now());
-//        borrowRecordRepository.save(borrowRecord);
-//
-//        if (Instant.now().isAfter(borrowRecord.getDueDate())) {
-//            User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//            long daysLate = ChronoUnit.DAYS.between(borrowRecord.getDueDate(), Instant.now());
-//
-//            UserViolation userViolation = new UserViolation();
-//            userViolation.setRecordID(borrowRecord);
-//            userViolation.setUserID(user);
-//            userViolation.setRecordedBy(librarian);
-//            userViolation.setViolationType("Trả sách muộn");
-//            userViolation.setPointsDeducted(25);
-//            userViolation.setDescription("Bạn đọc trả sách muộn " + daysLate + " ngày.");
-//            // Giả sử mỗi ngày trễ phạt 500 VNĐ
-//            userViolation.setPenaltyAmount(BigDecimal.valueOf(daysLate*500));
-//            userViolation.setViolationDate(Instant.now());
-//            userViolationRepository.save(userViolation);
-//
-//            user.setMemberPoints(user.getMemberPoints() - 25);
-//            userRepository.save(user);
-//        } else {
-//            User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-//
-//        }
-//        return true;
-//    }
+    PointHistoryRepository pointHistoryRepository;
+    MembershipRepository membershipRepository;
 
 
     //region Manage Books
@@ -190,6 +155,11 @@ public class LibrarianService {
     //endregion
 
     //region Manage Borrow Return
+    boolean isWithinRange(LocalDate date, LocalDate start, LocalDate end) {
+        return (date.isAfter(start) || date.isEqual(start)) &&
+                (date.isBefore(end) || date.isEqual(end));
+    }
+
     public APIResponse<PatronBorrowInformation> getPatronBorrowInformation(String patronID) {
         PatronInformation information = userRepository.getPatronInformationByUserID(patronID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION));
         List<BorrowBookResponse2> borrow = borrowRecordRepository.getNearAndOverDueBooks(patronID);
@@ -207,6 +177,7 @@ public class LibrarianService {
     }
 
     public APIResponse<Book> getBookByCode(String code) {
+        System.out.println("Meow " + librarySettingsService.getMaxReferenceMaterials("Gold"));
         return APIResponse.<Book>builder()
                 .code(1000)
                 .result(bookRepository.findByBookID(code).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK)))
@@ -215,27 +186,157 @@ public class LibrarianService {
 
     @Transactional
     public APIResponse lendBook(LendBookRequest request) {
-        User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         String librarianID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (librarianID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
         User librarian = userRepository.findByUserID(librarianID).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        String membership = membershipRepository.findByUserID(user).getMembershipType();
+        if (membership.equals("Vàng")){
+            membership = "Gold";
+        }
+        else if (membership.equals("Bạc")) {
+            membership = "Sliver";
+        }
+        else if (membership.equals("Đồng")) {
+            membership = "Bronze";
+        }
+        else throw new AppException(ErrorCode.UNIDENTIFIED_MEMBERSHIP_TYPE);
+        int maxReferenceMaterials = librarySettingsService.getMaxReferenceMaterials(membership);
+        int maxTextbooks = librarySettingsService.getMaxTextbooks(membership);
 
         List<Books> books = request.getBooks();
 
         for(Books book : books) {
             Book b = bookRepository.findByBookID(book.getBookID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
-            for (int i = 0; i < book.getQuantity(); i++) {
-                BorrowRecord borrowRecord = new BorrowRecord();
-                borrowRecord.setUserID(user);
-                borrowRecord.setBookID(b);
-                borrowRecord.setBorrowDate(Instant.now());
-                borrowRecord.setDueDate(Instant.now().plus(90, ChronoUnit.DAYS));
-                borrowRecord.setExtendCount(0);
-                borrowRecord.setApprovedBy(librarian);
-                borrowRecordRepository.save(borrowRecord);
+            String bookType = b.getBookType();
+            int numberOfBorrowed = borrowRecordRepository.getBorrowedCountByUserIDAndBookType(user.getUserID(), b.getBookType());
+            if (bookType.equals("Tài liệu tham khảo")) {
+                if (maxReferenceMaterials < numberOfBorrowed + book.getQuantity()) throw new AppException(ErrorCode.BORROWING_MORE_THAN_ALLOWED);
+                for (int i = 0; i < book.getQuantity(); i++) {
+                    BorrowRecord borrowRecord = new BorrowRecord();
+                    borrowRecord.setUserID(user);
+                    borrowRecord.setBookID(b);
+                    borrowRecord.setBorrowDate(LocalDateTime.now());
+                    borrowRecord.setDueDate(LocalDate.now().plusDays(librarySettingsService.getMaximumBorrowingPeriodForReferenceMaterials()).atStartOfDay());
+                    borrowRecord.setExtendCount(0);
+                    borrowRecord.setApprovedBy(librarian);
+                    borrowRecordRepository.save(borrowRecord);
+                }
+            }
+            if (bookType.equals("Giáo trình")) {
+                if (maxTextbooks < numberOfBorrowed + book.getQuantity()) throw new AppException(ErrorCode.BORROWING_MORE_THAN_ALLOWED);
+                for (int i = 0; i < book.getQuantity(); i++) {
+                    BorrowRecord borrowRecord = new BorrowRecord();
+                    borrowRecord.setUserID(user);
+                    borrowRecord.setBookID(b);
+                    borrowRecord.setBorrowDate(LocalDateTime.now());
+
+                    if (LocalDate.now().isAfter(librarySettingsService.getSemester1_BorrowDate("Start").minusDays(1))){
+                        LocalDate startDate = librarySettingsService.getSemester1_BorrowDate("Start");
+                        LocalDate endDate = librarySettingsService.getSemester1_BorrowDate("End");
+                        if (isWithinRange(LocalDate.now(), startDate, endDate)){
+                            borrowRecord.setDueDate(librarySettingsService.getSemester1_LatestReturnDate().plusDays(1).atStartOfDay());
+                        }
+                        else{
+                            borrowRecord.setDueDate(librarySettingsService.getSemester2_LatestReturnDate(false).plusDays(1).atStartOfDay());
+                        }
+                    }
+                    else {
+                        borrowRecord.setDueDate(librarySettingsService.getSemester2_LatestReturnDate(true).plusDays(1).atStartOfDay());
+                    }
+
+                    borrowRecord.setExtendCount(0);
+                    borrowRecord.setApprovedBy(librarian);
+                    borrowRecordRepository.save(borrowRecord);
+                }
             }
         }
-        return APIResponse.builder().code(1000).message("Thanh cong").build();
+        return APIResponse.builder().code(1000).message("Mượn sách thành công").build();
+    }
+
+    @Transactional
+    public APIResponse<List<String>> acceptBookReturn(LendBookRequest request) {
+        String librarianID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (librarianID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User librarian = userRepository.findByUserID(librarianID).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        List<String> result = new ArrayList<>();
+
+        List<Books> books = request.getBooks();
+        for(Books book : books) {
+            String bookType = bookRepository.findByBookID(book.getBookID()).orElseThrow().getBookType();
+            for (int i = 0; i < book.getQuantity(); i++) {
+                String borrowRecordID = borrowRecordRepository.findBorrowRecordIDByBookIDAndUserID(book.getBookID(), request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
+                BorrowRecord borrowRecord = borrowRecordRepository.findByRecordID(borrowRecordID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
+
+                borrowRecord.setReturnApprovedBy(librarian);
+                borrowRecord.setReturnDate(Instant.now());
+                borrowRecordRepository.save(borrowRecord);
+
+                if (LocalDateTime.now().isAfter(borrowRecord.getDueDate())) {
+                    User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                    long daysLate = ChronoUnit.DAYS.between(borrowRecord.getDueDate(), LocalDateTime.now());
+
+                    UserViolation userViolation = new UserViolation();
+                    userViolation.setRecordID(borrowRecord);
+                    userViolation.setUserID(user);
+                    userViolation.setRecordedBy(librarian);
+                    userViolation.setViolationType("Trả sách muộn");
+                    userViolation.setDescription("Bạn đọc trả sách muộn " + daysLate + " ngày.");
+                    int penaltyAmount;
+                    int pointsDeducted;
+                    if (bookType.equals("Tài liệu tham khảo")){
+                        if (daysLate <= 30) penaltyAmount = (int)(librarySettingsService.getLateFeeMultiplier_ReferenceMaterials_Under30Days() * borrowRecord.getBookID().getListedBookPrice());
+                        else penaltyAmount = (int)(librarySettingsService.getLateFeeMultiplier_ReferenceMaterials_Over30Days() * borrowRecord.getBookID().getListedBookPrice());
+                        pointsDeducted = librarySettingsService.getPointsDeductedForLateReferenceMaterialsReturn();
+                    }
+                    else {
+                        if (LocalDateTime.now().isBefore(borrowRecord.getDueDate().plusMonths(3))) penaltyAmount = (int) (librarySettingsService.getLateFeeMultiplier_Textbook_Under3Months() * borrowRecord.getBookID().getListedBookPrice());
+                        else penaltyAmount = (int) (librarySettingsService.getLateFeeMultiplier_Textbook_Over3Months() * borrowRecord.getBookID().getListedBookPrice());
+                        pointsDeducted = librarySettingsService.getPointsDeductedForLateTextbookReturn();
+                    }
+                    userViolation.setPointsDeducted(pointsDeducted);
+                    userViolation.setViolationDate(LocalDateTime.now());
+                    userViolationRepository.save(userViolation);
+
+                    if (user.getMemberPoints() - pointsDeducted > 0) user.setMemberPoints(user.getMemberPoints() - pointsDeducted);
+                    else user.setMemberPoints(0);
+                    userRepository.save(user);
+
+                    PointHistory pointHistory = new PointHistory();
+                    pointHistory.setUserID(user);
+                    pointHistory.setPoints(0 - pointsDeducted);
+                    pointHistory.setReason("Bạn đọc trả sách muộn " + daysLate + " ngày.");
+                    pointHistory.setUpdatedBy(librarian);
+                    pointHistory.setCreatedAt(LocalDateTime.now());
+                    pointHistoryRepository.save(pointHistory);
+
+                    result.add("Trả muộn cuốn " + borrowRecord.getBookID().getBookName() + " " + daysLate + " ngày. Số tiền phạt là: " + penaltyAmount + " VND");
+                } else {
+                    System.out.println("Minhminh:");
+                    User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                    int pointBonus = librarySettingsService.getBonusPointsForOnTimeBookReturn();
+                    user.setMemberPoints(user.getMemberPoints() + pointBonus);
+                    userRepository.save(user);
+
+                    PointHistory pointHistory = new PointHistory();
+                    pointHistory.setUserID(user);
+                    pointHistory.setPoints(pointBonus);
+                    pointHistory.setReason("Bạn đọc trả sách đúng hạn.");
+                    pointHistory.setUpdatedBy(librarian);
+                    pointHistory.setCreatedAt(LocalDateTime.now());
+                    pointHistoryRepository.save(pointHistory);
+
+                    result.add("Trả sách " + borrowRecord.getBookID().getBookName() + " đúng hạn.");
+                }
+            }
+        }
+        return APIResponse.<List<String>>builder()
+                .code(1000)
+                .result(result)
+                .build();
     }
     //endregion
+
+
 }

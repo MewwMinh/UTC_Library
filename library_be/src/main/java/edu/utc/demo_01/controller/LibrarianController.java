@@ -26,12 +26,6 @@ public class LibrarianController {
     LibrarianService service;
     CloudinaryService cloudinaryService;
 
-//    @PostMapping("accept-book-return")
-//    public boolean acceptBookReturn(@RequestBody LendBookRequest request) {
-//        return service.acceptBookReturn(request);
-//    }
-
-
     //region Manage Books
     @GetMapping("get-all-books")
     public APIResponse<List<BookResponse>> getAllBooks() {
@@ -79,6 +73,10 @@ public class LibrarianController {
     @PostMapping("lend-book")
     public APIResponse lendBook(@RequestBody LendBookRequest request) {
         return service.lendBook(request);
+    }
+    @PostMapping("accept-book-return")
+    public APIResponse<List<String>> acceptBookReturn(@RequestBody LendBookRequest request) {
+        return service.acceptBookReturn(request);
     }
     //endregion
 }

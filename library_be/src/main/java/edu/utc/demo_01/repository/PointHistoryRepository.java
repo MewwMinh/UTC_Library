@@ -17,7 +17,7 @@ public interface PointHistoryRepository extends JpaRepository<PointHistory, Stri
         FROM PointHistory ph
          LEFT JOIN Users u ON u.UserID = ph.UpdatedBy  
         WHERE ph.UserID = :userID
-        ORDER BY ph.CreatedAt DESC
+        ORDER BY ph.CreatedAt ASC 
     """, nativeQuery = true)
     List<PointHistoryResponse> getPatronPointHistory(@Param("userID") String userID);
 }

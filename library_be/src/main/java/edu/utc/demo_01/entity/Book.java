@@ -77,4 +77,7 @@ public class Book {
     @JoinColumn(name = "DDCCode", referencedColumnName = "DDCCode")
     private DDCClassification dDCCode;
 
+    @NotNull
+    @Column(name = "ListedBookPrice", nullable = false)
+    int listedBookPrice;
 }

@@ -11,6 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -42,11 +43,11 @@ public class BorrowRecord {
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "BorrowDate", nullable = false)
-    private Instant borrowDate;
+    private LocalDateTime borrowDate;
 
     @NotNull
     @Column(name = "DueDate", nullable = false)
-    private Instant dueDate;
+    private LocalDateTime dueDate;
 
     @ColumnDefault("0")
     @Column(name = "ExtendCount")

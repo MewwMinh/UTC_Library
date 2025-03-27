@@ -111,10 +111,10 @@ public class PatronController {
     public APIResponse<List<BorrowBookResponse1>> getBorrowRecordsHistory() {
         return service.getBorrowRecordsHistory();
     }
-    @PostMapping("renew-book/{id}")
-    public APIResponse renewBook(@PathVariable String id){
-        return service.renewBook(id);
-    }
+//    @PostMapping("renew-book/{id}")
+//    public APIResponse renewBook(@PathVariable String id){
+//        return service.renewBook(id);
+//    }
 
     @GetMapping("get-all-events")
     public APIResponse<List<EventResponse>> getAllEvents() {

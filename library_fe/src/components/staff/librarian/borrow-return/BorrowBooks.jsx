@@ -1,24 +1,17 @@
-// Remove book from selected books
-const removeBook = (bookIndex) => {
-  setSelectedBooks(selectedBooks.filter((_, index) => index !== bookIndex));
-}; // src/components/BorrowBooks/BorrowBooks.jsx
-import React, { useState, useRef, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import { useState, useRef, useEffect } from "react";
 import {
   Input,
   Button,
-  Card,
   Avatar,
   Badge,
   Table,
   Spin,
   notification,
-  Empty,
   Tag,
   Modal,
   Typography,
   List,
-  Divider,
-  Space,
   Alert,
   InputNumber,
 } from "antd";
@@ -27,22 +20,18 @@ import {
   UserOutlined,
   BookOutlined,
   ScanOutlined,
-  CloseCircleOutlined,
-  InfoCircleOutlined,
-  ClockCircleOutlined,
   WarningOutlined,
   CheckCircleOutlined,
   PlusOutlined,
   DeleteOutlined,
   IdcardOutlined,
-  MinusOutlined,
   PlusCircleOutlined,
   MinusCircleOutlined,
 } from "@ant-design/icons";
 import borrowReturnService from "/src/services/librarian/borrowReturnService.js";
 import styles from "/src/styles/borrow/BorrowBooks.module.css";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Search } = Input;
 
 const BorrowBooks = () => {
@@ -72,7 +61,9 @@ const BorrowBooks = () => {
       bookInputRef.current.focus();
     }
   }, [selectedBooks, bookLoading]);
-
+  const removeBook = (bookIndex) => {
+    setSelectedBooks(selectedBooks.filter((_, index) => index !== bookIndex));
+  };
   // Search patron by ID
   const handlePatronSearch = async (value) => {
     if (!value) {
