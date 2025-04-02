@@ -12,7 +12,13 @@ import {
   BookAddPage,
   BookDetailsPage,
   BorrowReturnPage,
+  ViolationsListPage,
+  ViolationDetailPage,
 } from "/src/pages/staff/librarian";
+import {
+  SupportRequestsPage,
+  SupportRequestDetail,
+} from "/src/pages/staff/shared";
 const StaffRoutes = () => {
   return (
     <Routes>
@@ -22,6 +28,11 @@ const StaffRoutes = () => {
         <Route path="books/edit/:bookId" element={<BookEditPage />} />
         <Route path="add-book" element={<BookAddPage />} />
         <Route path="borrow-return" element={<BorrowReturnPage />} />
+        <Route path="violations" element={<ViolationsListPage />} />
+        <Route path="violations/:id" element={<ViolationDetailPage />} />
+
+        <Route path="support-requests" element={<SupportRequestsPage />} />
+        <Route path="support-requests/:id" element={<SupportRequestDetail />} />
 
         <Route path="manage-patron" element={<ManagePatron />} />
         <Route path="patron-details/:patronId" element={<PatronDetails />} />

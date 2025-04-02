@@ -52,6 +52,8 @@ public class AddDefaultDataService {
         settings.add(createLibrarySetting("PointsDeductedForLateTextbookReturn", "20"));
         settings.add(createLibrarySetting("PointsDeductedForLateReferenceMaterialsReturn", "25"));
         settings.add(createLibrarySetting("BonusPointsForOnTimeBookReturn", "10"));
+        settings.add(createLibrarySetting("PointsDeductedForDamagedBook", "30"));
+        settings.add(createLibrarySetting("PointsDeductedForLostBook", "40"));
         librarySettingRepository.saveAll(settings);
     }
 

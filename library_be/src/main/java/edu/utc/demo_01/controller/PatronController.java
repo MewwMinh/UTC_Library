@@ -100,7 +100,7 @@ public class PatronController {
     }
 
     @GetMapping("get-borrowing-books")
-    public APIResponse<List<BorrowBookResponse1>> getBorrowingBooks() {
+    public APIResponse<List<BorrowBookResponse2>> getBorrowingBooks() {
         return service.getBorrowingBooks();
     }
     @GetMapping("get-near-and-over-due-books")
@@ -108,7 +108,7 @@ public class PatronController {
         return service.getNearAndOverDueBooks();
     }
     @GetMapping("get-borrow-records-history")
-    public APIResponse<List<BorrowBookResponse1>> getBorrowRecordsHistory() {
+    public APIResponse<List<BorrowBookResponse2>> getBorrowRecordsHistory() {
         return service.getBorrowRecordsHistory();
     }
 //    @PostMapping("renew-book/{id}")

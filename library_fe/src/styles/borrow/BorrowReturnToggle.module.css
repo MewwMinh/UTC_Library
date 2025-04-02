@@ -1,0 +1,89 @@
+/* BorrowReturnToggle.module.css */
+.toggleContainer {
+  display: flex;
+  align-items: center;
+  background-color: #f0f2f5;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.toggleContainer:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toggleOption {
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activeOption {
+  color: #fff;
+  background-color: #1890ff;
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.4);
+}
+
+.inactiveOption {
+  color: #595959;
+}
+
+.inactiveOption:hover {
+  color: #40a9ff;
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+.toggleIcon {
+  font-size: 18px;
+}
+
+.toggleDivider {
+  height: 30px;
+  width: 2px;
+  background-color: #d9d9d9;
+  margin: 0 12px;
+}
+
+/* Animation for toggle container */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(24, 144, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0);
+  }
+}
+
+.toggleContainer:active {
+  animation: pulse 0.8s ease-out;
+}
+
+/* Animation for active option */
+@keyframes slideIn {
+  0% {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.activeOption {
+  animation: slideIn 0.3s ease-out;
+}

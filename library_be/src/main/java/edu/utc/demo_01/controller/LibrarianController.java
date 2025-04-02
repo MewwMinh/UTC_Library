@@ -3,9 +3,12 @@ package edu.utc.demo_01.controller;
 import edu.utc.demo_01.dto.APIResponse;
 import edu.utc.demo_01.dto.librarian.request.AddBookRequest;
 import edu.utc.demo_01.dto.librarian.request.ChangeBookInfoRequest;
+import edu.utc.demo_01.dto.librarian.request.CreateViolationRecord;
 import edu.utc.demo_01.dto.librarian.request.LendBookRequest;
 import edu.utc.demo_01.dto.librarian.response.BookResponse;
 import edu.utc.demo_01.dto.librarian.response.PatronBorrowInformation;
+import edu.utc.demo_01.dto.librarian.response.PatronReturnInformation;
+import edu.utc.demo_01.dto.librarian.response.ReturnBookResponse;
 import edu.utc.demo_01.entity.Book;
 import edu.utc.demo_01.service.CloudinaryService;
 import edu.utc.demo_01.service.LibrarianService;
@@ -74,9 +77,21 @@ public class LibrarianController {
     public APIResponse lendBook(@RequestBody LendBookRequest request) {
         return service.lendBook(request);
     }
+    @PostMapping("accept-book-return/{id}")
+    public APIResponse<List<ReturnBookResponse>> acceptBookReturn(@PathVariable String id) {
+        return service.acceptBookReturn(id);
+    }
     @PostMapping("accept-book-return")
-    public APIResponse<List<String>> acceptBookReturn(@RequestBody LendBookRequest request) {
+    public APIResponse<List<ReturnBookResponse>> acceptBookReturn(@RequestBody LendBookRequest request) {
         return service.acceptBookReturn(request);
+    }
+    @PostMapping("create-violation-record")
+    public APIResponse createViolationRecord(@RequestBody CreateViolationRecord request) {
+        return service.createViolationRecord(request);
+    }
+    @GetMapping("get-patron-return-information/{id}")
+    public APIResponse<PatronReturnInformation> getPatronReturnInformation(@PathVariable String id) {
+        return service.getPatronReturnInformation(id);
     }
     //endregion
 }

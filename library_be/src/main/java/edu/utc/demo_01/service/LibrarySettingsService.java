@@ -68,5 +68,9 @@ public class LibrarySettingsService {
     public int getBonusPointsForOnTimeBookReturn(){
         return Integer.parseInt(librarySettingRepository.getSettingValue("BonusPointsForOnTimeBookReturn"));
     }
+    public int getPointsDeductedFor(String key){
+        String settingKey =  "PointsDeductedFor" + key;
+        return Integer.parseInt(librarySettingRepository.getSettingValue(settingKey));
+    }
 
 }

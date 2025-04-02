@@ -223,11 +223,11 @@ public class PatronService {
     //endregion
 
     //region BorrowHistory
-    public APIResponse<List<BorrowBookResponse1>> getBorrowingBooks(){
+    public APIResponse<List<BorrowBookResponse2>> getBorrowingBooks(){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-        List<BorrowBookResponse1> result = borrowRecordRepository.findBorrowingBooks(userID);
-        return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
+        List<BorrowBookResponse2> result = borrowRecordRepository.findBorrowingBooks(userID);
+        return APIResponse.<List<BorrowBookResponse2>>builder().code(1000).result(result).build();
     }
 
     public APIResponse<List<BorrowBookResponse2>> getNearAndOverDueBooks(){
@@ -237,11 +237,11 @@ public class PatronService {
         return APIResponse.<List<BorrowBookResponse2>>builder().code(1000).result(result).build();
     }
 
-    public APIResponse<List<BorrowBookResponse1>> getBorrowRecordsHistory(){
+    public APIResponse<List<BorrowBookResponse2>> getBorrowRecordsHistory(){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-        List<BorrowBookResponse1> result = borrowRecordRepository.getBorrowRecordsHistory(userID);
-        return APIResponse.<List<BorrowBookResponse1>>builder().code(1000).result(result).build();
+        List<BorrowBookResponse2> result = borrowRecordRepository.getBorrowRecordsHistory(userID);
+        return APIResponse.<List<BorrowBookResponse2>>builder().code(1000).result(result).build();
     }
 
 //    public APIResponse renewBook(String recordID){

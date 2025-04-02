@@ -10,7 +10,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Builder
@@ -54,7 +53,7 @@ public class BorrowRecord {
     private Integer extendCount;
 
     @Column(name = "ExtendedDate")
-    private Instant extendedDate;
+    private LocalDateTime extendedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -67,6 +66,6 @@ public class BorrowRecord {
     private User returnApprovedBy;
 
     @Column(name = "ReturnDate")
-    private Instant returnDate;
+    private LocalDateTime returnDate;
 
 }

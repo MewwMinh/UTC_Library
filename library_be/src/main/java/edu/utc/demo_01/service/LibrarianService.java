@@ -1,12 +1,11 @@
 package edu.utc.demo_01.service;
 
 import edu.utc.demo_01.dto.APIResponse;
-import edu.utc.demo_01.dto.librarian.request.AddBookRequest;
-import edu.utc.demo_01.dto.librarian.request.Books;
-import edu.utc.demo_01.dto.librarian.request.ChangeBookInfoRequest;
-import edu.utc.demo_01.dto.librarian.request.LendBookRequest;
+import edu.utc.demo_01.dto.librarian.request.*;
 import edu.utc.demo_01.dto.librarian.response.BookResponse;
 import edu.utc.demo_01.dto.librarian.response.PatronBorrowInformation;
+import edu.utc.demo_01.dto.librarian.response.PatronReturnInformation;
+import edu.utc.demo_01.dto.librarian.response.ReturnBookResponse;
 import edu.utc.demo_01.dto.patron.response.BorrowBookResponse2;
 import edu.utc.demo_01.dto.patron.response.PatronInformation;
 import edu.utc.demo_01.entity.*;
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -177,7 +176,6 @@ public class LibrarianService {
     }
 
     public APIResponse<Book> getBookByCode(String code) {
-        System.out.println("Meow " + librarySettingsService.getMaxReferenceMaterials("Gold"));
         return APIResponse.<Book>builder()
                 .code(1000)
                 .result(bookRepository.findByBookID(code).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK)))
@@ -209,6 +207,9 @@ public class LibrarianService {
 
         for(Books book : books) {
             Book b = bookRepository.findByBookID(book.getBookID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BOOK));
+            if (b.getAvailableCopies() < book.getQuantity()) throw new AppException(ErrorCode.NOT_ENOUGH_BOOK);
+            b.setAvailableCopies(b.getAvailableCopies() - book.getQuantity());
+            bookRepository.save(b);
             String bookType = b.getBookType();
             int numberOfBorrowed = borrowRecordRepository.getBorrowedCountByUserIDAndBookType(user.getUserID(), b.getBookType());
             if (bookType.equals("Tài liệu tham khảo")) {
@@ -256,21 +257,97 @@ public class LibrarianService {
     }
 
     @Transactional
-    public APIResponse<List<String>> acceptBookReturn(LendBookRequest request) {
+    public APIResponse acceptBookReturn(String recordID){
         String librarianID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (librarianID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
         User librarian = userRepository.findByUserID(librarianID).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        List<String> result = new ArrayList<>();
+        BorrowRecord borrowRecord = borrowRecordRepository.findByRecordID(recordID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
+        borrowRecord.setReturnApprovedBy(librarian);
+        borrowRecord.setReturnDate(LocalDateTime.now());
+        borrowRecordRepository.save(borrowRecord);
+        Book b = borrowRecord.getBookID();
+        b.setAvailableCopies(b.getAvailableCopies() + 1);
+        bookRepository.save(b);
+        String message;
+
+        if (LocalDateTime.now().isAfter(borrowRecord.getDueDate())) {
+            User user = borrowRecord.getUserID();
+            long daysLate = ChronoUnit.DAYS.between(borrowRecord.getDueDate(), LocalDateTime.now());
+
+            UserViolation userViolation = new UserViolation();
+            userViolation.setRecordID(borrowRecord);
+            userViolation.setUserID(user);
+            userViolation.setRecordedBy(librarian);
+            userViolation.setViolationType("Trả sách muộn");
+            userViolation.setDescription("Bạn đọc trả sách muộn " + daysLate + " ngày.");
+            userViolation.setSolution("Nộp tiền phạt");
+            int penaltyAmount;
+            int pointsDeducted;
+            if (borrowRecord.getBookID().getBookType().equals("Tài liệu tham khảo")){
+                if (daysLate <= 30) penaltyAmount = (int)(librarySettingsService.getLateFeeMultiplier_ReferenceMaterials_Under30Days() * borrowRecord.getBookID().getListedBookPrice());
+                else penaltyAmount = (int)(librarySettingsService.getLateFeeMultiplier_ReferenceMaterials_Over30Days() * borrowRecord.getBookID().getListedBookPrice());
+                pointsDeducted = librarySettingsService.getPointsDeductedForLateReferenceMaterialsReturn();
+            }
+            else {
+                if (LocalDateTime.now().isBefore(borrowRecord.getDueDate().plusMonths(3))) penaltyAmount = (int) (librarySettingsService.getLateFeeMultiplier_Textbook_Under3Months() * borrowRecord.getBookID().getListedBookPrice());
+                else penaltyAmount = (int) (librarySettingsService.getLateFeeMultiplier_Textbook_Over3Months() * borrowRecord.getBookID().getListedBookPrice());
+                pointsDeducted = librarySettingsService.getPointsDeductedForLateTextbookReturn();
+            }
+            userViolation.setPenaltyAmount(BigDecimal.valueOf(penaltyAmount));
+            userViolation.setPointsDeducted(pointsDeducted);
+            userViolation.setViolationDate(LocalDateTime.now());
+            userViolationRepository.save(userViolation);
+
+            if (user.getMemberPoints() - pointsDeducted > 0) user.setMemberPoints(user.getMemberPoints() - pointsDeducted);
+            else user.setMemberPoints(0);
+            userRepository.save(user);
+
+            PointHistory pointHistory = new PointHistory();
+            pointHistory.setUserID(user);
+            pointHistory.setPoints(0 - pointsDeducted);
+            pointHistory.setReason("Bạn đọc trả sách muộn " + daysLate + " ngày.");
+            pointHistory.setUpdatedBy(librarian);
+            pointHistory.setCreatedAt(LocalDateTime.now());
+            pointHistoryRepository.save(pointHistory);
+            message = "Trả sách thành công. Bạn đọc trả sách muộn " + daysLate + " ngày, nộp phạt " + penaltyAmount + "VND";
+        }
+        else {
+            User user = borrowRecord.getUserID();
+            int pointBonus = librarySettingsService.getBonusPointsForOnTimeBookReturn();
+            user.setMemberPoints(user.getMemberPoints() + pointBonus);
+            userRepository.save(user);
+
+            PointHistory pointHistory = new PointHistory();
+            pointHistory.setUserID(user);
+            pointHistory.setPoints(pointBonus);
+            pointHistory.setReason("Bạn đọc trả sách đúng hạn.");
+            pointHistory.setUpdatedBy(librarian);
+            pointHistory.setCreatedAt(LocalDateTime.now());
+            pointHistoryRepository.save(pointHistory);
+            message = "Bạn đọc trả sách đúng hạn!";
+        }
+        return APIResponse.builder().code(1000).message(message).build();
+    }
+
+    @Transactional
+    public APIResponse<List<ReturnBookResponse>> acceptBookReturn(LendBookRequest request) {
+        String librarianID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (librarianID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User librarian = userRepository.findByUserID(librarianID).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        List<ReturnBookResponse> result = new ArrayList<>();
 
         List<Books> books = request.getBooks();
         for(Books book : books) {
-            String bookType = bookRepository.findByBookID(book.getBookID()).orElseThrow().getBookType();
+            Book b = bookRepository.findByBookID(book.getBookID()).orElseThrow();
+            String bookType = b.getBookType();
+            b.setAvailableCopies(b.getAvailableCopies() + book.getQuantity());
+            bookRepository.save(b);
             for (int i = 0; i < book.getQuantity(); i++) {
                 String borrowRecordID = borrowRecordRepository.findBorrowRecordIDByBookIDAndUserID(book.getBookID(), request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
                 BorrowRecord borrowRecord = borrowRecordRepository.findByRecordID(borrowRecordID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
 
                 borrowRecord.setReturnApprovedBy(librarian);
-                borrowRecord.setReturnDate(Instant.now());
+                borrowRecord.setReturnDate(LocalDateTime.now());
                 borrowRecordRepository.save(borrowRecord);
 
                 if (LocalDateTime.now().isAfter(borrowRecord.getDueDate())) {
@@ -283,6 +360,7 @@ public class LibrarianService {
                     userViolation.setRecordedBy(librarian);
                     userViolation.setViolationType("Trả sách muộn");
                     userViolation.setDescription("Bạn đọc trả sách muộn " + daysLate + " ngày.");
+                    userViolation.setSolution("Nộp tiền phạt");
                     int penaltyAmount;
                     int pointsDeducted;
                     if (bookType.equals("Tài liệu tham khảo")){
@@ -311,9 +389,9 @@ public class LibrarianService {
                     pointHistory.setCreatedAt(LocalDateTime.now());
                     pointHistoryRepository.save(pointHistory);
 
-                    result.add("Trả muộn cuốn " + borrowRecord.getBookID().getBookName() + " " + daysLate + " ngày. Số tiền phạt là: " + penaltyAmount + " VND");
-                } else {
-                    System.out.println("Minhminh:");
+                    result.add(new ReturnBookResponse(borrowRecordID, "Trả muộn cuốn " + borrowRecord.getBookID().getBookName() + " " + daysLate + " ngày. Số tiền phạt là: " + penaltyAmount + " VND"));
+                }
+                else {
                     User user = userRepository.findByUserID(request.getUserID()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
                     int pointBonus = librarySettingsService.getBonusPointsForOnTimeBookReturn();
                     user.setMemberPoints(user.getMemberPoints() + pointBonus);
@@ -327,11 +405,65 @@ public class LibrarianService {
                     pointHistory.setCreatedAt(LocalDateTime.now());
                     pointHistoryRepository.save(pointHistory);
 
-                    result.add("Trả sách " + borrowRecord.getBookID().getBookName() + " đúng hạn.");
+                    result.add(new ReturnBookResponse(borrowRecordID, "Trả sách " + borrowRecord.getBookID().getBookName() + " đúng hạn."));
                 }
             }
         }
-        return APIResponse.<List<String>>builder()
+        return APIResponse.<List<ReturnBookResponse>>builder()
+                .code(1000)
+                .result(result)
+                .build();
+    }
+
+    public APIResponse createViolationRecord(CreateViolationRecord request) {
+        BorrowRecord borrowRecord = borrowRecordRepository.findByRecordID(request.getRecordID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_BORROW_RECORD));
+        User user = borrowRecord.getUserID();
+        Book book = borrowRecord.getBookID();
+        String librarianID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (librarianID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User librarian = userRepository.findByUserID(librarianID).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        UserViolation userViolation = new UserViolation();
+        userViolation.setRecordID(borrowRecord);
+        userViolation.setUserID(user);
+        userViolation.setRecordedBy(librarian);
+        userViolation.setViolationType(request.getViolationType());
+        if (request.getViolationType().equals("Mất sách")){
+            userViolation.setPointsDeducted(librarySettingsService.getPointsDeductedFor("LostBook"));
+        } else if (request.getViolationType().equals("Sách bị hư hỏng")) {
+            userViolation.setPointsDeducted(librarySettingsService.getPointsDeductedFor("DamagedBook"));
+        } else{
+            userViolation.setPointsDeducted(request.getPointsDeducted());
+        }
+        if (request.getDescription() != null) userViolation.setDescription(request.getDescription());
+        userViolation.setSolution(request.getSolution());
+        if (request.getSolution().equals("Nộp tiền phạt")){
+            userViolation.setPenaltyAmount(request.getPenaltyAmount());
+            book.setTotalCopies(book.getTotalCopies() - 1);
+            book.setAvailableCopies(book.getAvailableCopies() - 1);
+        } else if (request.getSolution().equals("Bồi thường sách mới")) {
+            userViolation.setPenaltyAmount(BigDecimal.ZERO);
+        } else {
+            userViolation.setPenaltyAmount(request.getPenaltyAmount());
+        }
+        userViolation.setViolationDate(LocalDateTime.now());
+        userViolationRepository.save(userViolation);
+        return APIResponse.builder().code(1000).message("Tạo mới thành công").build();
+    }
+
+    public APIResponse<PatronReturnInformation> getPatronReturnInformation(String patronID) {
+        PatronInformation information = userRepository.getPatronInformationByUserID(patronID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION));
+        List<BorrowBookResponse2> borrow = borrowRecordRepository.findBorrowingBooks(patronID);
+        List<BorrowBookResponse2> history = borrowRecordRepository.getBorrowRecordsHistory(patronID);
+        PatronReturnInformation result = new PatronReturnInformation();
+        result.setUserID(information.getUserID());
+        result.setFullName(information.getUserName());
+        result.setUserImage(information.getUserImage());
+        result.setStatus(information.getStatus());
+        result.setMembershipType(information.getMembershipType());
+        result.setBorrowingBooks(borrow);
+        result.setBorrowHistory(history);
+        return APIResponse.<PatronReturnInformation>builder()
                 .code(1000)
                 .result(result)
                 .build();

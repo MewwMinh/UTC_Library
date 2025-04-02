@@ -1,0 +1,255 @@
+/* src/styles/return/ReturnBooks.module.css */
+
+.container {
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.header {
+  margin-bottom: 24px;
+  color: #1a1a1a;
+}
+
+.sectionTitle {
+  color: #1890ff;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #91d5ff;
+  padding-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.sectionTitle svg {
+  margin-right: 8px;
+}
+
+.patronSearchSection {
+  background-color: #f0f9ff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #91d5ff;
+}
+
+.patronInfo {
+  margin-top: 20px;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.patronHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.patronName {
+  font-size: 18px;
+  font-weight: 600;
+  margin-left: 12px;
+}
+
+.patronDetail {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.patronDetailItem {
+  display: flex;
+  align-items: center;
+  margin-right: 24px;
+  margin-bottom: 8px;
+}
+
+.patronDetailLabel {
+  color: #787878;
+  margin-right: 8px;
+}
+
+.patronDetailValue {
+  font-weight: 500;
+}
+
+.patronBadge {
+  margin-left: 8px;
+}
+
+.booksList {
+  margin-top: 16px;
+}
+
+.booksHeader {
+  background-color: #e6f7ff;
+  padding: 12px 16px;
+  border-radius: 4px;
+  border-left: 4px solid #1890ff;
+  margin-bottom: 16px;
+  color: #0050b3;
+  font-weight: 500;
+}
+
+.noBooksMessage {
+  background-color: #f5f5f5;
+  padding: 12px 16px;
+  border-radius: 4px;
+  text-align: center;
+  color: #8c8c8c;
+  margin-top: 16px;
+}
+
+.bookScanSection {
+  background-color: #f0f9ff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #91d5ff;
+}
+
+.selectedBooks {
+  margin-top: 16px;
+  min-height: 100px;
+}
+
+.bookItem {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background-color: #fafafa;
+  position: relative;
+}
+
+.bookImage {
+  width: 50px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.bookInfo {
+  flex: 1;
+}
+
+.bookTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.bookAuthor {
+  color: #595959;
+  font-size: 13px;
+}
+
+.removeBookBtn {
+  background-color: transparent;
+  border: none;
+  color: #f5222d;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: background-color 0.2s;
+  border-radius: 4px;
+}
+
+.removeBookBtn:hover {
+  background-color: #fff2f0;
+}
+
+.actionsSection {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.clearBtn {
+  margin-right: 12px;
+}
+
+.barcodeInput {
+  background-color: #fff;
+  transition: all 0.3s;
+}
+
+.barcodeInput:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.returnButton {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+}
+
+.returnButton:hover,
+.returnButton:focus {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+  color: #fff;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  border-radius: 8px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 30px 20px;
+  color: #8c8c8c;
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+}
+
+.quantityInputWrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.quantityInput {
+  width: 60px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .patronHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .patronName {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .patronDetailItem {
+    width: 100%;
+  }
+}

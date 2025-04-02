@@ -54,6 +54,9 @@ public class UserViolation {
     @Column(name = "Description")
     private String description;
 
+    @Column(name = "Solution")
+    private String solution;
+
     @ColumnDefault("0.00")
     @Column(name = "PenaltyAmount", precision = 10, scale = 2)
     private BigDecimal penaltyAmount;

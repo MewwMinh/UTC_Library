@@ -1,9 +1,25 @@
-import { Breadcrumb } from "antd";
-import { HomeOutlined, BookOutlined, PlusOutlined } from "@ant-design/icons";
-import BookAdd from "/src/components/staff/librarian/book/BookAdd";
-import { BorrowBooks } from "/src/components/staff/librarian/borrow-return";
+import { useState } from "react";
+import { Breadcrumb, Divider } from "antd";
+import {
+  HomeOutlined,
+  BookOutlined,
+  SwapOutlined,
+  ImportOutlined,
+  ExportOutlined,
+} from "@ant-design/icons";
+import {
+  BorrowBooks,
+  ReturnBooks,
+} from "/src/components/staff/librarian/borrow-return";
+import styles from "/src/styles/borrow/BorrowReturnToggle.module.css";
 
-const BookAddPage = () => {
+const BorrowReturnPage = () => {
+  const [showBorrow, setShowBorrow] = useState(true);
+
+  const handleToggleChange = (checked) => {
+    setShowBorrow(checked);
+  };
+
   const breadcrumbItems = [
     {
       title: (
@@ -15,29 +31,55 @@ const BookAddPage = () => {
     },
     {
       title: (
-        <a href="/staff/books">
-          <BookOutlined /> Quản lý sách
-        </a>
+        <span>
+          <SwapOutlined /> Mượn/Trả sách
+        </span>
       ),
-      key: "books",
+      key: "borrow-return",
     },
     {
       title: (
         <span>
-          <PlusOutlined /> Thêm sách mới
+          <BookOutlined /> {showBorrow ? "Mượn sách" : "Trả sách"}
         </span>
       ),
-      key: "add",
+      key: "action",
     },
   ];
 
   return (
-    <div className="book-add-page">
+    <div className="borrow-return-page">
       <Breadcrumb items={breadcrumbItems} style={{ marginBottom: 16 }} />
-      <BorrowBooks />
-      {/* <BookAdd /> */}
+
+      <div style={{ marginBottom: 36, marginTop: 24 }}>
+        <div className={styles.toggleContainer}>
+          <div
+            className={`${styles.toggleOption} ${
+              showBorrow ? styles.activeOption : styles.inactiveOption
+            }`}
+            onClick={() => handleToggleChange(true)}
+          >
+            <ImportOutlined className={styles.toggleIcon} /> Mượn sách
+          </div>
+
+          <div className={styles.toggleDivider}></div>
+
+          <div
+            className={`${styles.toggleOption} ${
+              !showBorrow ? styles.activeOption : styles.inactiveOption
+            }`}
+            onClick={() => handleToggleChange(false)}
+          >
+            <ExportOutlined className={styles.toggleIcon} /> Trả sách
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+
+      {showBorrow ? <BorrowBooks /> : <ReturnBooks />}
     </div>
   );
 };
 
-export default BookAddPage;
+export default BorrowReturnPage;

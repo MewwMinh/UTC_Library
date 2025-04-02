@@ -62,7 +62,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
 """, nativeQuery = true)
     List<TopBookResponse> findTop10BorrowedBooks();
     @Query(value = """
-    SELECT b.BookID AS bookID,
+    SELECT br.RecordID AS borrowRecordID,
+        b.BookID AS bookID,
         b.BookName AS bookName, 
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
@@ -74,7 +75,7 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
         AND br.ReturnDate IS NULL
         ORDER BY br.BorrowDate DESC
 """, nativeQuery = true)
-    List<BorrowBookResponse1> findBorrowingBooks(@Param("id") String id);
+    List<BorrowBookResponse2> findBorrowingBooks(@Param("id") String id);
     @Query(value = """
     SELECT br.RecordID AS borrowRecordID,
         b.BookID AS bookID,
@@ -92,7 +93,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
 """, nativeQuery = true)
     List<BorrowBookResponse2> getNearAndOverDueBooks(@Param("id") String id);
     @Query(value = """
-    SELECT b.BookID AS bookID,
+    SELECT br.RecordID AS borrowRecordID,
+        b.BookID AS bookID,
         b.BookName AS bookName, 
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
@@ -104,7 +106,7 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
         AND br.ReturnDate IS NOT NULL
         ORDER BY br.BorrowDate DESC 
 """, nativeQuery = true)
-    List<BorrowBookResponse1> getBorrowRecordsHistory(@Param("id") String id);
+    List<BorrowBookResponse2> getBorrowRecordsHistory(@Param("id") String id);
     @Query(value = """
     WITH DateSeries AS (
         SELECT CURDATE() - INTERVAL n DAY AS Date
