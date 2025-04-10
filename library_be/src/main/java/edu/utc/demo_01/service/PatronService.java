@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -148,7 +149,7 @@ public class PatronService {
         transaction.setPatron(bookReservation.getUserID().getFullName());
         transaction.setAction("đặt mượn");
         transaction.setBookName(bookReservation.getBookID().getBookName());
-        transaction.setTransactionTime(Instant.now());
+        transaction.setTransactionTime(LocalDateTime.now());
         recentTransactionRepository.save(transaction);
 
         return APIResponse.<Boolean>builder().code(1000).result(true).build();
@@ -200,7 +201,7 @@ public class PatronService {
         helpTicket.setTitle(request.getTitle());
         helpTicket.setDescription(request.getDescription());
         helpTicket.setStatus("Đang chờ xử lý");
-        helpTicket.setCreatedAt(Instant.now());
+        helpTicket.setCreatedAt(LocalDateTime.now());
         helpTicketRepository.save(helpTicket);
         return true;
     }

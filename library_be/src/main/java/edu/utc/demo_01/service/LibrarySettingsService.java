@@ -60,10 +60,10 @@ public class LibrarySettingsService {
         return Integer.parseInt(librarySettingRepository.getSettingValue("MaximumBorrowingPeriodForReferenceMaterials"));
     }
     public int getPointsDeductedForLateReferenceMaterialsReturn(){
-        return Integer.parseInt(librarySettingRepository.getSettingValue("PointsDeductedForLateReferenceMaterials"));
+        return Integer.parseInt(librarySettingRepository.getSettingValue("PointsDeductedForLateReferenceMaterialsReturn"));
     }
     public int getPointsDeductedForLateTextbookReturn(){
-        return Integer.parseInt(librarySettingRepository.getSettingValue("PointsDeductedForLateTextbook"));
+        return Integer.parseInt(librarySettingRepository.getSettingValue("PointsDeductedForLateTextbookReturn"));
     }
     public int getBonusPointsForOnTimeBookReturn(){
         return Integer.parseInt(librarySettingRepository.getSettingValue("BonusPointsForOnTimeBookReturn"));

@@ -20,5 +20,8 @@ public class ChangeBookInfoRequest {
     String format;
     String description;
     String ddcCode;
+    Integer price;
+    String editNote;
+    String location;
 }
 

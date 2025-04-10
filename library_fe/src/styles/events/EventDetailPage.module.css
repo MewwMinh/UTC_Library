@@ -1,0 +1,52 @@
+/* EventDetailPage.module.css */
+.event-detail-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.event-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.breadcrumb {
+  margin-bottom: 0;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  font-size: 16px;
+  color: #ff4d4f;
+}
+
+@media (max-width: 768px) {
+  .event-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .back-button {
+    align-self: flex-start;
+  }
+}

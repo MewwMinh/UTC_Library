@@ -26,6 +26,8 @@ public enum ErrorCode {
     UNIDENTIFIED_MEMBERSHIP_TYPE("Hạng thành viên không xác định !!", 1016, HttpStatus.BAD_REQUEST),
     BORROWING_MORE_THAN_ALLOWED("Mượn quá số lượng sách quy định !!", 1017, HttpStatus.BAD_REQUEST),
     NOT_ENOUGH_BOOK("Thư viện không đủ số lượng sách !!", 1018, HttpStatus.BAD_REQUEST),
+    BORROWED_OR_NOT_EXIST("Cuốn sách này đã được mượn hoặc không tồn tại !!", 1019, HttpStatus.BAD_REQUEST),
+    CAN_NOT_PERFORM_THIS_ACTION("Không thể giảm số lượng sách ở đây, nếu muốn giảm số lượng sách, ... !!", 1020, HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, int code, HttpStatusCode httpStatusCode) {

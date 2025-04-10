@@ -21,4 +21,6 @@ public class AddBookRequest {
     String description;
     String coverImage;
     String ddcCode;
+    int price;
+    String location;
 }

@@ -23,5 +23,7 @@ public class BookResponse {
     String description;
     String coverImage;
     String ddcCode;
+    Integer price;
+
 }
 

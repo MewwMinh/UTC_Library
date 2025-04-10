@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { useState, useRef, useEffect } from "react";
 import {
   Input,
@@ -13,7 +12,6 @@ import {
   Typography,
   List,
   Alert,
-  InputNumber,
 } from "antd";
 import {
   SearchOutlined,
@@ -25,8 +23,6 @@ import {
   PlusOutlined,
   DeleteOutlined,
   IdcardOutlined,
-  PlusCircleOutlined,
-  MinusCircleOutlined,
 } from "@ant-design/icons";
 import borrowReturnService from "/src/services/librarian/borrowReturnService.js";
 import styles from "/src/styles/borrow/BorrowBooks.module.css";
@@ -50,20 +46,19 @@ const BorrowBooks = () => {
 
   // Focus on patron input when component mounts
   useEffect(() => {
-    if (patronInputRef.current) {
-      patronInputRef.current.focus();
-    }
+    if (patronInputRef.current) patronInputRef.current.focus();
   }, []);
 
   // Reset book code input after adding a book
   useEffect(() => {
-    if (!bookLoading && bookInputRef.current) {
-      bookInputRef.current.focus();
-    }
+    if (!bookLoading && bookInputRef.current) bookInputRef.current.focus();
   }, [selectedBooks, bookLoading]);
+
+  // Remove book from list
   const removeBook = (bookIndex) => {
     setSelectedBooks(selectedBooks.filter((_, index) => index !== bookIndex));
   };
+
   // Search patron by ID
   const handlePatronSearch = async (value) => {
     if (!value) {
@@ -79,15 +74,10 @@ const BorrowBooks = () => {
 
     try {
       const response = await borrowReturnService.getPatronBorrowInfo(value);
-
       if (response.success) {
         setPatronInfo(response.data);
-
-        // Switch focus to book input after finding patron
         setTimeout(() => {
-          if (bookInputRef.current) {
-            bookInputRef.current.focus();
-          }
+          if (bookInputRef.current) bookInputRef.current.focus();
         }, 100);
       } else {
         notification.error({
@@ -126,50 +116,38 @@ const BorrowBooks = () => {
       return;
     }
 
-    // Check if the book is already added - if it is, increase quantity
-    const existingBookIndex = selectedBooks.findIndex(
-      (book) => book.bookID === value
+    // Check if the book is already added
+    const isDuplicate = selectedBooks.some(
+      (book) => book.enteredCode === value
     );
-    if (existingBookIndex !== -1) {
-      // Create a copy of selectedBooks array
-      const updatedBooks = [...selectedBooks];
-      // Increase quantity
-      updatedBooks[existingBookIndex].quantity =
-        (updatedBooks[existingBookIndex].quantity || 1) + 1;
-
-      setSelectedBooks(updatedBooks);
-      setBookCode("");
-
-      notification.success({
-        message: "Số lượng đã tăng",
-        description: `Đã tăng số lượng sách "${selectedBooks[existingBookIndex].bookName}" lên ${updatedBooks[existingBookIndex].quantity}`,
+    if (isDuplicate) {
+      notification.warning({
+        message: "Sách đã được thêm",
+        description: "Mã sách này đã có trong danh sách mượn",
         placement: "topRight",
       });
+      setBookCode("");
       return;
     }
 
     setBookLoading(true);
-    setBookCode(value);
 
     try {
-      // In a real scenario, you'd fetch book details from the API
-      // For demonstration, we're mocking a response
-      const bookResponse = await borrowReturnService.getBookByCode(value);
-
-      if (bookResponse.success) {
+      const response = await borrowReturnService.getBookByCode(value);
+      if (response.success) {
         setSelectedBooks([
           ...selectedBooks,
           {
-            ...bookResponse.data,
+            ...response.data,
+            enteredCode: value, // Store the entered code
             key: selectedBooks.length,
-            quantity: 1,
           },
         ]);
-        setBookCode("");
       } else {
         notification.error({
           message: "Không tìm thấy sách",
-          description: bookResponse.message,
+          description:
+            response.message || "Sách không tồn tại hoặc đã được mượn",
           placement: "topRight",
         });
       }
@@ -185,15 +163,6 @@ const BorrowBooks = () => {
     }
   };
 
-  // Handle quantity change
-  const handleQuantityChange = (index, newQuantity) => {
-    if (newQuantity < 1) return; // Prevent quantity less than 1
-
-    const updatedBooks = [...selectedBooks];
-    updatedBooks[index].quantity = newQuantity;
-    setSelectedBooks(updatedBooks);
-  };
-
   // Reset all form fields
   const resetForm = () => {
     setPatronInfo(null);
@@ -201,11 +170,7 @@ const BorrowBooks = () => {
     setSelectedBooks([]);
     setBookCode("");
     setLendingResult(null);
-
-    // Return focus to patron input
-    if (patronInputRef.current) {
-      patronInputRef.current.focus();
-    }
+    if (patronInputRef.current) patronInputRef.current.focus();
   };
 
   // Confirm lending books
@@ -229,15 +194,12 @@ const BorrowBooks = () => {
     setConfirming(true);
 
     try {
-      // Prepare data with book IDs and quantities
-      const booksWithQuantities = selectedBooks.map((book) => ({
-        bookID: book.bookID,
-        quantity: book.quantity || 1,
-      }));
+      // Use the entered codes instead of bookIDs
+      const itemIDs = selectedBooks.map((book) => book.enteredCode);
 
       const response = await borrowReturnService.lendBooks({
         userID: patronInfo.userID,
-        books: booksWithQuantities,
+        itemID: itemIDs,
       });
 
       setLendingResult(response);
@@ -276,7 +238,6 @@ const BorrowBooks = () => {
   // Get status tag and color based on days remaining
   const getDueStatusTag = (dueDate) => {
     const daysRemaining = getDaysRemaining(dueDate);
-
     if (daysRemaining < 0) {
       return <Tag color="error">Quá hạn {Math.abs(daysRemaining)} ngày</Tag>;
     } else if (daysRemaining <= 3) {
@@ -460,7 +421,7 @@ const BorrowBooks = () => {
                   <div className={styles.bookItem}>
                     <img
                       src={
-                        book.coverImage ||
+                        book.bookImage ||
                         "https://via.placeholder.com/50x70?text=No+Image"
                       }
                       alt={book.bookName}
@@ -468,39 +429,9 @@ const BorrowBooks = () => {
                     />
                     <div className={styles.bookInfo}>
                       <div className={styles.bookTitle}>{book.bookName}</div>
-                      <div className={styles.bookAuthor}>{book.author}</div>
-                      <div className={styles.quantityInputWrapper}>
-                        <Button
-                          icon={<MinusCircleOutlined />}
-                          size="small"
-                          onClick={() =>
-                            handleQuantityChange(
-                              index,
-                              Math.max(1, (book.quantity || 1) - 1)
-                            )
-                          }
-                          disabled={(book.quantity || 1) <= 1}
-                        />
-                        <InputNumber
-                          min={1}
-                          className={styles.quantityInput}
-                          value={book.quantity || 1}
-                          onChange={(value) =>
-                            handleQuantityChange(index, value)
-                          }
-                          size="small"
-                          controls={false}
-                        />
-                        <Button
-                          icon={<PlusCircleOutlined />}
-                          size="small"
-                          onClick={() =>
-                            handleQuantityChange(
-                              index,
-                              (book.quantity || 1) + 1
-                            )
-                          }
-                        />
+                      <div className={styles.bookAuthor}>{book.bookAuthor}</div>
+                      <div className={styles.bookID}>
+                        <small>Mã sách: {book.enteredCode}</small>
                       </div>
                     </div>
                     <button
@@ -573,10 +504,7 @@ const BorrowBooks = () => {
             <p>Sách được mượn:</p>
             <ul>
               {selectedBooks.map((book, index) => (
-                <li key={index}>
-                  {book.bookName}{" "}
-                  <strong>(Số lượng: {book.quantity || 1})</strong>
-                </li>
+                <li key={index}>{book.bookName}</li>
               ))}
             </ul>
           </>

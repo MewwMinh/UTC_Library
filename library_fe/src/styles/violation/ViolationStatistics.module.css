@@ -1,0 +1,71 @@
+.statisticsContainer {
+  margin-bottom: 24px;
+}
+
+.chartCard {
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.chartCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+.chartTitle {
+  font-weight: 600;
+  margin-bottom: 0;
+  color: #333;
+}
+
+.chartContainer {
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.statsCard {
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s, transform 0.3s;
+  padding: 24px 0;
+}
+
+.statsCard:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}
+
+.selectControl {
+  min-width: 120px;
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 12px;
+}
+
+/* Custom tooltip style */
+:global(.recharts-tooltip-wrapper) {
+  z-index: 1000;
+}
+
+/* Smooth animation for charts */
+:global(.recharts-pie) {
+  transition: transform 0.3s;
+}
+
+:global(.recharts-pie:hover) {
+  transform: scale(1.02);
+}

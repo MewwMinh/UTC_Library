@@ -1,24 +1,41 @@
 // src/pages/librarian/BookDetailsPage.jsx
 import { Row, Col, Breadcrumb } from "antd";
 
-import { BookDetail, BookComment } from "/src/components/staff/librarian/book";
+import {
+  BookDetail,
+  BookComment,
+  BookItemList,
+} from "/src/components/staff/librarian/book";
 import { BookOutlined, EyeOutlined, HomeOutlined } from "@ant-design/icons";
+import styles from "/src/styles/books/BookCatalogPage.module.css";
+import { useNavigate } from "react-router-dom";
 
 const BookDetailsPage = () => {
+  const navigate = useNavigate();
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
   const breadcrumbItems = [
     {
       title: (
-        <a href="/staff/dashboard">
+        <span
+          onClick={() => handleNavigate("/staff/dashboard")}
+          className={styles.breadcrumbLink}
+        >
           <HomeOutlined /> Trang chủ
-        </a>
+        </span>
       ),
       key: "home",
     },
     {
       title: (
-        <a href="/staff/books">
+        <span
+          onClick={() => handleNavigate("/staff/books")}
+          className={styles.breadcrumbLink}
+        >
           <BookOutlined /> Quản lý sách
-        </a>
+        </span>
       ),
       key: "books",
     },
@@ -41,6 +58,9 @@ const BookDetailsPage = () => {
         </Col>
         <Col span={24}>
           <BookDetail />
+        </Col>
+        <Col span={24}>
+          <BookItemList />
         </Col>
         <Col span={24}>
           <BookComment />

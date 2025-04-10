@@ -49,7 +49,6 @@ const BookAdd = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  // const [coverImage, setCoverImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [cloudImageUrl, setCloudImageUrl] = useState("");
   const [isbnEntered, setIsbnEntered] = useState(false);
@@ -64,6 +63,8 @@ const BookAdd = () => {
       const bookData = {
         ...values,
         coverImage: cloudImageUrl, // URL từ cloud đã được lưu từ API phản hồi khi tải ảnh
+        price: values.price, // Thêm giá tiền
+        location: values.location, // Thêm vị trí sách
       };
       console.log("CloudImgURL: " + cloudImageUrl);
 
@@ -170,6 +171,7 @@ const BookAdd = () => {
         <Button
           icon={<RollbackOutlined />}
           onClick={() => navigate("/staff/books")}
+          style={{ marginRight: 10 }}
         >
           Quay lại
         </Button>
@@ -185,6 +187,7 @@ const BookAdd = () => {
           publicationYear: yearNow,
           format: "16 cm x 24 cm",
           totalCopies: 1,
+          price: 0, // Giá mặc định là 0
         }}
       >
         <Row gutter={24}>
@@ -299,6 +302,33 @@ const BookAdd = () => {
                     style={{ width: "100%" }}
                     placeholder="VD: 10"
                   />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="price"
+                  label="Giá tiền (VNĐ)"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập giá tiền sách" },
+                  ]}
+                >
+                  <InputNumber
+                    min={0}
+                    style={{ width: "100%" }}
+                    placeholder="VD: 150000"
+                    formatter={(value) =>
+                      `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item name="location" label="Vị trí sách">
+                  <Input placeholder="VD: Kệ A5, Tầng 3" />
                 </Form.Item>
               </Col>
             </Row>

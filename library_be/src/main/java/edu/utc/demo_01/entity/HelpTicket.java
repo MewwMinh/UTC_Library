@@ -10,7 +10,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -54,6 +54,6 @@ public class HelpTicket {
 
     @ColumnDefault("(now())")
     @Column(name = "CreatedAt")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
 }

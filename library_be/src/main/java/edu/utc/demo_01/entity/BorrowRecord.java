@@ -40,6 +40,12 @@ public class BorrowRecord {
     private Book bookID;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ItemID", nullable = false)
+    private BookItem itemID;
+
+    @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "BorrowDate", nullable = false)
     private LocalDateTime borrowDate;

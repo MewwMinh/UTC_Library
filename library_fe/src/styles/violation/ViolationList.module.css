@@ -1,0 +1,102 @@
+/* src/styles/ViolationList.module.css */
+
+.tableRowLight {
+  background-color: #fff;
+}
+
+.tableRowDark {
+  background-color: #fafafa;
+}
+
+.tableRowLight:hover td,
+.tableRowDark:hover td {
+  background-color: #e6f7ff !important;
+}
+
+.filterSection {
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: #fafafa;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.searchInput {
+  border-radius: 6px;
+}
+
+.actionButton {
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.exportButton {
+  margin-right: 8px;
+}
+
+.excelButton {
+  background: #52c41a;
+  color: white;
+}
+
+.pdfButton {
+  background: #ff4d4f;
+  color: white;
+}
+
+.loadingContainer {
+  text-align: center;
+  padding: 50px 0;
+}
+
+.loadingText {
+  margin-top: 16px;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+.tooltipText {
+  max-width: 200px;
+}
+
+/* Animation cho loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Cải thiện responsive */
+@media (max-width: 576px) {
+  .responsiveTable {
+    font-size: 12px;
+  }
+
+  .responsiveButton {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+
+  .cardTitle {
+    font-size: 16px;
+  }
+}

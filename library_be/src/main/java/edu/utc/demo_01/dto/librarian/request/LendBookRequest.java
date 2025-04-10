@@ -12,5 +12,5 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LendBookRequest {
     String userID;
-    List<Books> books;
+    List<String> itemID;
 }

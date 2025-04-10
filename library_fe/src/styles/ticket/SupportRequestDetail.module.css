@@ -1,0 +1,44 @@
+/* src/pages/styles/SupportRequestDetail.module.css */
+.container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.errorContainer {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.errorContainer p {
+  font-size: 16px;
+  margin-bottom: 24px;
+  color: #ff4d4f;
+}
+
+.errorContainer button {
+  background-color: #1890ff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.errorContainer button:hover {
+  background-color: #40a9ff;
+}
+
+@media (max-width: 992px) {
+  .container {
+    padding: 16px;
+  }
+}

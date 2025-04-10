@@ -92,7 +92,8 @@ public interface BookRepository extends JpaRepository < Book,
             Format AS format,
             b.Description AS description,
             CoverImage AS coverImage,
-            DDCName AS ddcName         
+            DDCName AS ddcName,
+            Price AS price    
         FROM
             Books b         
         JOIN

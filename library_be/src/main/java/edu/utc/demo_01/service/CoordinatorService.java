@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -87,7 +88,7 @@ public class CoordinatorService {
         ticketResponse.setStaffID(coordinator);
         ticketResponse.setTitle(request.getTitle());
         ticketResponse.setResponseText(request.getResponseText());
-        ticketResponse.setCreatedAt(Instant.now());
+        ticketResponse.setCreatedAt(LocalDateTime.now());
         ticketResponseRepository.save(ticketResponse);
         return true;
     }

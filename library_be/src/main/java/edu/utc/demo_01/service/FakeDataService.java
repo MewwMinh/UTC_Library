@@ -1,13 +1,22 @@
 package edu.utc.demo_01.service;
 
 import com.github.javafaker.Faker;
+import edu.utc.demo_01.entity.BorrowRecord;
+import edu.utc.demo_01.entity.User;
+import edu.utc.demo_01.entity.UserViolation;
 import edu.utc.demo_01.repository.*;
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -33,6 +42,8 @@ public class FakeDataService {
     AchievementRepository achievementRepository;
     EventRepository eventRepository;
     EventParticipantRepository eventParticipantRepository;
+    BookItemRepository bookItemRepository;
+    UserViolationRepository userViolationRepository;
 
     Faker faker = new Faker();
     Random random = new Random();
@@ -410,7 +421,7 @@ public class FakeDataService {
 //            // Danh sách các chủ đề và lĩnh vực
 //            List<String> bookTopics = new ArrayList<>(bookTitlesByTopic.keySet());
 //
-//            for (int i = 0; i < 100; i++) {
+//            for (int i = 0; i < 300; i++) {
 //                Book book = new Book();
 //
 //                // Chọn chủ đề ngẫu nhiên
@@ -496,6 +507,96 @@ public class FakeDataService {
 //                bookRepository.save(book);
 //            }
 //        }
+//    }
+//    //endregion
+//
+//    //region Fake Book Items
+//    @PostConstruct
+//    public void initializeBookItems() {
+//        // Kiểm tra xem đã có dữ liệu trong bảng BookItems chưa
+//        if (bookItemRepository.count() > 0) {
+//            return;
+//        }
+//
+//        List<Book> allBooks = bookRepository.findAll();
+//        List<BookItem> bookItems = new ArrayList<>();
+//
+//        // Các vị trí kệ sách mẫu
+//        String[] shelfLocations = {
+//                "Kệ A1-01", "Kệ A1-02", "Kệ A2-01", "Kệ A2-02",
+//                "Kệ B1-01", "Kệ B1-02", "Kệ B2-01", "Kệ B2-02",
+//                "Kệ C1-01", "Kệ C1-02", "Kệ C2-01", "Kệ C2-02",
+//                "Kệ D1-01", "Kệ D1-02", "Kệ D2-01", "Kệ D2-02"
+//        };
+//
+//        // Các mức giá sách mẫu
+//        Integer[] prices = {50000, 75000, 100000, 120000, 150000, 200000, 250000};
+//
+//        int totalItems = 0;
+//
+//        for (Book book : allBooks) {
+//            Integer totalCopies = book.getTotalCopies();
+//
+//            if (totalCopies == null || totalCopies <= 0) {
+//                continue; // Bỏ qua sách không có bản sao
+//            }
+//
+//            // Tạo barcode prefix từ ISBN (loại bỏ dấu gạch nếu có)
+//            String barcodePrefix = book.getIsbn().replaceAll("-", "");
+//
+//            // Chọn ngẫu nhiên vị trí kệ cho sách này
+//            String location = shelfLocations[random.nextInt(shelfLocations.length)];
+//
+//            // Chọn ngẫu nhiên giá tiền cho sách này
+//            Integer price = prices[random.nextInt(prices.length)];
+//
+//            // Tạo số lượng BookItems tương ứng với totalCopies
+//            for (int i = 1; i <= totalCopies; i++) {
+//                String barcode = generateBarcode(barcodePrefix, i);
+//                LocalDate acquisitionDate = generateRandomAcquisitionDate();
+//
+//                BookItem bookItem = BookItem.builder()
+//                        .bookID(book)
+//                        .barcode(barcode)
+//                        .status("Có sẵn")
+//                        .acquisitionDate(acquisitionDate)
+//                        .price(price)
+//                        .location(location)
+//                        .bookCondition("Tốt")
+//                        .notes("Sách được nhập vào ngày " + acquisitionDate)
+//                        .build();
+//
+//                bookItems.add(bookItem);
+//                totalItems++;
+//
+//                // Lưu theo lô để tránh OutOfMemoryError với số lượng lớn
+//                if (bookItems.size() >= 100) {
+//                    bookItemRepository.saveAll(bookItems);
+//                    bookItems.clear();
+//                }
+//            }
+//        }
+//
+//        // Lưu các mục còn lại
+//        if (!bookItems.isEmpty()) {
+//            bookItemRepository.saveAll(bookItems);
+//        }
+//
+//    }
+//
+//    private String generateBarcode(String prefix, int copyNumber) {
+//        // Tạo mã barcode theo định dạng ISBN-COPY_NUMBER
+//        // Ví dụ: 9780123456789-001
+//        return prefix + "-" + String.format("%03d", copyNumber);
+//    }
+//
+//    private LocalDate generateRandomAcquisitionDate() {
+//        // Tạo ngày nhập sách ngẫu nhiên trong 3 năm gần đây
+//        long minDay = LocalDate.now().minusYears(3).toEpochDay();
+//        long maxDay = LocalDate.now().toEpochDay();
+//        long randomDay = minDay + random.nextInt((int) (maxDay - minDay));
+//
+//        return LocalDate.ofEpochDay(randomDay);
 //    }
 //    //endregion
 //
@@ -646,124 +747,149 @@ public class FakeDataService {
 //    }
 //    //endregion
 //
-////    //region Fake Borrow Records
-////    @PostConstruct
-////    public void generateFakeBorrowRecords() {
-////        if (borrowRecordRepository.count() > 1001) return;
-////
-////        List<User> users = userRepository.findAllPatron();
-////        List<Book> books = bookRepository.findAll();
-////        List<User> librarians = userRepository.findAllLibrarian();
-////
-////        // Lấy ngày hiện tại
-////        Instant today = Instant.now();
-////        // Ngưỡng 70 ngày gần đây
-////        Instant recentThreshold = today.minus(70, ChronoUnit.DAYS);
-////
-////        if (users.isEmpty() || books.isEmpty()) {
-////            return;
-////        }
-////
-////        for (int i = 0; i < 5000; i++) {
-////            User user = users.get(random.nextInt(users.size()));
-////            Book book = books.get(random.nextInt(books.size()));
-////            User librarian = librarians.get(random.nextInt(librarians.size()));
-////
-////            // Xác định nếu sách được gia hạn
-////            int extendCount;
-////            int rand = random.nextInt(10);
-////            if (rand < 9) {  // 90% xác suất không gia hạn
-////                extendCount = 0;
-////            } else {  // 10% xác suất chia đều cho 1 và 2 lần gia hạn
-////                extendCount = random.nextInt(2) + 1; // Giá trị 1 hoặc 2
-////            }
-////
-////            // Tính ngày mượn dựa trên số lần gia hạn
-////            // Nếu có gia hạn, đảm bảo ngày mượn phải đủ xa để có thể gia hạn
-////            Instant borrowDate;
-////            if (extendCount > 0) {
-////                // Nếu gia hạn 1 lần, ngày mượn phải < hôm nay - 83 ngày
-////                // (90 ngày mượn tiêu chuẩn - 7 ngày có thể gia hạn trước khi hết hạn)
-////                int daysNeeded = 83 + (extendCount - 1) * 90;
-////                borrowDate = today.minus(daysNeeded + random.nextInt(30), ChronoUnit.DAYS);
-////            } else {
-////                // Nếu không gia hạn, có thể mượn trong 200 ngày qua
-////                borrowDate = today.minus(random.nextInt(1, 200), ChronoUnit.DAYS);
-////            }
-////
-////            // Tính ngày đến hạn = ngày mượn + 90 ngày
-////            Instant dueDate = borrowDate.plus(90, ChronoUnit.DAYS);
-////
-////            // Nếu có gia hạn, cập nhật ngày đến hạn tương ứng
-////            Instant extendedDate = null;
-////            if (extendCount > 0) {
-////                extendedDate = dueDate.minus(random.nextInt(3, 8), ChronoUnit.DAYS); // Gia hạn 3-7 ngày trước khi hết hạn
-////                dueDate = dueDate.plus(extendCount * 90, ChronoUnit.DAYS);
-////            }
-////
-////            // Xác định nếu sách đã được trả
-////            boolean isReturned;
-////
-////            // Nếu ngày đến hạn trả đã qua (đã quá hạn), luôn đặt trạng thái là đã trả
-////            if (dueDate.isBefore(today)) {
-////                isReturned = true;
-////            } else if (borrowDate.isAfter(recentThreshold)) {
-////                // Nếu sách mượn trong 70 ngày gần đây, tỷ lệ đã trả là 10%
-////                isReturned = random.nextDouble() < 0.10;
-////            } else {
-////                // Nếu chưa đến hạn trả và không phải mượn gần đây, có 50% cơ hội đã trả
-////                isReturned = random.nextBoolean();
-////            }
-////
-////            // Tính ngày trả
-////            Instant returnDate = null;
-////            if (isReturned) {
-////                boolean isLateReturn = false;
-////
-////                // Chỉ có thể trả muộn nếu ngày đến hạn đã qua
-////                if (dueDate.isBefore(today)) {
-////                    isLateReturn = random.nextDouble() < 0.05; // 5% xác suất trả muộn
-////                }
-////
-////                if (isLateReturn) {
-////                    // Trả muộn 1-10 ngày nhưng không vượt quá ngày hiện tại
-////                    Instant lateDate = dueDate.plus(random.nextInt(1, 11), ChronoUnit.DAYS);
-////                    returnDate = lateDate.isAfter(today) ? today : lateDate;
-////                } else {
-////                    // Trả đúng hạn hoặc sớm
-////                    Instant earliestReturn = borrowDate.plus(1, ChronoUnit.DAYS); // Ít nhất 1 ngày sau khi mượn
-////                    Instant latestReturn = dueDate.isBefore(today) ? dueDate : today;
-////
-////                    if (earliestReturn.isBefore(latestReturn)) {
-////                        // Trả trong khoảng từ ngày sau khi mượn đến ngày đến hạn (hoặc hôm nay nếu chưa đến hạn)
-////                        long daysBetween = ChronoUnit.DAYS.between(earliestReturn, latestReturn);
-////                        if (daysBetween > 0) {
-////                            returnDate = earliestReturn.plus(random.nextInt((int)daysBetween), ChronoUnit.DAYS);
-////                        } else {
-////                            returnDate = earliestReturn;
-////                        }
-////                    } else {
-////                        returnDate = earliestReturn;
-////                    }
-////                }
-////            }
-////
-////            // Tạo bản ghi mượn
-////            BorrowRecord record = new BorrowRecord();
-////            record.setUserID(user);
-////            record.setBookID(book);
-////            record.setBorrowDate(borrowDate);
-////            record.setDueDate(dueDate);
-////            record.setExtendCount(extendCount);
-////            record.setExtendedDate(extendedDate);
-////            record.setApprovedBy(librarian);
-////            record.setReturnApprovedBy(isReturned ? librarians.get(random.nextInt(librarians.size())) : null);
-////            record.setReturnDate(returnDate);
-////
-////            borrowRecordRepository.save(record);
-////        }
-////    }
-////    //endregion
+//    //region Fake Borrow Records
+//    @PostConstruct
+//    public void generateFakeBorrowRecords() {
+//        if (borrowRecordRepository.count() > 1) return;
+//
+//        List<User> users = userRepository.findAllPatron();
+//        List<Book> books = bookRepository.findAll();
+//        List<User> librarians = userRepository.findAllLibrarian();
+//
+//        // Nếu không có dữ liệu người dùng hoặc sách, không thể tạo bản ghi mượn
+//        if (users.isEmpty() || books.isEmpty() || librarians.isEmpty()) {
+//            return;
+//        }
+//
+//        LocalDateTime today = LocalDateTime.now();
+//        LocalDateTime recentThreshold = today.minusDays(70);
+//
+//        for (int i = 0; i < 3000; i++) {
+//            User user = users.get(random.nextInt(users.size()));
+//            Book book = books.get(random.nextInt(books.size()));
+//            User librarian = librarians.get(random.nextInt(librarians.size()));
+//
+//            // Tìm BookItem có sẵn cho sách này
+//            List<BookItem> availableItems = bookItemRepository.findByBookIDAndStatus(book, "Có sẵn");
+//
+//            // Nếu không còn BookItem nào có sẵn, chuyển sang sách khác
+//            if (availableItems.isEmpty()) {
+//                continue;
+//            }
+//
+//            // Chọn ngẫu nhiên một BookItem có sẵn
+//            BookItem selectedItem = availableItems.get(random.nextInt(availableItems.size()));
+//
+//            // Quyết định số lần gia hạn
+//            int extendCount;
+//            int rand = random.nextInt(10);
+//            if (rand < 9) {
+//                extendCount = 0;
+//            } else {
+//                extendCount = random.nextInt(2) + 1;
+//            }
+//
+//            // Tính toán ngày mượn
+//            LocalDateTime borrowDate;
+//            if (extendCount > 0) {
+//                int daysNeeded = 83 + (extendCount - 1) * 90;
+//                borrowDate = today.minusDays(daysNeeded + random.nextInt(30));
+//            } else {
+//                borrowDate = today.minusDays(random.nextInt(1, 200));
+//            }
+//
+//            // Tính toán ngày hẹn trả và ngày gia hạn
+//            LocalDateTime dueDate = borrowDate.plusDays(90);
+//            LocalDateTime extendedDate = null;
+//            if (extendCount > 0) {
+//                extendedDate = dueDate.minusDays(random.nextInt(3, 8));
+//                dueDate = dueDate.plusDays(extendCount * 90);
+//            }
+//
+//            // Quyết định xem sách đã được trả chưa
+//            boolean isReturned;
+//            if (dueDate.isBefore(today)) {
+//                isReturned = true;
+//            } else if (borrowDate.isAfter(recentThreshold)) {
+//                isReturned = random.nextDouble() < 0.10;
+//            } else {
+//                isReturned = random.nextBoolean();
+//            }
+//
+//            // Tính toán ngày trả nếu sách đã được trả
+//            LocalDateTime returnDate = null;
+//            if (isReturned) {
+//                boolean isLateReturn = false;
+//                if (dueDate.isBefore(today)) {
+//                    isLateReturn = random.nextDouble() < 0.05;
+//                }
+//
+//                if (isLateReturn) {
+//                    LocalDateTime lateDate = dueDate.plusDays(random.nextInt(1, 11));
+//                    returnDate = lateDate.isAfter(today) ? today : lateDate;
+//                } else {
+//                    LocalDateTime earliestReturn = borrowDate.plusDays(1);
+//                    LocalDateTime latestReturn = dueDate.isBefore(today) ? dueDate : today;
+//
+//                    if (earliestReturn.isBefore(latestReturn)) {
+//                        long daysBetween = ChronoUnit.DAYS.between(earliestReturn, latestReturn);
+//                        if (daysBetween > 0) {
+//                            returnDate = earliestReturn.plusDays(random.nextInt((int) daysBetween));
+//                        } else {
+//                            returnDate = earliestReturn;
+//                        }
+//                    } else {
+//                        returnDate = earliestReturn;
+//                    }
+//                }
+//            }
+//
+//            // Tạo bản ghi mượn
+//            BorrowRecord record = new BorrowRecord();
+//            record.setUserID(user);
+//            record.setBookID(book);
+//            record.setItemID(selectedItem); // Thêm liên kết đến BookItem cụ thể
+//            record.setBorrowDate(borrowDate);
+//            record.setDueDate(dueDate);
+//            record.setExtendCount(extendCount);
+//            record.setExtendedDate(extendedDate);
+//            record.setApprovedBy(librarian);
+//            record.setReturnApprovedBy(isReturned ? librarians.get(random.nextInt(librarians.size())) : null);
+//            record.setReturnDate(returnDate);
+//
+//            // Lưu bản ghi mượn
+//            borrowRecordRepository.save(record);
+//
+//            // Cập nhật trạng thái của BookItem và số lượng sách có sẵn
+//            if (!isReturned) {
+//                // Nếu chưa trả, cập nhật trạng thái của BookItem thành "Đang mượn"
+//                selectedItem.setStatus("Đang mượn");
+//                bookItemRepository.save(selectedItem);
+//
+//                // Giảm số lượng sách có sẵn trong Book
+//                book.setAvailableCopies(book.getAvailableCopies() - 1);
+//                bookRepository.save(book);
+//            }
+//        }
+//
+//        // Đảm bảo số lượng sách có sẵn là chính xác
+//        updateAvailableCopiesForAllBooks();
+//    }
+//
+//    /**
+//     * Cập nhật lại số lượng sách có sẵn cho tất cả các sách dựa trên số BookItems có trạng thái "Có sẵn"
+//     */
+//    private void updateAvailableCopiesForAllBooks() {
+//        List<Book> allBooks = bookRepository.findAll();
+//
+//        for (Book book : allBooks) {
+//            long availableCount = bookItemRepository.countByBookIDAndStatus(book, "Có sẵn");
+//            book.setAvailableCopies((int) availableCount);
+//            bookRepository.save(book);
+//        }
+//    }
+//
+//    //endregion
 //
 //    //region Fake User Wishlist
 //    @PostConstruct
@@ -799,7 +925,7 @@ public class FakeDataService {
 //                continue;
 //            }
 //            LocalDate reservationDate = LocalDate.now().minusDays(random.nextInt(20));
-//            LocalDate expiryDate =reservationDate.plus(7, ChronoUnit.DAYS);
+//            LocalDate expiryDate =reservationDate.plusDays(7);
 //            String status;
 //            if (LocalDate.now().isAfter(expiryDate)) {
 //                status = random.nextBoolean() ? "Đồng ý" : "Từ chối";
@@ -908,8 +1034,7 @@ public class FakeDataService {
 //                        random.nextInt(60)  // second
 //                );
 //
-//                Instant randomInstant = randomDateTime.atZone(ZoneId.systemDefault()).toInstant();
-//                pointHistory.setCreatedAt(randomInstant);
+//                pointHistory.setCreatedAt(randomDateTime);
 //
 //                pointHistories.add(pointHistory);
 //            }
@@ -918,40 +1043,6 @@ public class FakeDataService {
 //        // Lưu tất cả dữ liệu vào database
 //        pointHistoryRepository.saveAll(pointHistories);
 //        System.out.println("Đã tạo " + pointHistories.size() + " bản ghi lịch sử điểm");
-//    }
-//    //endregion
-//
-//    //region Fake Achievement
-//    @PostConstruct
-//    public void fakeAchievement() {
-//        if (achievementRepository.count() > 0) return;
-//        List<User> users = userRepository.findAllPatron();
-//        List<Achievement> achievements = achievementRepository.findAll();
-//        for (User user : users) {
-//            // Số lượng bản ghi cho mỗi người dùng (từ 0-5)
-//            int numRecords = random.nextInt(6);
-//
-//            for (int i = 0; i < numRecords; i++) {
-//                UserAchievement userAchievement = new UserAchievement();
-//                userAchievement.setUserID(user);
-//                userAchievement.setAchievementID(achievements.get(random.nextInt(achievements.size())));
-//
-//                // Lấy ngày hiện tại và trừ đi số ngày ngẫu nhiên từ 0 - 99
-//                LocalDate randomDate = LocalDate.now().minusDays(random.nextInt(100));
-//
-//                // Thêm giờ, phút, giây ngẫu nhiên
-//                LocalDateTime randomDateTime = randomDate.atTime(
-//                        random.nextInt(24),  // Giờ (0-23)
-//                        random.nextInt(60),  // Phút (0-59)
-//                        random.nextInt(60)   // Giây (0-59)
-//                );
-//
-//                // Chuyển đổi sang Instant
-//                Instant awardedAt = randomDateTime.atZone(ZoneId.systemDefault()).toInstant();
-//                userAchievement.setAwardedAt(awardedAt);
-//                userAchievementRepository.save(userAchievement);
-//            }
-//        }
 //    }
 //    //endregion
 //
@@ -1627,4 +1718,109 @@ public class FakeDataService {
 //        userAchievementRepository.saveAll(userAchievements);
 //    }
 //    //endregion
+
+    //region Fake Violation
+    @PostConstruct
+    public void initializeViolationData() {
+        // Kiểm tra nếu đã có dữ liệu trong bảng, không cần khởi tạo lại
+        if (userViolationRepository.count() > 0) {
+            return;
+        }
+
+        // Lấy danh sách users và borrow records để tham chiếu
+        List<User> patrons = userRepository.findAllPatron();
+        List<User> librarian = userRepository.findAllLibrarian();
+        List<BorrowRecord> borrowRecords = borrowRecordRepository.findAll();
+
+        // Nếu không có dữ liệu users hoặc borrow records, không thể tạo vi phạm
+        if (patrons.isEmpty() || borrowRecords.isEmpty()) {
+            return;
+        }
+
+        // Danh sách các loại vi phạm
+        List<String> violationTypes = Arrays.asList(
+                "Trả sách muộn",
+                "Làm hỏng sách",
+                "Làm mất sách",
+                "Vi phạm nội quy thư viện",
+                "Mang đồ ăn vào thư viện",
+                "Nói chuyện ồn ào"
+        );
+
+        // Danh sách mô tả chi tiết
+        List<String> descriptions = Arrays.asList(
+                "Trả sách trễ 5 ngày so với hạn",
+                "Sách bị rách trang 15-20",
+                "Đánh mất sách và không tìm được",
+                "Sử dụng điện thoại trong khu vực cấm",
+                "Mang nước ngọt vào thư viện",
+                "Làm ồn khu vực đọc yên tĩnh",
+                "Viết, vẽ lên sách",
+                "Gấp góc sách thay vì dùng bookmark",
+                "Quên không trả sách đúng hạn"
+        );
+
+        // Danh sách giải pháp
+        List<String> solutions = Arrays.asList(
+                "Nộp phạt theo quy định",
+                "Bồi thường sách mới",
+                "Phạt tiền và nhắc nhở",
+                "Cảnh cáo và nhắc nhở",
+                "Tạm dừng quyền mượn sách 2 tuần",
+                "Yêu cầu rời khỏi thư viện",
+                "Phạt tiền và bồi thường thiệt hại"
+        );
+
+        // Danh sách vi phạm cần tạo
+        List<UserViolation> violations = new ArrayList<>();
+
+        // Tạo 90 vi phạm mẫu
+        Random random = new Random();
+        for (int i = 0; i < 5000; i++) {
+            UserViolation violation = new UserViolation();
+
+            // Chọn ngẫu nhiên user vi phạm
+            User violator = patrons.get(random.nextInt(patrons.size()));
+            violation.setUserID(violator);
+
+            // Chọn ngẫu nhiên nhân viên ghi nhận vi phạm
+            User recorder = librarian.get(random.nextInt(librarian.size()));
+            violation.setRecordedBy(recorder);
+
+            // Chọn ngẫu nhiên loại vi phạm
+            String violationType = violationTypes.get(random.nextInt(violationTypes.size()));
+            violation.setViolationType(violationType);
+
+            // Gán borrow record nếu vi phạm liên quan đến mượn sách
+            if (violationType.contains("sách") && !borrowRecords.isEmpty()) {
+                violation.setRecordID(borrowRecords.get(random.nextInt(borrowRecords.size())));
+            }
+
+            // Chọn ngẫu nhiên mô tả
+            violation.setDescription(descriptions.get(random.nextInt(descriptions.size())));
+
+            // Chọn ngẫu nhiên giải pháp
+            violation.setSolution(solutions.get(random.nextInt(solutions.size())));
+
+            // Tạo số điểm trừ ngẫu nhiên từ 5 đến 20
+            violation.setPointsDeducted(random.nextInt(16) + 5);
+
+            // Tạo số tiền phạt ngẫu nhiên từ 10000 đến 200000
+            BigDecimal penaltyAmount = new BigDecimal(random.nextInt(191) * 1000 + 10000);
+            violation.setPenaltyAmount(penaltyAmount);
+
+            // Thời gian vi phạm trong vòng 3 tháng gần đây
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime randomDate = now.minusDays(random.nextInt(700));
+            violation.setViolationDate(randomDate);
+
+            violations.add(violation);
+        }
+
+        // Lưu danh sách vi phạm vào database
+        userViolationRepository.saveAll(violations);
+
+        System.out.println("Đã khởi tạo " + violations.size() + " dữ liệu vi phạm mẫu");
+    }
+    //endregion
 }

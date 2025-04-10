@@ -1,0 +1,96 @@
+/* EventInfo.module.css */
+.event-info-container {
+  height: 100%;
+}
+
+.event-info-card {
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.event-cover-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.event-info-header {
+  margin-bottom: 16px;
+}
+
+.event-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.event-title {
+  margin: 0;
+  flex: 1;
+}
+
+.event-status {
+  margin-left: 16px;
+}
+
+.event-basic-info {
+  width: 100%;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+}
+
+.info-icon {
+  margin-right: 8px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.section-divider {
+  margin: 24px 0;
+}
+
+.event-description {
+  margin-bottom: 16px;
+}
+
+.event-details {
+  margin-bottom: 16px;
+}
+
+.event-actions {
+  margin-top: 24px;
+}
+
+.action-button {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .event-title-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .event-status {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .event-actions .ant-row {
+    flex-direction: column;
+  }
+
+  .event-actions .ant-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 16px;
+  }
+}

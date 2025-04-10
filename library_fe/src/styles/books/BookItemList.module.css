@@ -1,0 +1,158 @@
+/* src/styles/books/BookItemList.module.css */
+.container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f1f1f;
+  margin: 0;
+}
+
+.deleteSelectedButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tableActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Định dạng cho các thẻ trạng thái */
+.statusTag {
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.statusAvailable {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+.statusBorrowed {
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  color: #faad14;
+}
+
+.statusMaintenance {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+.statusOther {
+  background-color: #f9f0ff;
+  border: 1px solid #d3adf7;
+  color: #722ed1;
+}
+
+/* Styles cho modal */
+.modalForm {
+  margin-top: 16px;
+}
+
+.formItem {
+  margin-bottom: 16px;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #1f1f1f;
+}
+
+.formInput,
+.formSelect,
+.formDatePicker {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.formInput:focus,
+.formSelect:focus {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  outline: none;
+}
+
+.formTextArea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.loadingSpinner {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+/* Style cho checkbox */
+:global(.ant-checkbox-wrapper) {
+  background-color: transparent !important;
+}
+
+:global(.ant-checkbox) {
+  background-color: white !important;
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 2px !important;
+}
+
+:global(.ant-table-tbody > tr > td) {
+  background-color: white;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px 0;
+  color: #8c8c8c;
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #d9d9d9;
+}
+
+.emptyStateText {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}

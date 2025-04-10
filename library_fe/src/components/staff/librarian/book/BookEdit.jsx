@@ -88,6 +88,9 @@ const BookEdit = () => {
           format: bookData.format || "16 cm x 24 cm",
           description: bookData.description,
           ddcCode: bookData.ddcCode,
+          price: bookData.price || 0,
+          location: bookData.location || "",
+          editNote: "",
         });
       } else {
         notification.error({
@@ -111,6 +114,17 @@ const BookEdit = () => {
   const handleSubmit = async (values) => {
     try {
       setSubmitting(true);
+
+      // Validate edit note
+      if (!values.editNote || values.editNote.trim() === "") {
+        notification.error({
+          message: "Lỗi",
+          description:
+            "Vui lòng nhập ghi chú về những thay đổi bạn đã thực hiện",
+        });
+        setSubmitting(false);
+        return;
+      }
 
       // Prepare form data with coverImage
       const bookData = {
@@ -180,6 +194,14 @@ const BookEdit = () => {
         setImageUrl(base64Image);
         setCoverImage(file);
         message.success(response.message || "Thay đổi ảnh thành công!");
+
+        // Automatically add a note about image change if edit note is empty
+        const currentNote = form.getFieldValue("editNote");
+        if (!currentNote || currentNote.trim() === "") {
+          form.setFieldsValue({
+            editNote: "Thay đổi ảnh bìa sách.",
+          });
+        }
       } else {
         message.error(response.message || "Không thể thay đổi ảnh bìa!");
       }
@@ -192,8 +214,6 @@ const BookEdit = () => {
 
     return false; // Prevent auto-upload
   };
-
-  // Removed handleRemoveImage as it's no longer needed
 
   const handleDeleteBook = async () => {
     try {
@@ -254,7 +274,7 @@ const BookEdit = () => {
         </div>
       }
       extra={
-        <Space>
+        <Space style={{ marginRight: 10 }}>
           <Button
             icon={<RollbackOutlined />}
             onClick={() => navigate("/staff/books")}
@@ -282,6 +302,7 @@ const BookEdit = () => {
           bookType: "Giáo trình",
           publicationYear: yearNow,
           format: "16 cm x 24 cm",
+          price: 0,
         }}
       >
         <Row gutter={24}>
@@ -388,6 +409,37 @@ const BookEdit = () => {
             </Row>
 
             <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="price"
+                  label="Giá tiền (VNĐ)"
+                  rules={[
+                    { required: true, message: "Vui lòng nhập giá tiền sách" },
+                  ]}
+                >
+                  <InputNumber
+                    min={0}
+                    style={{ width: "100%" }}
+                    placeholder="VD: 150000"
+                    formatter={(value) =>
+                      `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="location"
+                  label="Vị trí sách"
+                  help="Nếu tăng số lượng sách, có thể nhập vị trí cho các sách mới, nếu không, vị trí sẽ là vị trí của các sách cùng loại"
+                >
+                  <Input placeholder="VD: Kệ A5, Tầng 3" />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
               <Col xs={24} md={8}>
                 <Form.Item name="pageCount" label="Số trang">
                   <InputNumber
@@ -425,7 +477,25 @@ const BookEdit = () => {
             </Row>
 
             <Form.Item name="description" label="Mô tả">
-              <TextArea rows={6} placeholder="Nhập mô tả sách..." />
+              <TextArea rows={4} placeholder="Nhập mô tả sách..." />
+            </Form.Item>
+
+            <Form.Item
+              name="editNote"
+              label="Ghi chú chỉnh sửa"
+              rules={[
+                {
+                  required: true,
+                  message:
+                    "Vui lòng nhập ghi chú về những thay đổi bạn đã thực hiện",
+                },
+              ]}
+              help="Nhập thông tin về những thay đổi bạn đã thực hiện để dễ dàng theo dõi lịch sử chỉnh sửa"
+            >
+              <TextArea
+                rows={3}
+                placeholder="VD: Cập nhật giá sách, sửa lỗi chính tả trong mô tả..."
+              />
             </Form.Item>
           </Col>
 
@@ -498,6 +568,39 @@ const BookEdit = () => {
                 quả.
               </Text>
             </div>
+
+            {book && (
+              <Card
+                style={{ marginTop: 16 }}
+                title={
+                  <div style={{ textAlign: "center" }}>
+                    <Text strong>Thông tin hiện tại</Text>
+                  </div>
+                }
+                size="small"
+              >
+                <p>
+                  <Text strong>Mã sách:</Text> {book.bookID}
+                </p>
+                {book.availableCopies !== undefined && (
+                  <p>
+                    <Text strong>Số bản có thể mượn:</Text>{" "}
+                    {book.availableCopies}/{book.totalCopies}
+                  </p>
+                )}
+                {book.price !== undefined && (
+                  <p>
+                    <Text strong>Giá hiện tại:</Text>{" "}
+                    {book.price.toLocaleString()} VNĐ
+                  </p>
+                )}
+                {book.location && (
+                  <p>
+                    <Text strong>Vị trí hiện tại:</Text> {book.location}
+                  </p>
+                )}
+              </Card>
+            )}
           </Col>
         </Row>
 

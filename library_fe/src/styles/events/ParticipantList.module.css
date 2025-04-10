@@ -1,0 +1,106 @@
+/* ParticipantList.module.css */
+.participant-list-card {
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.participant-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.participant-list-title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.participant-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.search-container {
+  margin-bottom: 16px;
+}
+
+.search-input {
+  border-radius: 4px;
+}
+
+.participants-list {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.participant-item {
+  padding: 12px 0;
+  transition: background-color 0.3s;
+  border-radius: 4px;
+}
+
+.participant-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.participant-avatar {
+  background-color: #f5f5f5;
+}
+
+.participant-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.participant-tags {
+  display: flex;
+  gap: 4px;
+}
+
+.participant-description {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-list {
+  margin: 32px 0;
+}
+
+@media (max-width: 768px) {
+  .participant-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .participant-actions {
+    width: 100%;
+  }
+
+  .add-participant-button,
+  .export-button {
+    flex: 1;
+  }
+
+  .participant-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .participant-tags {
+    margin-top: 4px;
+  }
+}

@@ -2,23 +2,35 @@
 import { Breadcrumb } from "antd";
 import { HomeOutlined, BookOutlined, PlusOutlined } from "@ant-design/icons";
 import BookAdd from "/src/components/staff/librarian/book/BookAdd";
+import { useNavigate } from "react-router-dom";
+import styles from "/src/styles/books/BookCatalogPage.module.css";
 
 const BookAddPage = () => {
-  // Định nghĩa items cho Breadcrumb theo cách mới
+  const navigate = useNavigate();
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
   const breadcrumbItems = [
     {
       title: (
-        <a href="/staff/dashboard">
+        <span
+          onClick={() => handleNavigate("/staff/dashboard")}
+          className={styles.breadcrumbLink}
+        >
           <HomeOutlined /> Trang chủ
-        </a>
+        </span>
       ),
       key: "home",
     },
     {
       title: (
-        <a href="/staff/books">
+        <span
+          onClick={() => handleNavigate("/staff/books")}
+          className={styles.breadcrumbLink}
+        >
           <BookOutlined /> Quản lý sách
-        </a>
+        </span>
       ),
       key: "books",
     },

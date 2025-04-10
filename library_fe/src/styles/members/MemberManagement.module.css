@@ -1,0 +1,162 @@
+/* MemberManagement.module.css */
+.pageHeader {
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerTitle {
+  margin-bottom: 0;
+}
+
+.mainContent {
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.filterContainer {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tableActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.statusBadge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.avatarContainer {
+  display: flex;
+  align-items: center;
+}
+
+.avatarName {
+  margin-left: 12px;
+}
+
+.memberLevel {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.goldIcon {
+  color: #ffd700;
+  margin-right: 6px;
+}
+
+.silverIcon {
+  color: #c0c0c0;
+  margin-right: 6px;
+}
+
+.bronzeIcon {
+  color: #cd7f32;
+  margin-right: 6px;
+}
+
+.chartContainer {
+  margin-top: 24px;
+  height: 300px;
+}
+
+.statisticsCard {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.statisticsTitle {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.statisticsValue {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.tabContent {
+  padding: 24px 0;
+}
+
+.emptyState {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.tooltipIcon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.tooltipLabel {
+  flex: 1;
+  margin-right: 12px;
+}
+
+.tooltipValue {
+  font-weight: 500;
+}
+
+.detailLabel {
+  color: rgba(0, 0, 0, 0.45);
+  margin-bottom: 4px;
+}
+
+.detailValue {
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.editButton {
+  margin-left: 8px;
+}
+
+.searchForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.formItem {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+@media (max-width: 576px) {
+  .formItem {
+    min-width: 100%;
+  }
+}
+
+.actionButtons {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+}

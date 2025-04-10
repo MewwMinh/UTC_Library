@@ -73,11 +73,10 @@ public class Book {
     @Column(name = "CoverImage")
     private String coverImage;
 
+    @Column(name = "Price")
+    private Integer price;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DDCCode", referencedColumnName = "DDCCode")
     private DDCClassification dDCCode;
-
-    @NotNull
-    @Column(name = "ListedBookPrice", nullable = false)
-    int listedBookPrice;
 }

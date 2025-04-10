@@ -1,17 +1,11 @@
 package edu.utc.demo_01.service;
 
-import edu.utc.demo_01.entity.LibrarySetting;
 import edu.utc.demo_01.repository.*;
-import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,44 +21,44 @@ public class AddDefaultDataService {
     MembershipRepository membershipRepository;
     LibrarySettingRepository librarySettingRepository;
 
-    //region Library Setting
-    @PostConstruct
-    public void initSetting() {
-        if (librarySettingRepository.count() > 0) return;
-        List<LibrarySetting> settings = new ArrayList<>();
-        settings.add(createLibrarySetting("MaxTextbooks_GoldMember", "20"));
-        settings.add(createLibrarySetting("MaxTextbooks_SilverMember", "15"));
-        settings.add(createLibrarySetting("MaxTextbooks_BronzeMember", "10"));
-        settings.add(createLibrarySetting("MaxReferenceMaterials_GoldMember", "6"));
-        settings.add(createLibrarySetting("MaxReferenceMaterials_SilverMember", "4"));
-        settings.add(createLibrarySetting("MaxReferenceMaterials_BronzeMember", "2"));
-        settings.add(createLibrarySetting("LateFeeMultiplier_Textbook_Over3Months", "1"));
-        settings.add(createLibrarySetting("LateFeeMultiplier_Textbook_Under3Months", "0.5"));
-        settings.add(createLibrarySetting("LateFeeMultiplier_ReferenceMaterials_Over30Days", "1"));
-        settings.add(createLibrarySetting("LateFeeMultiplier_ReferenceMaterials_Under30Days", "0.5"));
-        settings.add(createLibrarySetting("Semester1_BorrowStartDate", "06-15"));
-        settings.add(createLibrarySetting("Semester1_BorrowEndDate", "12-14"));
-        settings.add(createLibrarySetting("Semester1_LatestReturnDate", "03-14"));
-        settings.add(createLibrarySetting("Semester2_BorrowStartDate", "12-15"));
-        settings.add(createLibrarySetting("Semester2_BorrowEndDate", "06-14"));
-        settings.add(createLibrarySetting("Semester2_LatestReturnDate", "09-14"));
-        settings.add(createLibrarySetting("MaximumBorrowingPeriodForReferenceMaterials", "45"));
-        settings.add(createLibrarySetting("PointsDeductedForLateTextbookReturn", "20"));
-        settings.add(createLibrarySetting("PointsDeductedForLateReferenceMaterialsReturn", "25"));
-        settings.add(createLibrarySetting("BonusPointsForOnTimeBookReturn", "10"));
-        settings.add(createLibrarySetting("PointsDeductedForDamagedBook", "30"));
-        settings.add(createLibrarySetting("PointsDeductedForLostBook", "40"));
-        librarySettingRepository.saveAll(settings);
-    }
-
-    private LibrarySetting createLibrarySetting(String settingKey, String settingValue) {
-        LibrarySetting setting = new LibrarySetting();
-        setting.setSettingKey(settingKey);
-        setting.setValue(settingValue);
-        setting.setUpdateAt(Instant.now());
-        return setting;
-    }
-    //endregion
+//    //region Library Setting
+//    @PostConstruct
+//    public void initSetting() {
+//        if (librarySettingRepository.count() > 0) return;
+//        List<LibrarySetting> settings = new ArrayList<>();
+//        settings.add(createLibrarySetting("MaxTextbooks_GoldMember", "20"));
+//        settings.add(createLibrarySetting("MaxTextbooks_SilverMember", "15"));
+//        settings.add(createLibrarySetting("MaxTextbooks_BronzeMember", "10"));
+//        settings.add(createLibrarySetting("MaxReferenceMaterials_GoldMember", "6"));
+//        settings.add(createLibrarySetting("MaxReferenceMaterials_SilverMember", "4"));
+//        settings.add(createLibrarySetting("MaxReferenceMaterials_BronzeMember", "2"));
+//        settings.add(createLibrarySetting("LateFeeMultiplier_Textbook_Over3Months", "1"));
+//        settings.add(createLibrarySetting("LateFeeMultiplier_Textbook_Under3Months", "0.5"));
+//        settings.add(createLibrarySetting("LateFeeMultiplier_ReferenceMaterials_Over30Days", "1"));
+//        settings.add(createLibrarySetting("LateFeeMultiplier_ReferenceMaterials_Under30Days", "0.5"));
+//        settings.add(createLibrarySetting("Semester1_BorrowStartDate", "06-15"));
+//        settings.add(createLibrarySetting("Semester1_BorrowEndDate", "12-14"));
+//        settings.add(createLibrarySetting("Semester1_LatestReturnDate", "03-14"));
+//        settings.add(createLibrarySetting("Semester2_BorrowStartDate", "12-15"));
+//        settings.add(createLibrarySetting("Semester2_BorrowEndDate", "06-14"));
+//        settings.add(createLibrarySetting("Semester2_LatestReturnDate", "09-14"));
+//        settings.add(createLibrarySetting("MaximumBorrowingPeriodForReferenceMaterials", "45"));
+//        settings.add(createLibrarySetting("PointsDeductedForLateTextbookReturn", "20"));
+//        settings.add(createLibrarySetting("PointsDeductedForLateReferenceMaterialsReturn", "25"));
+//        settings.add(createLibrarySetting("BonusPointsForOnTimeBookReturn", "10"));
+//        settings.add(createLibrarySetting("PointsDeductedForDamagedBook", "30"));
+//        settings.add(createLibrarySetting("PointsDeductedForLostBook", "40"));
+//        librarySettingRepository.saveAll(settings);
+//    }
+//
+//    private LibrarySetting createLibrarySetting(String settingKey, String settingValue) {
+//        LibrarySetting setting = new LibrarySetting();
+//        setting.setSettingKey(settingKey);
+//        setting.setValue(settingValue);
+//        setting.setUpdateAt(Instant.now());
+//        return setting;
+//    }
+//    //endregion
 //
 //    //region Roles
 //    @PostConstruct
@@ -307,7 +301,7 @@ public class AddDefaultDataService {
 //        private DDCClassification createClassification( String ddcCode, String ddcName, String description) {
 //            DDCClassification classification = new DDCClassification();
 //            classification.setDDCCode(ddcCode);
-//            classification.setDDCName(ddcName);
+//            classification.setDdcName(ddcName);
 //            classification.setDescription(description);
 //            return classification;
 //        }
@@ -321,7 +315,7 @@ public class AddDefaultDataService {
 //            user.setUserID("manager");
 //            user.setFullName("manager");
 //            user.setUserType("Manager");
-//            user.setStatus("Hoạt dộng");
+//            user.setStatus("Hoạt động");
 //            user.setCreatedAt(LocalDate.now());
 //            user.setDob(LocalDate.of(2000, 1, 1));
 //            user.setExpiry(LocalDate.of(3000, 1, 1));
@@ -331,7 +325,7 @@ public class AddDefaultDataService {
 //            user = userRepository.save(user);
 //            AuthCredential authCredential = new AuthCredential();
 //            authCredential.setUserID(user);
-//            authCredential.setEmail("admin@gmail.com");
+//            authCredential.setEmail("admin@lms.utc.edu.vn");
 //            authCredential.setPasswordHash(passwordEncoder.encode("123456"));
 //            authCredentialRepository.save(authCredential);
 //            Role role = roleRepository.findByRoleName("Manager");
@@ -345,7 +339,7 @@ public class AddDefaultDataService {
 //            user.setUserID("coordinator");
 //            user.setFullName("coordinator");
 //            user.setUserType("Staff");
-//            user.setStatus("Hoạt dộng");
+//            user.setStatus("Hoạt động");
 //            user.setCreatedAt(LocalDate.now());
 //            user.setDob(LocalDate.of(2000, 1, 1));
 //            user.setExpiry(LocalDate.of(3000, 1, 1));
@@ -355,7 +349,7 @@ public class AddDefaultDataService {
 //            user = userRepository.save(user);
 //            AuthCredential authCredential = new AuthCredential();
 //            authCredential.setUserID(user);
-//            authCredential.setEmail("coordinator@gmail.com");
+//            authCredential.setEmail("coordinator@lms.utc.edu.vn");
 //            authCredential.setPasswordHash(passwordEncoder.encode("123456"));
 //            authCredentialRepository.save(authCredential);
 //            Role role = roleRepository.findByRoleName("Coordinator");
@@ -369,7 +363,7 @@ public class AddDefaultDataService {
 //            user.setUserID("librarian");
 //            user.setFullName("librarian");
 //            user.setUserType("Staff");
-//            user.setStatus("Hoạt dộng");
+//            user.setStatus("Hoạt động");
 //            user.setCreatedAt(LocalDate.now());
 //            user.setDob(LocalDate.of(2000, 1, 1));
 //            user.setExpiry(LocalDate.of(3000, 1, 1));
@@ -379,7 +373,7 @@ public class AddDefaultDataService {
 //            user = userRepository.save(user);
 //            AuthCredential authCredential = new AuthCredential();
 //            authCredential.setUserID(user);
-//            authCredential.setEmail("librarian@gmail.com");
+//            authCredential.setEmail("librarian@lms.utc.edu.vn");
 //            authCredential.setPasswordHash(passwordEncoder.encode("123456"));
 //            authCredentialRepository.save(authCredential);
 //            Role role = roleRepository.findByRoleName("Librarian");
@@ -404,7 +398,7 @@ public class AddDefaultDataService {
 //            user = userRepository.save(user);
 //            AuthCredential authCredential = new AuthCredential();
 //            authCredential.setUserID(user);
-//            authCredential.setEmail("patron@gmail.com");
+//            authCredential.setEmail("patron@lms.utc.edu.vn");
 //            authCredential.setPasswordHash(passwordEncoder.encode("123456"));
 //            authCredentialRepository.save(authCredential);
 //            Role role = roleRepository.findByRoleName("patron");
@@ -414,7 +408,7 @@ public class AddDefaultDataService {
 //            userRoleRepository.save(userRole);
 //            Membership membership = new Membership();
 //            membership.setUserID(user);
-//            membership.setMembershipType("Đồng");
+//            membership.setMembershipType("Vàng");
 //            membership.setUpdatedAt(Instant.now());
 //            membershipRepository.save(membership);
 //        }
