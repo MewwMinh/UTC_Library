@@ -10,12 +10,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreatePatron {
+public class ChangePatronInformation {
     String userID;
     String fullName;
-    String gender;
+    String status;
     LocalDate dob;
-    String userImage;
-    String nationalID;
-    String email;
+    String gender;
+    Integer plusDays;
+    Integer memberPoints;
+    String role;
 }

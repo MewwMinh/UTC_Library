@@ -1,443 +1,471 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  Avatar,
-  Col,
-  Divider,
-  Space,
-  Typography,
-  Statistic,
   Card,
-  Skeleton,
+  Avatar,
+  Row,
+  Col,
+  Typography,
   Tag,
+  Skeleton,
   Badge,
-  Tooltip,
   notification,
-  Modal,
   Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  InputNumber,
 } from "antd";
 import {
-  CalendarOutlined,
-  MailOutlined,
-  IdcardOutlined,
   UserOutlined,
-  ClockCircleOutlined,
+  MailOutlined,
+  CalendarOutlined,
   TrophyOutlined,
-  BookOutlined,
-  CrownOutlined,
-  ManOutlined,
-  WomanOutlined,
-  QuestionCircleOutlined,
+  TagOutlined,
+  IdcardOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
-import { motion } from "framer-motion";
-import dayjs from "dayjs";
-import PropTypes from "prop-types";
-import librarianService from "/src/services/librarianService";
+import moment from "moment";
+import patronService from "/src/services/coordinator/patronService.js";
+import styles from "/src/styles/members/PatronInformation.module.css";
+import { useParams } from "react-router-dom";
 
-const { Title, Text } = Typography;
+const { Text, Title } = Typography;
+const { Option } = Select;
 
 const PatronInformation = () => {
-  const [patronData, setPatronData] = useState(null);
+  const [patron, setPatron] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [imageError, setImageError] = useState(false);
-  const [imageModalVisible, setImageModalVisible] = useState(false);
-  const { patronId } = useParams();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const { patronID } = useParams();
 
+  // Lấy dữ liệu bạn đọc
   useEffect(() => {
-    if (patronId) {
-      fetchPatronData(patronId);
-    }
-  }, [patronId]);
+    const fetchPatronData = async () => {
+      try {
+        setLoading(true);
+        const response = await patronService.getPatronDetails(patronID);
 
-  const fetchPatronData = async (id) => {
+        if (response.success) {
+          setPatron(response.data);
+        } else {
+          notification.error({
+            message: "Lỗi",
+            description: response.message || "Không thể tải thông tin bạn đọc",
+          });
+        }
+        // eslint-disable-next-line no-unused-vars
+      } catch (error) {
+        notification.error({
+          message: "Lỗi kết nối",
+          description: "Không thể kết nối đến máy chủ",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (patronID) {
+      fetchPatronData();
+    }
+  }, [patronID]);
+
+  // Hàm chuyển đổi định dạng ngày tháng
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return moment(dateString).format("DD/MM/YYYY");
+  };
+
+  // Lấy màu cho tag hạng thành viên
+  const getMembershipColor = (type) => {
+    switch (type) {
+      case "Vàng":
+        return "gold";
+      case "Bạc":
+        return "silver";
+      case "Đồng":
+        return "bronze";
+      default:
+        return "default";
+    }
+  };
+
+  // Hiển thị trạng thái
+  const getStatusBadge = (status) => {
+    if (status === "Hoạt động") {
+      return <Badge status="success" text="Hoạt động" />;
+    } else if (status === "Tạm khóa") {
+      return <Badge status="warning" text="Tạm khóa" />;
+    } else {
+      return <Badge status="error" text="Vô hiệu" />;
+    }
+  };
+
+  // Chuyển đổi giới tính
+  const getGenderText = (gender) => {
+    return gender === "Nam" ? "Nam" : gender === "Nữ" ? "Nữ" : "Khác";
+  };
+
+  // Chuyển đổi role
+  const getRoleText = (role) => {
+    switch (role) {
+      case "STUDENT":
+        return "Sinh viên";
+      case "TEACHER":
+        return "Giảng viên";
+      case "STAFF":
+        return "Nhân viên";
+      case "RESEARCHER":
+        return "Nghiên cứu sinh";
+      case "PATRON":
+        return "Bạn đọc";
+      default:
+        return role;
+    }
+  };
+
+  // Mở modal chỉnh sửa
+  const showEditModal = () => {
+    // Đặt giá trị mặc định cho form
+    if (patron) {
+      form.setFieldsValue({
+        userID: patron.patronID,
+        fullName: patron.patronName,
+        status: patron.patronStatus,
+        dob: patron.dob ? moment(patron.dob) : null,
+        gender: patron.gender,
+        memberPoints: patron.memberPoints,
+        role: patron.role,
+        plusDays: 0, // Mặc định là 0 ngày
+      });
+    }
+    setIsModalVisible(true);
+  };
+
+  // Đóng modal
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  // Xử lý khi submit form
+  const handleSubmit = async () => {
     try {
-      setLoading(true);
-      const response = await librarianService.getPatronInformation(id);
+      const values = await form.validateFields();
+
+      // Chuyển đổi định dạng ngày tháng
+      if (values.dob) {
+        values.dob = values.dob.format("YYYY-MM-DD");
+      }
+
+      // Nếu plusDays là 0 hoặc empty, loại bỏ khỏi payload
+      if (!values.plusDays) {
+        delete values.plusDays;
+      }
+
+      setSubmitLoading(true);
+
+      const response = await patronService.updatePatronInfo(values);
 
       if (response.success) {
-        setPatronData(response.data);
+        notification.success({
+          message: "Thành công",
+          description:
+            response.message || "Cập nhật thông tin bạn đọc thành công",
+        });
+
+        // Đóng modal
+        setIsModalVisible(false);
+
+        // Tải lại thông tin bạn đọc
+        const refreshResponse = await patronService.getPatronDetails(patronID);
+        if (refreshResponse.success) {
+          setPatron(refreshResponse.data);
+        }
       } else {
         notification.error({
           message: "Lỗi",
-          description: response.message || "Không thể tải thông tin bạn đọc",
+          description:
+            response.message || "Không thể cập nhật thông tin bạn đọc",
         });
       }
     } catch (error) {
-      console.error("Error fetching patron data:", error);
       notification.error({
-        message: "Lỗi kết nối",
-        description: "Không thể kết nối đến máy chủ",
+        message: "Lỗi",
+        description: "Có lỗi xảy ra khi cập nhật thông tin bạn đọc",
       });
     } finally {
-      setLoading(false);
+      setSubmitLoading(false);
     }
-  };
-
-  const getRankTag = (rank) => {
-    let color, icon;
-    switch (rank) {
-      case "Vàng":
-        color = "#FFD700";
-        icon = <CrownOutlined />;
-        break;
-      case "Bạc":
-        color = "#C0C0C0";
-        icon = <TrophyOutlined />;
-        break;
-      case "Đồng":
-        color = "#CD7F32";
-        icon = <BookOutlined />;
-        break;
-      default:
-        color = "#CD7F32";
-        icon = <BookOutlined />;
-    }
-
-    return (
-      <Tag
-        icon={icon}
-        color={color}
-        style={{
-          padding: "4px 8px",
-          fontSize: "14px",
-          borderRadius: "50px",
-          fontWeight: "bold",
-        }}
-      >
-        Thành viên {rank}
-      </Tag>
-    );
-  };
-
-  const getStatusTag = (expiryDate) => {
-    const now = dayjs();
-    const expiry = dayjs(expiryDate);
-    const daysRemaining = expiry.diff(now, "day");
-
-    let color, text;
-    if (daysRemaining > 90) {
-      color = "success";
-      text = "Còn hạn";
-    } else if (daysRemaining > 0) {
-      color = "warning";
-      text = `Còn ${daysRemaining} ngày`;
-    } else {
-      color = "error";
-      text = "Hết hạn";
-    }
-
-    return (
-      <Tag
-        color={color}
-        style={{
-          padding: "4px 8px",
-          fontSize: "14px",
-          borderRadius: "50px",
-        }}
-      >
-        <ClockCircleOutlined style={{ marginRight: 4 }} />
-        {text}
-      </Tag>
-    );
-  };
-
-  const getGenderIcon = (gender) => {
-    if (gender === "Nam") {
-      return <ManOutlined style={{ color: "#1890ff" }} />;
-    } else if (gender === "Nữ") {
-      return <WomanOutlined style={{ color: "#eb2f96" }} />;
-    }
-    return <QuestionCircleOutlined />;
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return dayjs(dateString).format("DD/MM/YYYY");
-  };
-
-  const daysUntilExpiry = (expiryDate) => {
-    if (!expiryDate) return 0;
-    const now = dayjs();
-    const expiry = dayjs(expiryDate);
-    return Math.max(0, expiry.diff(now, "day"));
   };
 
   return (
-    <Col
-      xs={24}
-      sm={24}
-      md={8}
-      style={{
-        textAlign: "center",
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+    <div className={styles.patronInfoContainer}>
+      {loading ? (
+        <Skeleton active avatar paragraph={{ rows: 4 }} />
+      ) : patron ? (
+        <Card
+          className={styles.patronCard}
+          bordered={false}
+          extra={
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={showEditModal}
+            >
+              Chỉnh sửa
+            </Button>
+          }
+        >
+          <div className={styles.cardHeader}>
+            <Avatar
+              size={100}
+              src={patron.patronImage}
+              icon={!patron.patronImage && <UserOutlined />}
+              className={styles.avatar}
+            />
+            <div className={styles.headerInfo}>
+              <Title level={3} className={styles.patronName}>
+                {patron.patronName}
+              </Title>
+              <div className={styles.patronTags}>
+                <Tag
+                  color={getMembershipColor(patron.membershipType)}
+                  icon={<TrophyOutlined />}
+                >
+                  Hạng {patron.membershipType}
+                </Tag>
+                <Tag color="blue" icon={<TagOutlined />}>
+                  {getRoleText(patron.role)}
+                </Tag>
+                {getStatusBadge(patron.patronStatus)}
+              </div>
+            </div>
+          </div>
+
+          <Row gutter={[24, 16]} className={styles.patronDetails}>
+            <Col xs={24} sm={12} md={8}>
+              <div className={styles.infoItem}>
+                <IdcardOutlined className={styles.infoIcon} />
+                <div>
+                  <Text type="secondary">Mã bạn đọc</Text>
+                  <div>{patron.patronID}</div>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <div className={styles.infoItem}>
+                <MailOutlined className={styles.infoIcon} />
+                <div>
+                  <Text type="secondary">Email</Text>
+                  <div>{patron.patronEmail}</div>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <div className={styles.infoItem}>
+                <UserOutlined className={styles.infoIcon} />
+                <div>
+                  <Text type="secondary">Giới tính</Text>
+                  <div>{getGenderText(patron.gender)}</div>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <div className={styles.infoItem}>
+                <CalendarOutlined className={styles.infoIcon} />
+                <div>
+                  <Text type="secondary">Ngày sinh</Text>
+                  <div>{formatDate(patron.dob)}</div>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <div className={styles.infoItem}>
+                <TrophyOutlined className={styles.infoIcon} />
+                <div>
+                  <Text type="secondary">Điểm thành viên</Text>
+                  <div className={styles.pointsValue}>
+                    {patron.memberPoints} điểm
+                  </div>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <div className={styles.infoItem}>
+                <CalendarOutlined className={styles.infoIcon} />
+                <div>
+                  <Text type="secondary">Ngày tạo</Text>
+                  <div>{formatDate(patron.createdAt)}</div>
+                </div>
+              </div>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <div className={styles.infoItem}>
+                <CalendarOutlined className={styles.infoIcon} />
+                <div>
+                  <Text type="secondary">Ngày hết hạn</Text>
+                  <div>{formatDate(patron.expiry)}</div>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </Card>
+      ) : (
+        <div className={styles.noData}>Không tìm thấy thông tin bạn đọc</div>
+      )}
+
+      {/* Modal chỉnh sửa thông tin */}
+      <Modal
+        title="Chỉnh sửa thông tin bạn đọc"
+        open={isModalVisible}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Hủy
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={submitLoading}
+            onClick={handleSubmit}
+          >
+            Lưu thay đổi
+          </Button>,
+        ]}
+        width={700}
       >
-        {loading ? (
-          <Skeleton active avatar={{ size: 180 }} paragraph={{ rows: 7 }} />
-        ) : (
-          <>
-            <Card
-              style={{
-                overflow: "hidden",
-                borderRadius: "16px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                border: "none",
-                marginBottom: "20px",
-              }}
-              bodyStyle={{ padding: 0 }}
-            >
-              <div
-                style={{
-                  background:
-                    "linear-gradient(135deg, #1890ff 0%, #096dd9 100%)",
-                  padding: "32px 0 24px",
-                  position: "relative",
-                }}
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{
+            userID: patron?.patronID,
+            fullName: patron?.patronName,
+            status: patron?.patronStatus,
+            dob: patron?.dob ? moment(patron.dob) : null,
+            gender: patron?.gender,
+            memberPoints: patron?.memberPoints,
+            role: patron?.role,
+            plusDays: 0,
+          }}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="userID"
+                label="Mã bạn đọc"
+                rules={[
+                  { required: true, message: "Vui lòng nhập mã bạn đọc" },
+                ]}
               >
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Badge
-                    count={
-                      <Tooltip
-                        title={`Thành viên ${patronData?.membershipType}`}
-                      >
-                        <CrownOutlined
-                          style={{
-                            color:
-                              patronData?.membershipType === "Vàng"
-                                ? "#FFD700"
-                                : patronData?.membershipType === "Bạc"
-                                ? "#C0C0C0"
-                                : "#CD7F32",
-                            fontSize: "24px",
-                            backgroundColor: "white",
-                            borderRadius: "50%",
-                            padding: "4px",
-                            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
-                          }}
-                        />
-                      </Tooltip>
-                    }
-                    offset={[0, 10]}
-                  >
-                    <div onClick={() => setImageModalVisible(true)}>
-                      <Avatar
-                        size={180}
-                        src={imageError ? null : patronData?.userImage}
-                        icon={
-                          imageError || !patronData?.userImage ? (
-                            <UserOutlined />
-                          ) : null
-                        }
-                        style={{
-                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-                          border: "4px solid white",
-                          cursor: "pointer",
-                          backgroundColor: imageError ? "#fafafa" : undefined,
-                        }}
-                        onError={() => setImageError(true)}
-                      />
-                    </div>
-                  </Badge>
-                </motion.div>
+                <Input disabled />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="fullName"
+                label="Họ và tên"
+                rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
 
-                <div style={{ marginTop: 16 }}>
-                  <Title
-                    level={3}
-                    style={{
-                      color: "white",
-                      margin: 0,
-                      textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                    }}
-                  >
-                    {patronData?.userName}
-                  </Title>
-                  <Space align="center" style={{ marginTop: 4 }}>
-                    <IdcardOutlined
-                      style={{ color: "rgba(255, 255, 255, 0.85)" }}
-                    />
-                    <Text
-                      style={{
-                        color: "rgba(255, 255, 255, 0.85)",
-                        fontWeight: "500",
-                      }}
-                    >
-                      {patronData?.userID}
-                    </Text>
-                  </Space>
-                </div>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="status"
+                label="Trạng thái"
+                rules={[
+                  { required: true, message: "Vui lòng chọn trạng thái" },
+                ]}
+              >
+                <Select>
+                  <Option value="Hoạt động">Hoạt động</Option>
+                  <Option value="Không hoạt động">Không hoạt động</Option>
+                  <Option value="Bị cấm">Bị cấm</Option>
+                  <Option value="Hết hạn">Hết hạn</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="role"
+                label="Vai trò"
+                rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
+              >
+                <Select>
+                  <Option value="TEACHER">Giảng viên</Option>
+                  <Option value="STUDENT">Sinh viên</Option>
+                  <Option value="RESEARCHER">Nghiên cứu sinh</Option>
+                  <Option value="PATRON">Bạn đọc</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
-                <div
-                  style={{
-                    marginTop: 16,
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 12,
-                  }}
-                >
-                  {getRankTag(patronData?.membershipType)}
-                  {getStatusTag(patronData?.expirationDate)}
-                </div>
-              </div>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="dob"
+                label="Ngày sinh"
+                rules={[{ required: true, message: "Vui lòng chọn ngày sinh" }]}
+              >
+                <DatePicker style={{ width: "100%" }} format="DD/MM/YYYY" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="gender"
+                label="Giới tính"
+                rules={[{ required: true, message: "Vui lòng chọn giới tính" }]}
+              >
+                <Select>
+                  <Option value="Nam">Nam</Option>
+                  <Option value="Nữ">Nữ</Option>
+                  <Option value="Khác">Khác</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
-              <div style={{ padding: "16px 24px" }}>
-                <Row
-                  justify="space-around"
-                  style={{
-                    marginBottom: 16,
-                    marginTop: 8,
-                    background: "rgba(24, 144, 255, 0.05)",
-                    padding: "16px 8px",
-                    borderRadius: 8,
-                  }}
-                >
-                  <Col span={12}>
-                    <Statistic
-                      title="Điểm thành viên"
-                      value={patronData?.memberPoints || 0}
-                      prefix={<TrophyOutlined />}
-                      valueStyle={{ color: "#1890ff" }}
-                    />
-                  </Col>
-                  <Col span={12}>
-                    <Statistic
-                      title="Còn lại"
-                      value={daysUntilExpiry(patronData?.expirationDate)}
-                      suffix="ngày"
-                      valueStyle={{
-                        color:
-                          daysUntilExpiry(patronData?.expirationDate) < 30
-                            ? "#ff4d4f"
-                            : "#52c41a",
-                      }}
-                    />
-                  </Col>
-                </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="memberPoints"
+                label="Điểm thành viên"
+                rules={[
+                  { required: true, message: "Vui lòng nhập điểm thành viên" },
+                ]}
+              >
+                <InputNumber min={0} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="plusDays"
+                label="Gia hạn thêm (ngày)"
+                tooltip="Số ngày gia hạn thêm cho tài khoản, để trống nếu không cần gia hạn"
+              >
+                <InputNumber min={0} style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
 
-                <Divider style={{ margin: "16px 0" }} />
-
-                <Space
-                  direction="vertical"
-                  size="middle"
-                  style={{ width: "100%", textAlign: "left" }}
-                >
-                  <div>
-                    <Text type="secondary">Vai trò</Text>
-                    <div style={{ fontWeight: 500 }}>
-                      <UserOutlined style={{ marginRight: 8 }} />
-                      {patronData?.role || "N/A"}
-                    </div>
-                  </div>
-                  <div>
-                    <Text type="secondary">Email</Text>
-                    <Tooltip title={patronData?.email}>
-                      <div
-                        style={{
-                          fontWeight: 500,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        <MailOutlined style={{ marginRight: 8 }} />
-                        {patronData?.email || "N/A"}
-                      </div>
-                    </Tooltip>
-                  </div>
-                  <div>
-                    <Text type="secondary">Ngày sinh</Text>
-                    <div style={{ fontWeight: 500 }}>
-                      <CalendarOutlined style={{ marginRight: 8 }} />
-                      {formatDate(patronData?.dateOfBirth)}
-                    </div>
-                  </div>
-                  <div>
-                    <Text type="secondary">Giới tính</Text>
-                    <div style={{ fontWeight: 500 }}>
-                      {getGenderIcon(patronData?.gender)}
-                      <span style={{ marginLeft: 8 }}>
-                        {patronData?.gender || "N/A"}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <Text type="secondary">Ngày đăng ký thành viên</Text>
-                    <div style={{ fontWeight: 500 }}>
-                      <CalendarOutlined style={{ marginRight: 8 }} />
-                      {formatDate(patronData?.creationDate)}
-                    </div>
-                  </div>
-                  <div>
-                    <Text type="secondary">Ngày hết hạn thành viên</Text>
-                    <div
-                      style={{
-                        fontWeight: 500,
-                        color:
-                          daysUntilExpiry(patronData?.expirationDate) < 30
-                            ? "#ff4d4f"
-                            : "inherit",
-                      }}
-                    >
-                      <CalendarOutlined style={{ marginRight: 8 }} />
-                      {formatDate(patronData?.expirationDate)}
-                    </div>
-                  </div>
-                </Space>
-              </div>
-            </Card>
-
-            {/* Modal để xem ảnh lớn */}
-            <Modal
-              visible={imageModalVisible}
-              footer={null}
-              onCancel={() => setImageModalVisible(false)}
-              width={520}
-              centered
-              style={{ padding: 0 }}
-              bodyStyle={{ padding: 0 }}
-            >
-              {patronData?.userImage && !imageError ? (
-                <img
-                  src={patronData.userImage}
-                  alt={patronData.userName}
-                  style={{
-                    maxWidth: "100%",
-                    display: "block",
-                    margin: "0 auto",
-                  }}
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div
-                  style={{
-                    height: 400,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#f5f5f5",
-                  }}
-                >
-                  <UserOutlined style={{ fontSize: 100, color: "#bfbfbf" }} />
-                </div>
-              )}
-            </Modal>
-          </>
-        )}
-      </motion.div>
-    </Col>
+          {patron?.expiry && (
+            <div style={{ marginBottom: 16 }}>
+              <Text type="secondary">
+                Ngày hết hạn hiện tại: {formatDate(patron.expiry)}
+              </Text>
+            </div>
+          )}
+        </Form>
+      </Modal>
+    </div>
   );
-};
-
-// Import Row from Antd since it's used in the component
-import { Row } from "antd";
-import { useParams } from "react-router-dom";
-
-PatronInformation.propTypes = {
-  patronId: PropTypes.string.isRequired,
 };
 
 export default PatronInformation;

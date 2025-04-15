@@ -18,4 +18,5 @@ public class BorrowBookResponse2 {
     Timestamp dueDate;
     Timestamp returnDate;
     String bookImage;
+    String author;
 }

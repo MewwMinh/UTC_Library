@@ -31,11 +31,10 @@ public class SecurityConfig {
     private String signerKey;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter, CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
         httpSecurity.authorizeHttpRequests(requests -> requests
                 .requestMatchers(HttpMethod.POST, PUBLIC_URLS).permitAll()
-                .requestMatchers(HttpMethod.POST, "/coordinator/create_user").hasAnyRole("MANAGER", "COORDINATOR")
-                .requestMatchers(HttpMethod.GET, "/patron/get-borrow-records-history").hasAnyRole("PATRON", "STUDENT", "RESEARCHER", "TEACHER")
+                .requestMatchers(HttpMethod.POST, "/coordinator/change-patron-infomation").hasAnyRole("MANAGER", "COORDINATOR")
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated());
 
@@ -47,6 +46,10 @@ public class SecurityConfig {
 
         httpSecurity.addFilterBefore(jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter.class);
+
+        httpSecurity.exceptionHandling(exception -> exception
+                .accessDeniedHandler(accessDeniedHandler) // gán handler vào đây
+        );
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.cors(Customizer.withDefaults());

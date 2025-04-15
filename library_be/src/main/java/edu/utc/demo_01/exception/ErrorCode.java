@@ -28,6 +28,8 @@ public enum ErrorCode {
     NOT_ENOUGH_BOOK("Thư viện không đủ số lượng sách !!", 1018, HttpStatus.BAD_REQUEST),
     BORROWED_OR_NOT_EXIST("Cuốn sách này đã được mượn hoặc không tồn tại !!", 1019, HttpStatus.BAD_REQUEST),
     CAN_NOT_PERFORM_THIS_ACTION("Không thể giảm số lượng sách ở đây, nếu muốn giảm số lượng sách, ... !!", 1020, HttpStatus.BAD_REQUEST),
+    USER_ID_EXIST("Mã người dùng này đã tồn tại trên hệ thống !!", 1021, HttpStatus.BAD_REQUEST),
+    EMAIL_EXIST("Email này đã tồn tại trên hệ thống !!", 1022, HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, int code, HttpStatusCode httpStatusCode) {

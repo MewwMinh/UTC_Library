@@ -20,6 +20,7 @@ public interface UserViolationRepository extends JpaRepository<UserViolation, St
                ViolationType AS violationType,
                Description AS description,
                PointsDeducted AS pointsDeducted,
+               Solution AS solution,
                PenaltyAmount AS penaltyAmount,
                ViolationDate AS violationDate
         FROM UserViolation v
@@ -27,7 +28,7 @@ public interface UserViolationRepository extends JpaRepository<UserViolation, St
         WHERE v.userID = :id 
         ORDER BY ViolationDate DESC 
 """, nativeQuery = true)
-    List<ViolationsResponse> getUserViolations(@Param("id") String id);
+    List<ViolationsResponse> getPatronViolations(@Param("id") String id);
     @Query(value = """
     SELECT
         ViolationID AS violationID,

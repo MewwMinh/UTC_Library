@@ -1,0 +1,73 @@
+/* src/components/patron/PatronInformation.module.css */
+.patronInfoContainer {
+  width: 100%;
+}
+
+.patronCard {
+  background: linear-gradient(to right, #f0f7ff, #ffffff);
+  box-shadow: 0 2px 15px rgba(24, 144, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  border-top: 3px solid #1890ff;
+}
+
+.cardHeader {
+  display: flex;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.avatar {
+  border: 4px solid rgba(24, 144, 255, 0.2);
+  box-shadow: 0 0 10px rgba(24, 144, 255, 0.15);
+}
+
+.headerInfo {
+  margin-left: 24px;
+  flex: 1;
+}
+
+.patronName {
+  margin: 0 0 12px 0;
+  color: #1890ff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.patronTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.patronDetails {
+  margin-top: 24px;
+  background-color: rgba(24, 144, 255, 0.03);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.infoIcon {
+  font-size: 18px;
+  color: #1890ff;
+  margin-right: 12px;
+  margin-top: 2px;
+}
+
+.pointsValue {
+  color: #1890ff;
+  font-weight: bold;
+}
+
+.noData {
+  text-align: center;
+  padding: 24px;
+  color: #999;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}

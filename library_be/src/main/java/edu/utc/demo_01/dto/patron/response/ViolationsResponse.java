@@ -16,6 +16,7 @@ public class ViolationsResponse {
     String violationType;
     String description;
     int pointsDeducted;
+    String solution;
     BigDecimal penaltyAmount;
     Timestamp violationDate;
 }

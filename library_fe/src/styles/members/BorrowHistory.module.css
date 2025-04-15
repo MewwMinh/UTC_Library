@@ -1,0 +1,83 @@
+/* src/components/patron/BorrowHistory.module.css */
+.borrowHistoryContainer {
+  width: 100%;
+}
+
+.borrowTable {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.borrowTable :global(.ant-table-thead > tr > th) {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.borrowTable :global(.ant-table-row:hover) {
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+}
+
+.bookInfo {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.bookInfo:hover {
+  background-color: #f0f7ff;
+}
+
+.bookImage {
+  margin-right: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+.bookDetails {
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+}
+
+.bookTitle {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #1890ff;
+  font-size: 15px;
+}
+
+.bookAuthor {
+  font-size: 13px;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.authorIcon {
+  color: #1890ff;
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+}
+
+.dateIcon {
+  color: #1890ff;
+  margin-right: 6px;
+}
+
+.daysRemaining {
+  margin-top: 4px;
+  color: #666;
+  font-size: 12px;
+}

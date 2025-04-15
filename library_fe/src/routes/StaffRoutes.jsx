@@ -1,11 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 import StaffLayout from "/src/components/layout/StaffLayout";
 import {
-  ManagePatron,
+  PatronListPage,
   PatronDetails,
+  ReadingRoomControl,
   ManageSupportRequest,
-  ManageMember,
-  EventDetailPage,
   EventList,
 } from "/src/pages/staff/coordinator";
 import {
@@ -42,9 +41,10 @@ const StaffRoutes = () => {
           element={<SupportRequestDetail />}
         />
 
-        <Route path="members" element={<ManageMember />} />
+        <Route path="members" element={<PatronListPage />} />
+        <Route path="reading-room" element={<ReadingRoomControl />} />
         <Route path="events" element={<EventList />} />
-        <Route path="events/:id" element={<EventDetailPage />} />
+        <Route path="patron-info/:patronID" element={<PatronDetails />} />
         <Route index element={<LibrarianDashboard />} />
         <Route path="dashboard" element={<LibrarianDashboard />} />
         <Route

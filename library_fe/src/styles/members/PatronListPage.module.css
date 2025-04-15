@@ -1,0 +1,91 @@
+/* src/pages/patron/PatronListPage.module.css */
+.patronListPage {
+  padding: 24px;
+}
+
+.breadcrumb {
+  margin-bottom: 16px;
+}
+
+.pageTitle {
+  margin-bottom: 0 !important;
+}
+
+.mainCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.actionGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.searchBox {
+  max-width: 400px;
+}
+
+.addButton {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.statCard {
+  text-align: center;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .patronListPage {
+    padding: 16px;
+  }
+
+  .actionGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBox {
+    max-width: 100%;
+  }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.breadcrumbBelow {
+  margin-bottom: 16px;
+  padding: 0 16px;
+}
+
+.breadcrumbLink {
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.85);
+  transition: color 0.3s;
+}
+
+.breadcrumbLink:hover {
+  color: #1890ff;
+}

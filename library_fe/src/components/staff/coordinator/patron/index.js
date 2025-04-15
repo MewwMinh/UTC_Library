@@ -1,5 +1,5 @@
-export { default as ListPatron } from "./ListPatron";
-export { default as FindPatron } from "./FindPatron";
-export { default as PatronDetail } from "./PatronDetail";
-export { default as PatronReward } from "./PatronReward";
-export { default as PatronBorrowRecently } from "./PatronBorrowRecently";
+export { default as PatronList } from "./PatronList";
+export { default as PatronInformation } from "./PatronInformation";
+export { default as BorrowHistory } from "./BorrowHistory";
+export { default as ReadingRoomHistory } from "./ReadingRoomHistory";
+export { default as ViolationHistory } from "./ViolationHistory";

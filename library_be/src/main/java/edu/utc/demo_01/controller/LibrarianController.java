@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/librarian")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "https://utc-library.vercel.app"})
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LibrarianController {

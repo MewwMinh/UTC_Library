@@ -1,0 +1,41 @@
+/* src/components/patron/ReadingRoomHistory.module.css */
+.readingRoomHistoryContainer {
+  width: 100%;
+}
+
+.historyTable {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.historyTable :global(.ant-table-thead > tr > th) {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.historyTable :global(.ant-table-row:hover) {
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+}
+
+.timeInfo {
+  display: flex;
+  align-items: center;
+}
+
+.timeIcon {
+  color: #1890ff;
+  margin-right: 8px;
+}
+
+.staffInfo {
+  display: flex;
+  align-items: center;
+}
+
+.staffIcon {
+  color: #1890ff;
+  margin-right: 8px;
+}

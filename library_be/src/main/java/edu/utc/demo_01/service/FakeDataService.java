@@ -2,6 +2,7 @@ package edu.utc.demo_01.service;
 
 import com.github.javafaker.Faker;
 import edu.utc.demo_01.entity.BorrowRecord;
+import edu.utc.demo_01.entity.ReadingRoomRecord;
 import edu.utc.demo_01.entity.User;
 import edu.utc.demo_01.entity.UserViolation;
 import edu.utc.demo_01.repository.*;
@@ -13,11 +14,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +45,7 @@ public class FakeDataService {
     EventParticipantRepository eventParticipantRepository;
     BookItemRepository bookItemRepository;
     UserViolationRepository userViolationRepository;
+    ReadingRoomRecordRepository readingRoomRecordRepository;
 
     Faker faker = new Faker();
     Random random = new Random();
@@ -1821,6 +1823,171 @@ public class FakeDataService {
         userViolationRepository.saveAll(violations);
 
         System.out.println("Đã khởi tạo " + violations.size() + " dữ liệu vi phạm mẫu");
+    }
+    //endregion
+
+    //region Fake Reading Room Record
+    // Giờ mở cửa thư viện
+    private final LocalTime LIBRARY_OPEN_TIME = LocalTime.of(8, 0);
+    // Giờ đóng cửa thư viện
+    private final LocalTime LIBRARY_CLOSE_TIME = LocalTime.of(17, 0);
+
+    @PostConstruct
+    public void generateCompletedCheckoutData() {
+        // Skip if data already exists
+        if (readingRoomRecordRepository.count() > 0) {
+            return;
+        }
+
+        // Get patrons and coordinators
+        List<User> patrons = userRepository.findAllPatron();
+        List<User> coordinators = userRepository.findAllCoordinator();
+
+        if (patrons.isEmpty() || coordinators.isEmpty()) {
+            System.out.println("No patrons or coordinators found. Cannot generate reading room records.");
+            return;
+        }
+
+        // Generate 10,000 completed records
+        List<ReadingRoomRecord> records = new ArrayList<>();
+
+        // Generate records for the past 180 days
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startDate = now.minusDays(180);
+
+        for (int i = 0; i < 100; i++) {
+            // Random date within the last 180 days
+            long daysBetween = ChronoUnit.DAYS.between(startDate, now);
+            LocalDateTime randomDate = startDate.plusDays(random.nextInt((int) daysBetween));
+
+            // Chỉ tạo dữ liệu cho các ngày từ thứ 2 đến thứ 6
+            while (randomDate.getDayOfWeek() == DayOfWeek.SATURDAY ||
+                    randomDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                randomDate = startDate.plusDays(random.nextInt((int) daysBetween));
+            }
+
+            // Thời gian check-in từ 8h đến 16h (không thể check-in sau 16h vì thư viện đóng cửa lúc 17h)
+            int checkInHour = 8 + random.nextInt(9); // 8-16h
+            int checkInMinute = random.nextInt(60);
+            LocalDateTime checkInTime = randomDate
+                    .withHour(checkInHour)
+                    .withMinute(checkInMinute)
+                    .withSecond(0);
+
+            // Thời gian ở lại thư viện (1-6 giờ, với trọng số nghiêng về 2-3 giờ)
+            int stayHours;
+            int randomValue = random.nextInt(100);
+            if (randomValue < 15) { // 15% chance for 1 hour
+                stayHours = 1;
+            } else if (randomValue < 45) { // 30% chance for 2 hours
+                stayHours = 2;
+            } else if (randomValue < 75) { // 30% chance for 3 hours
+                stayHours = 3;
+            } else if (randomValue < 90) { // 15% chance for 4 hours
+                stayHours = 4;
+            } else if (randomValue < 97) { // 7% chance for 5 hours
+                stayHours = 5;
+            } else { // 3% chance for 6 hours
+                stayHours = 6;
+            }
+
+            // Thêm phút để tạo thời gian check-out thực tế hơn
+            int stayMinutes = random.nextInt(60);
+            LocalDateTime checkOutTime = checkInTime.plusHours(stayHours).plusMinutes(stayMinutes);
+
+            // Đảm bảo thời gian check-out không vượt quá 17h
+            if (checkOutTime.toLocalTime().isAfter(LIBRARY_CLOSE_TIME)) {
+                checkOutTime = LocalDateTime.of(checkOutTime.toLocalDate(), LIBRARY_CLOSE_TIME);
+            }
+
+            // Chọn ngẫu nhiên bạn đọc và nhân viên
+            User patron = patrons.get(random.nextInt(patrons.size()));
+            User checkInCoordinator = coordinators.get(random.nextInt(coordinators.size()));
+            User checkOutCoordinator = coordinators.get(random.nextInt(coordinators.size()));
+
+            ReadingRoomRecord record = new ReadingRoomRecord();
+            record.setUserID(patron);
+            record.setCheckInTime(checkInTime);
+            record.setCheckOutTime(checkOutTime);
+            record.setCheckInBy(checkInCoordinator);
+            record.setCheckOutBy(checkOutCoordinator);
+
+            records.add(record);
+        }
+
+        // Save all records
+        readingRoomRecordRepository.saveAll(records);
+        System.out.println("Generated 10,000 completed reading room records");
+    }
+    public void generateActiveCheckoutData() {
+        // Get patrons and coordinators
+        List<User> patrons = userRepository.findAllPatron();
+        List<User> coordinators = userRepository.findAllCoordinator();
+
+        if (patrons.isEmpty() || coordinators.isEmpty()) {
+            System.out.println("No patrons or coordinators found. Cannot generate active reading room records.");
+            return;
+        }
+
+        // Generate 50 active records (no checkout time)
+        List<ReadingRoomRecord> records = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        // Đảm bảo chỉ tạo dữ liệu nếu ngày hiện tại là từ thứ 2 đến thứ 6 và trong giờ làm việc của thư viện
+        if (now.getDayOfWeek() == DayOfWeek.SATURDAY || now.getDayOfWeek() == DayOfWeek.SUNDAY ||
+                now.toLocalTime().isBefore(LIBRARY_OPEN_TIME) || now.toLocalTime().isAfter(LIBRARY_CLOSE_TIME)) {
+            System.out.println("Current time is outside library hours. Cannot generate active records.");
+            return;
+        }
+
+        for (int i = 0; i < 50; i++) {
+            // Tính thời gian check-in (trong khoảng từ giờ mở cửa đến giờ hiện tại)
+            LocalTime earliestTime = LIBRARY_OPEN_TIME;
+            LocalTime latestTime = now.toLocalTime();
+
+            // Nếu đã quá 3 giờ kể từ khi mở cửa, tạo phân bố thời gian với trọng số hợp lý hơn
+            int hoursAgo;
+            int randomValue = random.nextInt(100);
+
+            if (randomValue < 15) { // 15% mới đến (trong vòng 30 phút)
+                hoursAgo = 0;
+            } else if (randomValue < 45) { // 30% đến 1-2 giờ trước
+                hoursAgo = 1 + random.nextInt(2);
+            } else if (randomValue < 75) { // 30% đến 2-3 giờ trước
+                hoursAgo = 2 + random.nextInt(2);
+            } else if (randomValue < 90) { // 15% đến 3-4 giờ trước
+                hoursAgo = 3 + random.nextInt(2);
+            } else { // 10% đến từ sáng sớm (nếu đủ thời gian)
+                int maxHoursAgo = (int) ChronoUnit.HOURS.between(LIBRARY_OPEN_TIME, latestTime);
+                hoursAgo = Math.min(5, maxHoursAgo - 1) + random.nextInt(Math.max(1, maxHoursAgo - 5));
+            }
+
+            int minutesAgo = random.nextInt(60);
+            LocalDateTime checkInTime = now.minusHours(hoursAgo).minusMinutes(minutesAgo);
+
+            // Đảm bảo thời gian check-in không sớm hơn giờ mở cửa
+            if (checkInTime.toLocalTime().isBefore(LIBRARY_OPEN_TIME)) {
+                checkInTime = LocalDateTime.of(checkInTime.toLocalDate(), LIBRARY_OPEN_TIME)
+                        .plusMinutes(random.nextInt(30)); // Thêm 0-30 phút sau giờ mở cửa
+            }
+
+            // Chọn ngẫu nhiên bạn đọc và nhân viên (đảm bảo không trùng người dùng active)
+            User patron = patrons.get(i % patrons.size());
+            User checkInCoordinator = coordinators.get(random.nextInt(coordinators.size()));
+
+            ReadingRoomRecord record = new ReadingRoomRecord();
+            record.setUserID(patron);
+            record.setCheckInTime(checkInTime);
+            record.setCheckOutTime(null); // Các bản ghi active có checkout time là null
+            record.setCheckInBy(checkInCoordinator);
+            record.setCheckOutBy(null); // Chưa có nhân viên check-out
+
+            records.add(record);
+        }
+
+        // Lưu tất cả bản ghi
+        readingRoomRecordRepository.saveAll(records);
+        System.out.println("Generated 50 active reading room records");
     }
     //endregion
 }

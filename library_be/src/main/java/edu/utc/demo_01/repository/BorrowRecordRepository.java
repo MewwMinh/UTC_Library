@@ -148,4 +148,19 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
         AND br.ReturnDate IS NULL
 """, nativeQuery = true)
     int getBorrowedCountByUserIDAndBookType(@Param("id") String id, @Param("bookType") String bookType);
+    @Query(value = """
+    SELECT br.RecordID AS borrowRecordID,
+        b.BookID AS bookID,
+        b.BookName AS bookName, 
+               br.BorrowDate AS borrowDate,
+               br.DueDate AS dueDate,
+               br.ReturnDate AS returnDate,
+               b.CoverImage AS bookImage,
+               b.Author AS author
+        FROM BorrowRecords br
+        JOIN Books b ON br.bookID = b.bookID
+        WHERE br.userID = :id 
+        ORDER BY br.BorrowDate DESC 
+""", nativeQuery = true)
+    List<BorrowBookResponse2> getPatronBorrowRecordsHistory(@Param("id") String id);
 }
