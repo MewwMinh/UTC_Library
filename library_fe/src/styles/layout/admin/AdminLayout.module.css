@@ -1,0 +1,44 @@
+/* AdminLayout.module.css */
+.adminLayout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainContent {
+  display: flex;
+  flex-grow: 1;
+}
+
+.contentWrapper {
+  flex: 1;
+  background-color: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+  margin-left: 250px !important;
+}
+
+.content {
+  flex: 1;
+  padding: 24px;
+  margin: 0;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Transition effects */
+.adminLayout * {
+  transition: all 0.3s ease;
+}
+
+/* Shadow effects */
+.contentWrapper {
+  box-shadow: inset 5px 0 10px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .content {
+    padding: 16px;
+  }
+}

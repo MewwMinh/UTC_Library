@@ -191,6 +191,7 @@ const PatronInformation = () => {
             response.message || "Không thể cập nhật thông tin bạn đọc",
         });
       }
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       notification.error({
         message: "Lỗi",

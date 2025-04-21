@@ -31,6 +31,7 @@ import {
 import eventService from "/src/services/patron/eventService";
 import "dayjs/locale/vi";
 import locale from "antd/lib/date-picker/locale/vi_VN";
+import styles from "/src/styles/events/ListEvent.module.css";
 
 const { Title, Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
@@ -64,8 +65,14 @@ const ListEvent = () => {
       const response = await eventService.getAllEvents();
 
       if (response.success) {
-        setEvents(response.data || []);
-        setFilteredEvents(response.data || []);
+        // Thêm trạng thái dựa trên thời gian
+        const eventsWithStatus = (response.data || []).map((event) => ({
+          ...event,
+          computedStatus: getEventStatus(event.startTime, event.endTime),
+        }));
+
+        setEvents(eventsWithStatus);
+        setFilteredEvents(eventsWithStatus);
       } else {
         notification.error({
           message: "Lỗi",
@@ -82,6 +89,21 @@ const ListEvent = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Hàm tính toán trạng thái của sự kiện dựa vào thời gian
+  const getEventStatus = (startTime, endTime) => {
+    const now = new Date();
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    if (now < start) {
+      return "Sắp diễn ra";
+    } else if (now > end) {
+      return "Đã diễn ra";
+    } else {
+      return "Đang diễn ra";
     }
   };
 
@@ -106,9 +128,9 @@ const ListEvent = () => {
       });
     }
 
-    // Apply status filter
+    // Apply status filter - sử dụng computedStatus thay vì status
     if (statusFilter) {
-      result = result.filter((event) => event.status === statusFilter);
+      result = result.filter((event) => event.computedStatus === statusFilter);
     }
 
     setFilteredEvents(result);
@@ -174,17 +196,37 @@ const ListEvent = () => {
     });
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Sắp diễn ra":
+        return "green";
+      case "Đang diễn ra":
+        return "gold";
+      case "Đã diễn ra":
+        return "blue";
+      case "Đã hủy":
+        return "red";
+      default:
+        return "default";
+    }
+  };
+
   const columns = [
     {
       title: "Tên sự kiện",
       dataIndex: "title",
       key: "title",
       render: (text, record) => (
-        <div style={{ fontWeight: "bold" }}>
+        <div className={styles.eventTitle}>
           {text}
-          {record.status === "Sắp diễn ra" && (
+          {record.computedStatus === "Sắp diễn ra" && (
             <Tag color="green" style={{ marginLeft: 8 }}>
               Sắp diễn ra
+            </Tag>
+          )}
+          {record.computedStatus === "Đang diễn ra" && (
+            <Tag color="gold" style={{ marginLeft: 8 }}>
+              Đang diễn ra
             </Tag>
           )}
         </div>
@@ -196,7 +238,7 @@ const ListEvent = () => {
       render: (_, record) => (
         <div>
           <div>
-            <ClockCircleOutlined style={{ marginRight: 8 }} />
+            <ClockCircleOutlined className={styles.eventTime} />
             <Text>{formatDateTime(record.startTime)}</Text>
           </div>
           <div>
@@ -211,22 +253,17 @@ const ListEvent = () => {
       key: "location",
       render: (text) => (
         <Text>
-          <EnvironmentOutlined style={{ marginRight: 8 }} />
+          <EnvironmentOutlined className={styles.iconMargin} />
           {text}
         </Text>
       ),
     },
     {
       title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "computedStatus",
+      key: "computedStatus",
       render: (status) => {
-        let color =
-          status === "Sắp diễn ra"
-            ? "green"
-            : status === "Đã diễn ra"
-            ? "blue"
-            : "red";
+        const color = getStatusColor(status);
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -247,7 +284,7 @@ const ListEvent = () => {
       title: "Hành động",
       key: "action",
       render: (_, record) =>
-        record.status === "Sắp diễn ra" ? (
+        record.computedStatus === "Sắp diễn ra" ? (
           <Button type="primary" onClick={() => showModal(record)}>
             Đăng ký tham gia
           </Button>
@@ -259,20 +296,16 @@ const ListEvent = () => {
     <Card
       title={
         <div style={{ textAlign: "center" }}>
-          <CalendarOutlined style={{ fontSize: 24, marginRight: 8 }} />
-          <Title
-            level={3}
-            style={{ margin: 0, display: "inline-block", color: "white" }}
-          >
+          <CalendarOutlined
+            className={styles.iconMargin}
+            style={{ fontSize: 24 }}
+          />
+          <Title level={3} className={styles.cardTitle}>
             Sự kiện thư viện
           </Title>
         </div>
       }
-      style={{
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        borderRadius: "12px",
-        overflow: "hidden",
-      }}
+      className={styles.eventCard}
       styles={{
         header: {
           background: "linear-gradient(135deg, #1677ff 0%, #0958d9 100%)",
@@ -286,10 +319,10 @@ const ListEvent = () => {
       {/* Filter section */}
       <Card
         size="small"
-        style={{ marginBottom: 16, borderRadius: 8 }}
+        className={styles.filterCard}
         variant="borderless"
         styles={{
-          body: { padding: 16 },
+          body: { padding: "16px" },
         }}
       >
         <Row gutter={[16, 16]} align="middle">
@@ -323,6 +356,7 @@ const ListEvent = () => {
                 allowClear
               >
                 <Option value="Sắp diễn ra">Sắp diễn ra</Option>
+                <Option value="Đang diễn ra">Đang diễn ra</Option>
                 <Option value="Đã diễn ra">Đã diễn ra</Option>
                 <Option value="Đã hủy">Đã hủy</Option>
               </Select>
@@ -342,9 +376,9 @@ const ListEvent = () => {
       </Divider>
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: "40px 0" }}>
+        <div className={styles.loadingContainer}>
           <Spin size="large" />
-          <div style={{ marginTop: 16 }}>Đang tải dữ liệu...</div>
+          <div className={styles.loadingText}>Đang tải dữ liệu...</div>
         </div>
       ) : filteredEvents.length > 0 ? (
         <Table
@@ -361,7 +395,9 @@ const ListEvent = () => {
             pageSizeOptions: ["5", "10", "20"],
           }}
           rowClassName={(record) =>
-            record.status === "Sắp diễn ra" ? "upcoming-event-row" : ""
+            record.computedStatus === "Sắp diễn ra"
+              ? styles.upcomingEventRow
+              : ""
           }
         />
       ) : (
@@ -377,26 +413,30 @@ const ListEvent = () => {
       <Modal
         title={
           <div>
-            <CalendarOutlined style={{ marginRight: 8 }} />
+            <CalendarOutlined className={styles.iconMargin} />
             Chi tiết sự kiện
           </div>
         }
         open={isModalVisible}
         onOk={
-          selectedEvent?.status === "Sắp diễn ra"
+          selectedEvent?.computedStatus === "Sắp diễn ra"
             ? handleRegister
             : handleCancel
         }
         onCancel={handleCancel}
         okText={
-          selectedEvent?.status === "Sắp diễn ra" ? "Đăng ký tham gia" : "Đóng"
+          selectedEvent?.computedStatus === "Sắp diễn ra"
+            ? "Đăng ký tham gia"
+            : "Đóng"
         }
         cancelText="Hủy"
         confirmLoading={registering}
         cancelButtonProps={{
           style: {
             display:
-              selectedEvent?.status === "Sắp diễn ra" ? "inline-block" : "none",
+              selectedEvent?.computedStatus === "Sắp diễn ra"
+                ? "inline-block"
+                : "none",
           },
         }}
       >
@@ -404,52 +444,36 @@ const ListEvent = () => {
           <div>
             <Title level={4}>{selectedEvent.title}</Title>
             <div style={{ margin: "16px 0" }}>
-              <Tag
-                color={
-                  selectedEvent.status === "Sắp diễn ra"
-                    ? "green"
-                    : selectedEvent.status === "Đã diễn ra"
-                    ? "blue"
-                    : "red"
-                }
-              >
-                {selectedEvent.status}
+              <Tag color={getStatusColor(selectedEvent.computedStatus)}>
+                {selectedEvent.computedStatus}
               </Tag>
             </div>
 
-            <div style={{ margin: "8px 0" }}>
-              <ClockCircleOutlined style={{ marginRight: 8 }} />
+            <div className={styles.modalContentSection}>
+              <ClockCircleOutlined className={styles.iconMargin} />
               <Text strong>Thời gian:</Text>
-              <div style={{ marginLeft: 24 }}>
+              <div className={styles.modalDetailText}>
                 <Text>Bắt đầu: {formatDateTime(selectedEvent.startTime)}</Text>
                 <br />
                 <Text>Kết thúc: {formatDateTime(selectedEvent.endTime)}</Text>
               </div>
             </div>
 
-            <div style={{ margin: "8px 0" }}>
-              <EnvironmentOutlined style={{ marginRight: 8 }} />
+            <div className={styles.modalContentSection}>
+              <EnvironmentOutlined className={styles.iconMargin} />
               <Text strong>Địa điểm:</Text> {selectedEvent.location}
             </div>
 
             <div style={{ margin: "16px 0" }}>
-              <InfoCircleOutlined style={{ marginRight: 8 }} />
+              <InfoCircleOutlined className={styles.iconMargin} />
               <Text strong>Mô tả:</Text>
-              <Paragraph style={{ marginLeft: 24, marginTop: 8 }}>
+              <Paragraph className={styles.modalDescription}>
                 {selectedEvent.description}
               </Paragraph>
             </div>
 
-            {selectedEvent.status === "Sắp diễn ra" && (
-              <div
-                style={{
-                  marginTop: 16,
-                  padding: 12,
-                  background: "#f6ffed",
-                  border: "1px solid #b7eb8f",
-                  borderRadius: 4,
-                }}
-              >
+            {selectedEvent.computedStatus === "Sắp diễn ra" && (
+              <div className={styles.eventInfoMessage}>
                 <Text>Bạn có muốn đăng ký tham gia sự kiện này?</Text>
               </div>
             )}

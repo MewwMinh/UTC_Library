@@ -5,10 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -35,11 +34,11 @@ public class Event {
 
     @NotNull
     @Column(name = "StartTime", nullable = false)
-    private Instant startTime;
+    private LocalDateTime startTime;
 
     @NotNull
     @Column(name = "EndTime", nullable = false)
-    private Instant endTime;
+    private LocalDateTime endTime;
 
     @Size(max = 255)
     @Column(name = "Location")
@@ -49,9 +48,6 @@ public class Event {
     @JoinColumn(name = "CreatedBy")
     private User createdBy;
 
-    @Size(max = 50)
-    @ColumnDefault("'Sắp diễn ra'")
-    @Column(name = "Status", length = 50)
-    private String status;
-
+    @Column(name = "MaxAttendees")
+    private Integer maxAttendees;
 }

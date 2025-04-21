@@ -121,7 +121,7 @@ public class PatronController {
         return service.getAllEvents();
     }
     @GetMapping("get-all-attended-events")
-    public APIResponse<List<EventResponse>> getAllAttendedEvents() {
+    public APIResponse<List<EventResponse1>> getAllAttendedEvents() {
         return service.getAllAttendedEvents();
     }
     @PostMapping("register-event")

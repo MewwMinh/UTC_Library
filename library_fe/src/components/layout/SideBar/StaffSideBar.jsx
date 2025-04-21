@@ -7,7 +7,6 @@ import {
   BookOutlined,
   SwapOutlined,
   HomeOutlined,
-  ScheduleOutlined,
   CalendarOutlined,
   TeamOutlined,
   QuestionCircleOutlined,
@@ -142,11 +141,6 @@ const StaffSidebar = () => {
                   key: "reading-room",
                   icon: <HomeOutlined />,
                   label: "Phòng đọc",
-                },
-                {
-                  key: "seat-reservations",
-                  icon: <ScheduleOutlined />,
-                  label: "Đặt chỗ",
                 },
                 {
                   key: "events",

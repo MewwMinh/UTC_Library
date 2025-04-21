@@ -1,6 +1,7 @@
 package edu.utc.demo_01.repository;
 
-import edu.utc.demo_01.dto.patron.response.EventResponse;
+import edu.utc.demo_01.dto.patron.response.EventResponse1;
+import edu.utc.demo_01.entity.Event;
 import edu.utc.demo_01.entity.EventParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,7 +31,7 @@ public interface EventParticipantRepository extends JpaRepository<EventParticipa
         WHERE ep.UserID = :id
         ORDER BY StartTime DESC   
     """, nativeQuery = true)
-    List<EventResponse> getAllAttendedEvents(@Param("id") String id);
+    List<EventResponse1> getAllAttendedEvents(@Param("id") String id);
     @Query(value = """
         SELECT COUNT(*)
         FROM EventParticipants
@@ -47,4 +48,6 @@ public interface EventParticipantRepository extends JpaRepository<EventParticipa
         )             
     """, nativeQuery = true)
     int isRegisted(@Param("userID") String userID, @Param("eventID") String eventID);
+
+    List<EventParticipant> findByEventID(Event eventID);
 }

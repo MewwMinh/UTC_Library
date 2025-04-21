@@ -295,11 +295,11 @@ public class PatronService {
         List<EventResponse> events = eventRepository.getAllEvents();
         return APIResponse.<List<EventResponse>>builder().code(1000).result(events).build();
     }
-    public APIResponse<List<EventResponse>> getAllAttendedEvents(){
+    public APIResponse<List<EventResponse1>> getAllAttendedEvents(){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
-        List<EventResponse> events = eventParticipantRepository.getAllAttendedEvents(userID);
-        return APIResponse.<List<EventResponse>>builder().code(1000).result(events).build();
+        List<EventResponse1> events = eventParticipantRepository.getAllAttendedEvents(userID);
+        return APIResponse.<List<EventResponse1>>builder().code(1000).result(events).build();
     }
     public String registerEvent(RegisterEvent request){
         String userID = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -307,11 +307,11 @@ public class PatronService {
         if (eventParticipantRepository.isRegisted(userID, request.getEventID()) == 1) throw new AppException(ErrorCode.REGISTED_EVENT);
         User user = userRepository.findByUserID(userID).orElseThrow();
         Event event = eventRepository.findByEventID(request.getEventID()).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_EVENT));
-        if (event.getStartTime().isBefore(Instant.now())) throw new AppException(ErrorCode.EVENT_TOOK_PLACE);
+        if (event.getStartTime().isBefore(LocalDateTime.now())) throw new AppException(ErrorCode.EVENT_TOOK_PLACE);
         EventParticipant eventParticipant = new EventParticipant();
         eventParticipant.setUserID(user);
         eventParticipant.setEventID(event);
-        eventParticipant.setRegistrationDate(Instant.now());
+        eventParticipant.setRegistrationDate(LocalDateTime.now());
         eventParticipant.setAttendanceStatus("Đã đăng ký");
         eventParticipantRepository.save(eventParticipant);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

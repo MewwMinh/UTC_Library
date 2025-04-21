@@ -1,0 +1,73 @@
+.cardHeader {
+  background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 16px;
+}
+
+.cardTitle {
+  margin: 0;
+  display: inline-block;
+  color: white;
+}
+
+.eventCard {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.filterCard {
+  margin-bottom: 16px;
+  border-radius: 8px;
+}
+
+.filterBody {
+  padding: 16px;
+}
+
+.loadingContainer {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.loadingText {
+  margin-top: 16px;
+}
+
+.upcomingEventRow {
+  background-color: rgba(82, 196, 26, 0.05);
+}
+
+.eventTitle {
+  font-weight: bold;
+}
+
+.eventTime {
+  margin-right: 8px;
+}
+
+.eventInfoMessage {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 4px;
+}
+
+.iconMargin {
+  margin-right: 8px;
+}
+
+.modalContentSection {
+  margin: 8px 0;
+}
+
+.modalDetailText {
+  margin-left: 24px;
+}
+
+.modalDescription {
+  margin-left: 24px;
+  margin-top: 8px;
+}

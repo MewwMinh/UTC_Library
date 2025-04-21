@@ -1,0 +1,120 @@
+/* AdminHeader.module.css */
+.header {
+  background: linear-gradient(90deg, #1677ff 0%, #0958d9 100%);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 72x;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  min-width: 240px;
+}
+
+.headerCenter {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.libraryTitle {
+  color: white !important;
+  margin: 0 !important;
+  font-size: 20px !important;
+  line-height: 1.3 !important;
+}
+
+.englishTitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  line-height: normal;
+  margin-top: 7px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+  justify-content: flex-end;
+}
+
+.triggerBtn {
+  color: white;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.triggerBtn:hover {
+  color: #e6f4ff;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 40px;
+  border-radius: 8px;
+}
+
+.iconButton {
+  color: white;
+  font-size: 18px;
+}
+
+.iconButton:hover {
+  color: #e6f4ff;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.userProfile:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.avatar {
+  background-color: #e6f4ff;
+  color: #1677ff;
+}
+
+.userName {
+  color: white !important;
+  margin-left: 8px;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 992px) {
+  .headerCenter {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .userName {
+    display: none;
+  }
+}

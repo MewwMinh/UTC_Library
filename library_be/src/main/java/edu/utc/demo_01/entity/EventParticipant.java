@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -34,7 +34,7 @@ public class EventParticipant {
 
     @ColumnDefault("(now())")
     @Column(name = "RegistrationDate")
-    private Instant registrationDate;
+    private LocalDateTime registrationDate;
 
     @Size(max = 50)
     @ColumnDefault("'Đã đăng ký'")

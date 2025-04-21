@@ -1,20 +1,20 @@
-package edu.utc.demo_01.dto.patron.response;
+package edu.utc.demo_01.dto.coordinator.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventResponse {
-    String eventID;
+public class ChangeEventInformation {
     String title;
     String description;
-    Timestamp startTime;
-    Timestamp endTime;
+    LocalDateTime startTime;
+    LocalDateTime endTime;
     String location;
+    Integer maxAttendees;
 }

@@ -10,11 +10,12 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventResponse {
+public class EventResponse1 {
     String eventID;
     String title;
     String description;
     Timestamp startTime;
     Timestamp endTime;
     String location;
+    String status;
 }

@@ -1,0 +1,52 @@
+/* AdminSidebar.module.css */
+.sidebar {
+  background: #ffffff;
+  height: calc(100vh - 60px);
+  position: fixed;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  left: 0;
+  z-index: 100;
+}
+
+.menu {
+  border-right: none;
+  padding-top: 16px;
+  height: calc(100% - 60px); /* Chiều cao trừ đi phần footer */
+  overflow: auto;
+}
+
+.sidebarFooter {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 12px;
+  border-top: 1px solid #f0f0f0;
+  background-color: white;
+}
+
+.footerItem {
+  text-align: center;
+}
+
+.version {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+/* Custom styling for menu items */
+.sidebar :global(.ant-menu-item-selected) {
+  background-color: #e6f4ff !important;
+  border-right: 3px solid #1677ff;
+}
+
+.sidebar :global(.ant-menu-item:hover) {
+  color: #1677ff;
+}
+
+/* Các item menu có padding đều */
+.sidebar :global(.ant-menu-item) {
+  height: 50px;
+  line-height: 50px;
+  margin: 4px 0;
+}

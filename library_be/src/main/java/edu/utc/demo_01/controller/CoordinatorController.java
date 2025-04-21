@@ -1,13 +1,11 @@
 package edu.utc.demo_01.controller;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.coordinator.request.ChangeEventInformation;
 import edu.utc.demo_01.dto.coordinator.request.ChangePatronInformation;
 import edu.utc.demo_01.dto.coordinator.request.CreatePatron;
 import edu.utc.demo_01.dto.coordinator.request.ResponseTicket;
-import edu.utc.demo_01.dto.coordinator.response.PatronDetailsResponse;
-import edu.utc.demo_01.dto.coordinator.response.PatronInReadingRoom;
-import edu.utc.demo_01.dto.coordinator.response.PatronResponse;
-import edu.utc.demo_01.dto.coordinator.response.UsingReadingRoomResponse;
+import edu.utc.demo_01.dto.coordinator.response.*;
 import edu.utc.demo_01.dto.patron.response.BorrowBookResponse2;
 import edu.utc.demo_01.dto.patron.response.ViolationsResponse;
 import edu.utc.demo_01.service.CoordinatorService;
@@ -79,6 +77,33 @@ public class CoordinatorController {
     @PostMapping("create_patron")
     APIResponse createPatron(@RequestBody CreatePatron request) {
         return service.createPatron(request);
+    }
+    //endregion
+
+    //region Manage Event
+    @GetMapping("get-all-events")
+    public APIResponse<List<EventResponse>> getAllEvents(){
+        return service.getAllEvents();
+    }
+    @GetMapping("get-event-by-event-id/{eventID}")
+    public APIResponse<EventResponse> getEventByEventID(@PathVariable String eventID) {
+        return service.getEventByEventID(eventID);
+    }
+    @PostMapping("change-event-infomation/{eventID}")
+    public APIResponse changeEventInfomation(@PathVariable String eventID, @RequestBody ChangeEventInformation request){
+        return service.changeEventInfomation(eventID, request);
+    }
+    @DeleteMapping("delete-event/{eventID}")
+    public APIResponse deleteEvent(@PathVariable String eventID) {
+        return service.deleteEventByEventID(eventID);
+    }
+    @PostMapping("create-event")
+    public APIResponse createEvent(@RequestBody ChangeEventInformation request) {
+        return service.createEvent(request);
+    }
+    @GetMapping("get-all-patron-registed/{eventID}")
+    public APIResponse<List<PatronRegisted>> getAllPatronRegisted(@PathVariable String eventID){
+        return service.getAllPatronRegisted(eventID);
     }
     //endregion
 }

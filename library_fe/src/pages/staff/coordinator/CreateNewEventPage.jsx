@@ -1,13 +1,10 @@
 import { Card, Col, Breadcrumb } from "antd";
 import { HomeOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import {
-  EventDetail,
-  EventParticipantsList,
-} from "/src/components/staff/coordinator/event";
+import { CreateEventForm } from "/src/components/staff/coordinator/event";
 import styles from "/src/styles/members/PatronListPage.module.css";
 
-const EventDetailPage = () => {
+const CreateNewEventPage = () => {
   const navigate = useNavigate();
 
   const handleNavigate = (path) => {
@@ -39,7 +36,7 @@ const EventDetailPage = () => {
     {
       title: (
         <span className={styles.breadcrumbLink}>
-          <CalendarOutlined /> Thông tin chi tiết sự kiện
+          <CalendarOutlined /> Tạo sự kiện mới
         </span>
       ),
       key: "create",
@@ -53,11 +50,10 @@ const EventDetailPage = () => {
       </Col>
 
       <Card variant="borderless" className={styles.mainCard}>
-        <EventDetail />
-        <EventParticipantsList />
+        <CreateEventForm />
       </Card>
     </div>
   );
 };
 
-export default EventDetailPage;
+export default CreateNewEventPage;

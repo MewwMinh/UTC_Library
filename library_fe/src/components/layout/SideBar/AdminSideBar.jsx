@@ -1,56 +1,65 @@
-import { Menu } from "antd";
-import Sider from "antd/es/layout/Sider";
-import { useState } from "react";
+import React, { useState } from "react";
+import { Layout, Menu, Typography } from "antd";
 import {
   DashboardOutlined,
-  BookOutlined,
-  SearchOutlined,
-  WarningOutlined,
+  TeamOutlined,
+  SettingOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
-import "/src/styles/Sider.css";
-import { useNavigate } from "react-router-dom";
+import styles from "/src/styles/layout/admin/AdminSidebar.module.css";
 
-function AdminSideBar() {
-  const [selectedMenu, setSelectedMenu] = useState("dashboard");
-  const navigate = useNavigate();
+const { Sider } = Layout;
+const { Text } = Typography;
+
+const AdminSidebar = () => {
+  const [selectedKey, setSelectedKey] = useState("1");
 
   const menuItems = [
-    { key: "dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
     {
-      key: "manage-staff",
+      key: "1",
+      icon: <DashboardOutlined />,
+      label: "Tổng quan",
+    },
+    {
+      key: "2",
+      icon: <TeamOutlined />,
       label: "Quản lý nhân viên",
-      icon: <BookOutlined />,
     },
     {
-      key: "config-system",
+      key: "3",
+      icon: <SettingOutlined />,
       label: "Cấu hình hệ thống",
-      icon: <SearchOutlined />,
     },
     {
-      key: "activity-logs",
+      key: "4",
+      icon: <FileTextOutlined />,
       label: "Nhật ký hoạt động",
-      icon: <WarningOutlined />,
+    },
+    {
+      key: "5",
+      icon: <BarChartOutlined />,
+      label: "Báo cáo & Thống kê",
     },
   ];
 
   return (
-    <Sider className="side-bar" width={250}>
+    <Sider width={250} className={styles.sidebar}>
       <Menu
         mode="inline"
-        selectedKeys={[selectedMenu]}
-        onClick={(e) => {
-          setSelectedMenu(e.key);
-          navigate(`/admin/${e.key}`);
-        }}
+        selectedKeys={[selectedKey]}
         items={menuItems}
-        style={{
-          fontSize: "16px",
-          fontWeight: "500",
-          borderRight: "none",
-        }}
+        className={styles.menu}
+        onClick={(e) => setSelectedKey(e.key)}
       />
+
+      <div className={styles.sidebarFooter}>
+        <div className={styles.footerItem}>
+          <Text className={styles.version}>Phiên bản 1.0.0</Text>
+        </div>
+      </div>
     </Sider>
   );
-}
+};
 
-export default AdminSideBar;
+export default AdminSidebar;

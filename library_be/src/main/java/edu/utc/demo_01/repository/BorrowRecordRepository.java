@@ -68,7 +68,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
                br.ReturnDate AS returnDate,
-               b.CoverImage AS bookImage
+               b.CoverImage AS bookImage,
+               b.Author AS author
         FROM BorrowRecords br
         JOIN Books b ON br.bookID = b.bookID
         WHERE br.userID = :id
@@ -83,7 +84,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
                br.ReturnDate AS returnDate,
-               b.CoverImage AS bookImage
+               b.CoverImage AS bookImage,
+               b.Author AS author
         FROM BorrowRecords br
         JOIN Books b ON br.bookID = b.bookID
         WHERE br.userID = :id
@@ -99,7 +101,8 @@ public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Stri
                br.BorrowDate AS borrowDate,
                br.DueDate AS dueDate,
                br.ReturnDate AS returnDate,
-               b.CoverImage AS bookImage
+               b.CoverImage AS bookImage,
+               b.Author AS author
         FROM BorrowRecords br
         JOIN Books b ON br.bookID = b.bookID
         WHERE br.userID = :id 

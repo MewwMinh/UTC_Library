@@ -1,4 +1,4 @@
-package edu.utc.demo_01.dto.patron.response;
+package edu.utc.demo_01.dto.coordinator.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,4 +17,7 @@ public class EventResponse {
     Timestamp startTime;
     Timestamp endTime;
     String location;
+    Integer maxAttendees;
+    Long registeredParticipantCount;
+    Long eventAttendeeCount;
 }

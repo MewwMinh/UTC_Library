@@ -1,0 +1,70 @@
+/* AdminFooter.module.css */
+.footer {
+  padding: 12px 24px;
+  background-color: white;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.footerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.copyright {
+  color: #8c8c8c;
+  font-size: 12px;
+}
+
+.contactInfo {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.contactItem {
+  color: #8c8c8c;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.footerRight {
+  display: flex;
+  gap: 24px;
+}
+
+.links {
+  display: flex;
+  gap: 16px;
+}
+
+.link {
+  color: #595959;
+  font-size: 12px;
+  transition: color 0.3s;
+}
+
+.link:hover {
+  color: #1677ff;
+}
+
+@media (max-width: 768px) {
+  .footerContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footerRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

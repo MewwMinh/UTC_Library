@@ -1,0 +1,134 @@
+/* src/components/EventParticipantsList/EventParticipantsList.module.css */
+.container {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease;
+}
+
+.title {
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.title::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background-color: #1677ff;
+  border-radius: 2px;
+}
+
+.eventName {
+  color: #1677ff;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+.filters {
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.filterGroup {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.searchInput {
+  min-width: 250px;
+  transition: all 0.3s ease;
+  flex: 2;
+}
+
+.searchInput:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.statusFilter {
+  min-width: 180px;
+  flex: 1;
+}
+
+.resultCount {
+  color: #8c8c8c;
+  font-size: 14px;
+  text-align: right;
+}
+
+.table {
+  margin-bottom: 20px;
+}
+
+.tableRow {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tableRow:hover {
+  background-color: #f0f7ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.emptyState {
+  margin: 40px 0;
+  padding: 20px;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+
+/* Animation for loading state */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filterGroup {
+    width: 100%;
+  }
+
+  .searchInput,
+  .statusFilter {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .resultCount {
+    width: 100%;
+    text-align: left;
+    margin-top: 8px;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
+}

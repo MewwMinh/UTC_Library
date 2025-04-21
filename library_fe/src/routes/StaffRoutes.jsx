@@ -5,7 +5,9 @@ import {
   PatronDetails,
   ReadingRoomControl,
   ManageSupportRequest,
-  EventList,
+  EvenListPage,
+  EventDetailPage,
+  CreateNewEventPage,
 } from "/src/pages/staff/coordinator";
 import {
   LibrarianDashboard,
@@ -43,7 +45,9 @@ const StaffRoutes = () => {
 
         <Route path="members" element={<PatronListPage />} />
         <Route path="reading-room" element={<ReadingRoomControl />} />
-        <Route path="events" element={<EventList />} />
+        <Route path="events" element={<EvenListPage />} />
+        <Route path="events/create-event" element={<CreateNewEventPage />} />
+        <Route path="events/details/:eventId" element={<EventDetailPage />} />
         <Route path="patron-info/:patronID" element={<PatronDetails />} />
         <Route index element={<LibrarianDashboard />} />
         <Route path="dashboard" element={<LibrarianDashboard />} />

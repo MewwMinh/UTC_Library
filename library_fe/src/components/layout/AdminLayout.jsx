@@ -1,17 +1,21 @@
 import { Layout } from "antd";
-import UserHeader from "./Header/UserHeader";
-import "/src/styles/Layout.css";
-import AdminSideBar from "./SideBar/AdminSideBar";
+import AdminHeader from "./Header/AdminHeader";
+import AdminSidebar from "./SideBar/AdminSideBar";
+import AdminFooter from "./Footer/AdminFooter";
+import styles from "/src/styles/layout/admin/AdminLayout.module.css";
 import { Outlet } from "react-router-dom";
 
 const AdminLayout = () => {
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <UserHeader />
-      <Layout className="container">
-        <AdminSideBar />
-        <Layout className="content">
-          <Outlet />
+    <Layout className={styles.adminLayout}>
+      <AdminHeader />
+      <Layout className={styles.mainContent}>
+        <AdminSidebar />
+        <Layout className={styles.contentWrapper}>
+          <div className={styles.content}>
+            <Outlet />
+          </div>
+          <AdminFooter />
         </Layout>
       </Layout>
     </Layout>

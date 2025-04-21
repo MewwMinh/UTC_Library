@@ -1,13 +1,11 @@
 package edu.utc.demo_01.service;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.coordinator.request.ChangeEventInformation;
 import edu.utc.demo_01.dto.coordinator.request.ChangePatronInformation;
 import edu.utc.demo_01.dto.coordinator.request.CreatePatron;
 import edu.utc.demo_01.dto.coordinator.request.ResponseTicket;
-import edu.utc.demo_01.dto.coordinator.response.PatronDetailsResponse;
-import edu.utc.demo_01.dto.coordinator.response.PatronInReadingRoom;
-import edu.utc.demo_01.dto.coordinator.response.PatronResponse;
-import edu.utc.demo_01.dto.coordinator.response.UsingReadingRoomResponse;
+import edu.utc.demo_01.dto.coordinator.response.*;
 import edu.utc.demo_01.dto.patron.response.BorrowBookResponse2;
 import edu.utc.demo_01.dto.patron.response.ViolationsResponse;
 import edu.utc.demo_01.entity.*;
@@ -47,6 +45,8 @@ public class CoordinatorService {
     UserViolationRepository userViolationRepository;
     ReadingRoomRecordRepository readingRoomRecordRepository;
     ActivityLogRepository activityLogRepository;
+    EventRepository eventRepository;
+    private final EventParticipantRepository eventParticipantRepository;
 
     public boolean responseTicket(ResponseTicket request) {
         TicketResponse ticketResponse = new TicketResponse();
@@ -308,5 +308,145 @@ public class CoordinatorService {
         authCredentialRepository.save(credential);
         return true;
     }
+    //endregion
+
+    //region Manage Event
+    public APIResponse<List<EventResponse>> getAllEvents() {
+        return APIResponse.<List<EventResponse>>builder()
+                .code(1000)
+                .result(eventRepository.getEvents())
+                .build();
+    }
+
+    public APIResponse<EventResponse> getEventByEventID(String eventID) {
+        return APIResponse.<EventResponse>builder()
+                .code(1000)
+                .result(eventRepository.getEventByEventID(eventID))
+                .build();
+    }
+
+    @Transactional
+    public APIResponse changeEventInfomation(String eventID, ChangeEventInformation request) {
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User coordinator = userRepository.findByUserID(userID).orElseThrow();
+        UserRole userRole = userRoleRepository.findByUser(coordinator).orElseThrow();
+
+        String actionDetails = "";
+
+        Event event = eventRepository.findByEventID(eventID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_EVENT));
+
+        if (!request.getTitle().equals(event.getTitle())){
+            actionDetails += "Thay đổi tiêu đề sự kiện từ " + event.getTitle() + " thành " + request.getTitle() + "\n";
+            event.setTitle(request.getTitle());
+        }
+
+        if (!request.getDescription().equals(event.getDescription())) {
+            actionDetails += "Thay đổi chi tiết sự kiện từ " + event.getDescription() + " thành " + request.getDescription() + "\n";
+            event.setDescription(request.getDescription());
+        }
+
+        if (!request.getStartTime().equals(event.getStartTime())) {
+            actionDetails += "Thay đổi thời gian bắt đầu từ " + event.getStartTime() + " thành " + request.getStartTime() + "\n";
+            event.setStartTime(request.getStartTime());
+        }
+
+        if (!request.getEndTime().equals(event.getEndTime())) {
+            actionDetails += "Thay đổi thời gian kết thúc từ " + event.getEndTime() + " thành " + request.getEndTime() + "\n";
+            event.setEndTime(request.getEndTime());
+        }
+
+        if (!request.getLocation().equals(event.getLocation())) {
+            actionDetails += "Thay đổi địa điểm từ " + event.getLocation() + " thành " + request.getLocation() + "\n";
+            event.setLocation(request.getLocation());
+        }
+
+        if (!request.getMaxAttendees().equals(event.getMaxAttendees())) {
+            actionDetails += "Thay đổi số lượng người tham dự tối đa từ " + event.getMaxAttendees() + " thành " + request.getMaxAttendees() + "\n";
+            event.setMaxAttendees(request.getMaxAttendees());
+        }
+
+        event.setCreatedBy(coordinator);
+        eventRepository.save(event);
+
+        //Ghi log
+        ActivityLog activityLog = new ActivityLog();
+        activityLog.setActorID(coordinator);
+        activityLog.setActorRole(userRole.getRole().getRoleName());
+        activityLog.setActionType("Cập nhật");
+        activityLog.setEntityType("Event");
+        activityLog.setEntityID(eventID);
+        activityLog.setActionDetails(actionDetails);
+        activityLog.setActionTime(LocalDateTime.now());
+        activityLog.setStatus("Thành công");
+        activityLogRepository.save(activityLog);
+
+        return APIResponse.builder()
+                .code(1000)
+                .message("Sửa đổi thông tin cho sự kiện " + event.getTitle() + " thành công !!")
+                .build();
+    }
+
+    public APIResponse deleteEventByEventID(String eventID) {
+        eventRepository.delete(eventRepository.findByEventID(eventID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_EVENT)));
+        return APIResponse.builder()
+                .code(1000)
+                .message("Xóa thành công sự kiện!!")
+                .build();
+    }
+
+    @Transactional
+    public APIResponse createEvent(ChangeEventInformation request) {
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User coordinator = userRepository.findByUserID(userID).orElseThrow();
+        UserRole userRole = userRoleRepository.findByUser(coordinator).orElseThrow();
+
+        Event event = new Event();
+        event.setTitle(request.getTitle());
+        if (request.getDescription() != null) event.setDescription(request.getDescription());
+        event.setStartTime(request.getStartTime());
+        event.setEndTime(request.getEndTime());
+        if (request.getLocation() != null) event.setLocation(request.getLocation());
+        event.setMaxAttendees(request.getMaxAttendees());
+        event.setCreatedBy(coordinator);
+        eventRepository.save(event);
+
+        //Ghi log
+        ActivityLog activityLog = new ActivityLog();
+        activityLog.setActorID(coordinator);
+        activityLog.setActorRole(userRole.getRole().getRoleName());
+        activityLog.setActionType("Tạo mới");
+        activityLog.setEntityType("Event");
+        activityLog.setEntityID(event.getEventID());
+        activityLog.setActionDetails("Tao mới sự kiện " + event.getTitle());
+        activityLog.setActionTime(LocalDateTime.now());
+        activityLog.setStatus("Thành công");
+        activityLogRepository.save(activityLog);
+
+        return APIResponse.builder()
+                .code(1000)
+                .message("Tao mới sự kiện " + event.getTitle() + " thành công!!")
+                .build();
+    }
+
+    public APIResponse<List<PatronRegisted>> getAllPatronRegisted(String eventID) {
+        Event event = eventRepository.findByEventID(eventID).orElseThrow(() -> new AppException(ErrorCode.CAN_NOT_FIND_EVENT));
+        List<EventParticipant> eventParticipants = eventParticipantRepository.findByEventID(event);
+        List<PatronRegisted> patronRegisteds = new ArrayList<>();
+        for (EventParticipant eventParticipant : eventParticipants) {
+            PatronRegisted p = new PatronRegisted();
+            p.setPatronID(eventParticipant.getUserID().getUserID());
+            p.setPatronName(eventParticipant.getUserID().getFullName());
+            p.setAttendanceStatus(eventParticipant.getAttendanceStatus());
+            p.setRegisterTime(eventParticipant.getRegistrationDate());
+            patronRegisteds.add(p);
+        }
+        return APIResponse.<List<PatronRegisted>>builder()
+                .code(1000)
+                .result(patronRegisteds)
+                .build();
+    }
+
     //endregion
 }
