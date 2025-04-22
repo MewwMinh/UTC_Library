@@ -177,7 +177,7 @@ public class FakeDataService {
             auth.setUserID(user);
             auth.setEmail(userId + "@lms.utc.edu.vn");
             auth.setPasswordHash(passwordEncoder.encode("123456"));
-            auth.setLastLogin(Instant.now());
+            auth.setLastLogin(LocalDateTime.now());
             authCredentialRepository.save(auth);
 
             // Tạo Membership
@@ -236,7 +236,7 @@ public class FakeDataService {
             auth.setUserID(user);
             auth.setEmail(userId + "@lms.utc.edu.vn");
             auth.setPasswordHash(passwordEncoder.encode("123456"));
-            auth.setLastLogin(Instant.now());
+            auth.setLastLogin(LocalDateTime.now());
             authCredentialRepository.save(auth);
 
             // Gán UserRole

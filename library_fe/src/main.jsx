@@ -17,7 +17,7 @@ createRoot(document.getElementById("root")).render(
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/user/*" element={<UserRoutes />} />
-          <Route path="/admin/*" element={<AdminRoutes />} />
+          <Route path="/manager/*" element={<AdminRoutes />} />
           <Route path="/staff/*" element={<StaffRoutes />} />
           <Route path="/login" element={<LoginForm />} />
         </Routes>

@@ -1,0 +1,117 @@
+/* src/components/LibrarySettings/SettingSection.module.css */
+.settingSection {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.settingSection:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
+  color: #1677ff;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.content {
+  margin-bottom: 20px;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.settingItem:last-child {
+  border-bottom: none;
+}
+
+.settingLabel {
+  color: #444;
+  flex: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settingValue {
+  color: #1f1f1f;
+  font-weight: 500;
+  text-align: right;
+  flex: 1;
+}
+
+.editButton {
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.editButton:hover {
+  background-color: #1677ff;
+  color: white;
+}
+
+/* Modal styles */
+.modalHeader {
+  margin-bottom: 20px;
+}
+
+.modalTitle {
+  font-size: 18px;
+  color: #1677ff;
+}
+
+.modalDescription {
+  color: #666;
+  margin-top: 4px;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.formSection {
+  margin-bottom: 24px;
+}
+
+.formSectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #444;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .settingItem {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .settingValue {
+    text-align: left;
+  }
+}

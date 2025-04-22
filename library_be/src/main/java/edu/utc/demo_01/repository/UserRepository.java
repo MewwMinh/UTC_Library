@@ -2,6 +2,8 @@ package edu.utc.demo_01.repository;
 
 import edu.utc.demo_01.dto.coordinator.response.PatronDetailsResponse;
 import edu.utc.demo_01.dto.coordinator.response.PatronResponse;
+import edu.utc.demo_01.dto.manager.response.EmployeeDetails;
+import edu.utc.demo_01.dto.manager.response.EmployeeInformation;
 import edu.utc.demo_01.dto.patron.response.PatronInformation;
 import edu.utc.demo_01.dto.patron.response.TopPatronReponse;
 import edu.utc.demo_01.entity.User;
@@ -145,4 +147,50 @@ public interface UserRepository extends JpaRepository<User, String> {
     PatronDetailsResponse getPatronDetailsByUserID(@Param("userID") String userID);
 
     boolean existsByUserID(String userID);
+
+    @Query(value = """
+        SELECT
+            u.UserID AS userID,
+            u.FullName AS userName,
+            u.UserImage AS userImage,
+            u.Gender AS gender,
+            u.Status AS status,    
+            ac.Email AS patronEmail,
+            r.RoleName AS role                 
+        FROM
+            Users u                 
+        JOIN
+            AuthCredentials ac 
+                ON u.UserID = ac.UserID                 
+        JOIN UserRoles ur ON u.UserId = ur.UserId
+                JOIN Roles r ON ur.RoleId = r.RoleId           
+        WHERE
+            u.UserType = 'Staff'
+    """, nativeQuery = true)
+    List<EmployeeInformation> getAllEmployees();
+
+    @Query(value = """
+        SELECT
+            u.UserID AS userID,
+            u.FullName AS userName,
+            u.UserImage AS userImage,
+            u.Gender AS gender,
+            u.Status AS status,    
+            ac.Email AS patronEmail,
+            r.RoleName AS role,
+            u.CreatedAt AS createAt,
+            u.DOB AS dob,
+            u.NationalID AS nationalID,
+            ac.LastLogin AS lastLoginAt  
+        FROM
+            Users u                 
+        JOIN
+            AuthCredentials ac 
+                ON u.UserID = ac.UserID                 
+        JOIN UserRoles ur ON u.UserId = ur.UserId
+                JOIN Roles r ON ur.RoleId = r.RoleId           
+        WHERE
+            u.UserID = :userID
+    """, nativeQuery = true)
+    EmployeeDetails getEmployeeByUserID(@Param("userID") String userID);
 }

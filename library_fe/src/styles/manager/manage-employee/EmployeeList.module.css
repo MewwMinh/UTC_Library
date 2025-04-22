@@ -1,0 +1,132 @@
+/* EmployeeList.module.css */
+
+.container {
+  padding: 0 16px;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  background: #fff;
+}
+
+.card :global(.ant-card-head) {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+.card :global(.ant-card-head-title) {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.card :global(.ant-card-body) {
+  padding: 24px;
+}
+
+.filterSection {
+  margin-bottom: 24px;
+  background-color: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.filterItem {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.filterItem label {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.searchInput {
+  width: 100%;
+}
+
+.resetButton {
+  /* margin-top: 24px; */
+  width: 100%;
+  margin-bottom: 9px;
+}
+
+.table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table :global(.ant-table) {
+  border-radius: 8px;
+}
+
+.table :global(.ant-table-tbody > tr) {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.table :global(.ant-table-tbody > tr:hover) {
+  background-color: #f0f9ff;
+}
+
+.table :global(.ant-table-thead > tr > th) {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+}
+
+.employeeInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  border: 2px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.employeeName {
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 2px;
+}
+
+.employeeEmail {
+  font-size: 12px;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 8px;
+  }
+
+  .card :global(.ant-card-body) {
+    padding: 16px 12px;
+  }
+
+  .filterSection {
+    padding: 12px;
+  }
+
+  .table :global(.ant-table) {
+    font-size: 13px;
+  }
+
+  .employeeInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .avatar {
+    margin-bottom: 4px;
+  }
+}

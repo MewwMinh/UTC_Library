@@ -8,7 +8,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -37,6 +37,6 @@ public class AuthCredential {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "LastLogin")
-    private Instant lastLogin;
+    private LocalDateTime lastLogin;
 
 }

@@ -72,7 +72,7 @@ const LoginForm = () => {
       if (scope === "LIBRARIAN" || scope === "COORDINATOR") {
         navigate("/staff/dashboard");
       } else if (scope === "MANAGER") {
-        navigate("/admin/dashboard");
+        navigate("/manager/dashboard");
       } else if (
         scope === "TEACHER" ||
         scope === "STUDENT" ||

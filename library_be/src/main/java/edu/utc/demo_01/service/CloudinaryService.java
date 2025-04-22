@@ -35,4 +35,17 @@ public class CloudinaryService {
             throw new RuntimeException("Failed to upload image", e);
         }
     }
+
+    public String uploadEmployeeAvatar(MultipartFile file, String userID) {
+        try {
+            Map<String, String> params = new HashMap<>();
+            params.put("folder", "employee-avatars");
+            params.put("public_id", userID);
+
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), params);
+            return (String) uploadResult.get("secure_url");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload image", e);
+        }
+    }
 }

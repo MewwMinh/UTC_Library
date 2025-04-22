@@ -1,0 +1,111 @@
+/* CreateEmployee.module.css */
+
+.container {
+  padding: 0 16px;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  background: #fff;
+}
+
+.card :global(.ant-card-head) {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 24px;
+}
+
+.card :global(.ant-card-head-title) {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.card :global(.ant-card-body) {
+  padding: 24px;
+}
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.avatarUpload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.avatar {
+  border: 2px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.uploadButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.avatarUrl {
+  max-width: 200px;
+  overflow: hidden;
+  font-size: 12px;
+  color: #718096;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 8px;
+  }
+
+  .card :global(.ant-card-body) {
+    padding: 16px;
+  }
+
+  .avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .avatarSection {
+    margin-bottom: 16px;
+  }
+
+  .formActions {
+    justify-content: center;
+  }
+}
+
+.formSection {
+  margin-bottom: 24px;
+}
+
+.formSection :global(.ant-form-item:last-child) {
+  margin-bottom: 0;
+}
+
+:global(.ant-form-item-label) {
+  font-weight: 500;
+  color: #475569;
+}
+
+:global(.ant-input-group-addon) {
+  padding: 0;
+}

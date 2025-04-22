@@ -1,0 +1,14 @@
+.breadcrumbBelow {
+  margin-bottom: 16px;
+  padding: 0 16px;
+}
+
+.breadcrumbLink {
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.85);
+  transition: color 0.3s;
+}
+
+.breadcrumbLink:hover {
+  color: #1890ff;
+}

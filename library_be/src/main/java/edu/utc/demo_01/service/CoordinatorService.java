@@ -266,7 +266,7 @@ public class CoordinatorService {
         authCredential.setUserID(user);
         authCredential.setEmail(request.getEmail());
         authCredential.setPasswordHash(passwordEncoder.encode("123456"));
-        authCredential.setLastLogin(Instant.now());
+        authCredential.setLastLogin(LocalDateTime.now());
         authCredentialRepository.save(authCredential);
 
         Role role = roleRepository.findByRoleName("PATRON");

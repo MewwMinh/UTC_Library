@@ -1,0 +1,161 @@
+.employeeCard {
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+/* Profile Section */
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.avatarContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
+  color: white;
+  position: relative;
+}
+
+.avatar {
+  border: 4px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 16px;
+  transition: transform 0.3s ease;
+}
+
+.employeeName {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.employeeName h4 {
+  margin-bottom: 4px;
+  color: white;
+}
+
+.employeeId {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.employeeRole {
+  font-size: 14px;
+  padding: 4px 12px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  margin-top: 8px;
+}
+
+.quickInfoSection {
+  padding: 16px 24px;
+  background-color: #f9fafb;
+  flex-grow: 1;
+}
+
+.quickInfoItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #e8e8e8;
+}
+
+.quickInfoItem:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.infoIcon {
+  margin-right: 12px;
+  color: #1677ff;
+  font-size: 18px;
+}
+
+/* Detailed Info Section */
+.detailInfoSection {
+  padding: 0 8px;
+  height: 100%;
+}
+
+.infoItem {
+  margin-bottom: 16px;
+  display: flex;
+}
+
+.infoLabel {
+  min-width: 150px;
+  color: #8c8c8c;
+  font-weight: 500;
+}
+
+.infoValue {
+  flex: 1;
+  color: #262626;
+}
+
+.editForm {
+  padding: 8px;
+}
+
+.note {
+  display: block;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+.notFound {
+  text-align: center;
+  padding: 64px 0;
+  color: #8c8c8c;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .profileSection {
+    margin-bottom: 24px;
+  }
+
+  .infoItem {
+    flex-direction: column;
+  }
+
+  .infoLabel {
+    min-width: auto;
+    margin-bottom: 4px;
+  }
+
+  .quickInfoItem {
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .avatarContainer {
+    padding: 16px;
+  }
+
+  .avatar {
+    width: 120px !important;
+    height: 120px !important;
+    line-height: 120px !important;
+    font-size: 48px !important;
+  }
+}

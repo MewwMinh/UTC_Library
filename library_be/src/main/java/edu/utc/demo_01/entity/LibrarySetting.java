@@ -9,7 +9,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -36,6 +36,6 @@ public class LibrarySetting {
     private User updateBy;
 
     @Column(name = "UpdateAt")
-    private Instant updateAt;
+    private LocalDateTime updateAt;
 
 }
