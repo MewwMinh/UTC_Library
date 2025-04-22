@@ -7,6 +7,7 @@ import edu.utc.demo_01.dto.manager.response.EmployeeActivityLog;
 import edu.utc.demo_01.dto.manager.response.EmployeeDetails;
 import edu.utc.demo_01.dto.manager.response.EmployeeInformation;
 import edu.utc.demo_01.dto.manager.setting.*;
+import edu.utc.demo_01.dto.statistics.*;
 import edu.utc.demo_01.service.ManagerService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -91,6 +92,49 @@ public class ManagerController {
     //endregion
 
     //region Statistic
+    @GetMapping("get-tong-hop-thong-ke")
+    public APIResponse<TongHopThongKe> getTongHopThongKe(){
+        return service.getTongHopThongKe();
+    }
 
+    @GetMapping("get-phan-loai-nguoi-dung")
+    public APIResponse<PhanLoaiNguoiDung> getPhanLoaiNguoiDung(){
+        return service.getPhanLoaiNguoiDung();
+    }
+
+    @GetMapping("get-thong-ke-hang-thanh-vien")
+    public APIResponse<ThongKeHangThanhVien> getThongKeHangThanhVien(){
+        return service.getThongKeHangThanhVien();
+    }
+
+    @GetMapping("get-thong-ke-muon-tra-5-nam-gan-day")
+    public APIResponse<List<ThongKeMuonTra5NamGanDay>> getThongKeMuonTra5NamGanDay(){
+        return service.getThongKeMuonTra5NamGanDay();
+    }
+
+    @GetMapping("get-thong-ke-muon-tra-theo-nam/{year}")
+    public APIResponse<List<ThongKeMuonTraTheoNam>> getThongKeMuonTraTheoNam(@PathVariable int year){
+        return service.getThongKeMuonTraTheoNam(year);
+    }
+
+    @GetMapping("get-thong-ke-nhu-cau-su-dung-thu-vien-theo-nam/{year}")
+    public APIResponse<List<ThongKeNhuCauSuDungThuVienTheoNam>> getThongKeNhuCauSuDungThuVienTheoNam(@PathVariable int year){
+        return service.getThongKeNhuCauSuDungThuVienTheoNam(year);
+    }
+
+    @GetMapping("get-thong-ke-nhu-cau-su-dung-thu-vien-theo-thang/{year}/{month}")
+    public APIResponse<List<ThongKeNhuCauSuDungThuVienTheoThang>> getThongKeNhuCauSuDungThuVienTheoThang(@PathVariable int year, @PathVariable int month){
+        return service.getThongKeNhuCauSuDungThuVienTheoThang(year, month);
+    }
+
+    @GetMapping("get-top-10-sach-duoc-muon-nhieu-nhat-theo-thang/{year}/{month}")
+    public APIResponse<List<Top10SachDuocMuonNhieuNhatTheoThang>> getTop10SachDuocMuonNhieuNhatTheoThang(@PathVariable int year, @PathVariable int month){
+        return service.getTop10SachDuocMuonNhieuNhatTheoThang(year, month);
+    }
+
+    @GetMapping("/test")
+    public boolean test(){
+        return service.test();
+    }
     //endregion
 }

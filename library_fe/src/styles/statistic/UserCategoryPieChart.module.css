@@ -1,0 +1,11 @@
+/* src/components/UserCategoryPieChart/UserCategoryPieChart.module.css */
+/* src/components/MembershipLevelPieChart/MembershipLevelPieChart.module.css */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}

@@ -1,5 +1,4 @@
-// src/pages/manager/ActivityLog.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   Card,
@@ -18,7 +17,6 @@ import {
   Spin,
   notification,
   Divider,
-  Badge,
   Empty,
   Statistic,
 } from "antd";
@@ -67,7 +65,7 @@ const ActivityLog = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentLog, setCurrentLog] = useState(null);
   const [exportLoading, setExportLoading] = useState(false);
-  const [statistics, setStatistics] = useState({
+  const [, setStatistics] = useState({
     totalLogs: 0,
     actionTypeCount: {},
     entityTypeCount: {},

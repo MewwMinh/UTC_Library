@@ -7,6 +7,7 @@ import edu.utc.demo_01.dto.manager.response.EmployeeActivityLog;
 import edu.utc.demo_01.dto.manager.response.EmployeeDetails;
 import edu.utc.demo_01.dto.manager.response.EmployeeInformation;
 import edu.utc.demo_01.dto.manager.setting.*;
+import edu.utc.demo_01.dto.statistics.*;
 import edu.utc.demo_01.entity.*;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
@@ -37,6 +38,7 @@ public class ManagerService {
     UserRoleRepository userRoleRepository;
     ActivityLogRepository activityLogRepository;
     LibrarySettingRepository librarySettingRepository;
+    AchievementRepository achievementRepository;
 
 
     //region Dashboard
@@ -316,6 +318,80 @@ public class ManagerService {
     //endregion
 
     //region Statistic
+    public APIResponse<PhanLoaiNguoiDung> getPhanLoaiNguoiDung(){
+        return APIResponse.<PhanLoaiNguoiDung>builder()
+                .code(1000)
+                .result(achievementRepository.phanLoaiNguoiDung())
+                .build();
+    }
 
+    public APIResponse<ThongKeHangThanhVien> getThongKeHangThanhVien(){
+        return APIResponse.<ThongKeHangThanhVien>builder()
+                .code(1000)
+                .result(achievementRepository.thongKeHangThanhVien())
+                .build();
+    }
+
+    public APIResponse<List<ThongKeMuonTra5NamGanDay>> getThongKeMuonTra5NamGanDay(){
+        return APIResponse.<List<ThongKeMuonTra5NamGanDay>>builder()
+                .code(1000)
+                .result(achievementRepository.thongKeMuonTra5NamGanDay())
+                .build();
+    }
+
+    public APIResponse<List<ThongKeMuonTraTheoNam>> getThongKeMuonTraTheoNam(int year){
+        return APIResponse.<List<ThongKeMuonTraTheoNam>>builder()
+                .code(1000)
+                .result(achievementRepository.thongKeMuonTraTheoNam(year))
+                .build();
+    }
+
+    public APIResponse<List<ThongKeNhuCauSuDungThuVienTheoNam>> getThongKeNhuCauSuDungThuVienTheoNam(int year){
+        return APIResponse.<List<ThongKeNhuCauSuDungThuVienTheoNam>>builder()
+                .code(1000)
+                .result(achievementRepository.thongKeNhuCauSuDungThuVienTheoNam(year))
+                .build();
+    }
+
+    public APIResponse<List<ThongKeNhuCauSuDungThuVienTheoThang>> getThongKeNhuCauSuDungThuVienTheoThang(int year, int month){
+        return APIResponse.<List<ThongKeNhuCauSuDungThuVienTheoThang>>builder()
+                .code(1000)
+                .result(achievementRepository.thongKeNhuCauSuDungThuVienTheoThang(year, month))
+                .build();
+    }
+
+    public APIResponse<List<Top10SachDuocMuonNhieuNhatTheoThang>> getTop10SachDuocMuonNhieuNhatTheoThang(int year, int month){
+        return APIResponse.<List<Top10SachDuocMuonNhieuNhatTheoThang>>builder()
+                .code(1000)
+                .result(achievementRepository.top10SachDuocMuonNhieuNhatTheoThang(year, month))
+                .build();
+    }
+
+    public APIResponse<TongHopThongKe> getTongHopThongKe(){
+        return APIResponse.<TongHopThongKe>builder()
+                .code(1000)
+                .result(achievementRepository.tongHopThongKe())
+                .build();
+    }
+
+    public boolean test(){
+//        List<Object[]> results = achievementRepository.thongKeMuonTra5NamGanDay();
+//
+//        for (Object[] row : results) {
+//            for (int i = 0; i < row.length; i++) {
+//                Object value = row[i];
+//                System.out.println("Index " + i + ": Value = " + value + ", Type = " + (value != null ? value.getClass().getName() : "null"));
+//            }
+//            System.out.println("-----");
+//        }
+
+//        Object raw = achievementRepository.tongHopThongKe();
+//        Object[] result = (Object[]) raw;
+//
+//        for (int i = 0; i < result.length; i++) {
+//            System.out.println("Index " + i + ": Value = " + result[i] + ", Type = " + result[i].getClass().getName());
+//        }
+        return true;
+    }
     //endregion
 }

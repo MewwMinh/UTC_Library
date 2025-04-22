@@ -1,0 +1,75 @@
+/* src/components/PieChart/PieChart.module.css */
+.container {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.chartContainer {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tooltip {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+.tooltipLabel {
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  color: #666;
+}
+
+.tooltipValue {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.legendItem {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.totalValue {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+}
+
+.totalLabel {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.total {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
