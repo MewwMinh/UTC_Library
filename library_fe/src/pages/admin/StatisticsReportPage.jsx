@@ -3,6 +3,11 @@ import { HomeOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import EmployeeList from "/src/components/admin/manage-employee/EmployeeList";
 import styles from "/src/styles/manager/Page.module.css";
+import {
+  BookBorrowingStatistics,
+  UserStatistics,
+  Statistic,
+} from "/src/components/admin";
 
 const ConfigSystemPage = () => {
   const navigate = useNavigate();
@@ -39,7 +44,9 @@ const ConfigSystemPage = () => {
   return (
     <div className={styles.bookCatalogPage}>
       <Breadcrumb items={breadcrumbItems} className={styles.breadcrumbBelow} />
-      <EmployeeList />
+      <Statistic />
+      <UserStatistics />
+      <BookBorrowingStatistics />
     </div>
   );
 };

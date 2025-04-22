@@ -3,6 +3,7 @@ package edu.utc.demo_01.service;
 import edu.utc.demo_01.dto.APIResponse;
 import edu.utc.demo_01.dto.manager.request.EmployeeCreateRequest;
 import edu.utc.demo_01.dto.manager.request.EmployeeUpdateRequest;
+import edu.utc.demo_01.dto.manager.response.EmployeeActivityLog;
 import edu.utc.demo_01.dto.manager.response.EmployeeDetails;
 import edu.utc.demo_01.dto.manager.response.EmployeeInformation;
 import edu.utc.demo_01.dto.manager.setting.*;
@@ -125,31 +126,31 @@ public class ManagerService {
         User e = userRepository.findByUserID(employeeID).orElseThrow();
         if (!e.getFullName().equals(request.getUserName()))
         {
-            actionDetails += "Thay đồi tên từ " + e.getFullName() + " thành " + request.getUserName() + "\n";
+            actionDetails += "Thay đổi tên từ " + e.getFullName() + " thành " + request.getUserName() + "\n";
             e.setFullName(request.getUserName());
         }
 
         if (e.getStatus() != null || !e.getStatus().equals(request.getStatus()))
         {
-            actionDetails += "Thay đồi trạng thái từ " + e.getStatus() + " thành " + request.getStatus() + "\n";
+            actionDetails += "Thay đổi trạng thái từ " + e.getStatus() + " thành " + request.getStatus() + "\n";
             e.setStatus(request.getStatus());
         }
 
         if (!e.getDob().equals(request.getDob()))
         {
-            actionDetails += "Thay đồi ngày tháng năm sinh từ " + e.getDob() + " thành " + request.getDob() + "\n";
+            actionDetails += "Thay đổi ngày tháng năm sinh từ " + e.getDob() + " thành " + request.getDob() + "\n";
             e.setDob(request.getDob());
         }
 
         if (!e.getGender().equals(request.getGender()))
         {
-            actionDetails += "Thay đồi giới tính từ " + e.getGender() + " thành " + request.getGender() + "\n";
+            actionDetails += "Thay đổi giới tính từ " + e.getGender() + " thành " + request.getGender() + "\n";
             e.setGender(request.getGender());
         }
 
         if (!e.getNationalID().equals(request.getNationalID()))
         {
-            actionDetails += "Thay đồi giới CCCD " + e.getNationalID() + " thành " + request.getNationalID() + "\n";
+            actionDetails += "Thay đổi giới CCCD " + e.getNationalID() + " thành " + request.getNationalID() + "\n";
             e.setNationalID(request.getNationalID());
         }
 
@@ -158,7 +159,7 @@ public class ManagerService {
         AuthCredential ac = authCredentialRepository.findByUserID(e).orElseThrow();
         if (!ac.getEmail().equals(request.getEmail()))
         {
-            actionDetails += "Thay đồi email từ " + ac.getEmail() + " thành " + request.getEmail() + "\n";
+            actionDetails += "Thay đổi email từ " + ac.getEmail() + " thành " + request.getEmail() + "\n";
             ac.setEmail(request.getEmail());
         }
         authCredentialRepository.save(ac);
@@ -166,7 +167,7 @@ public class ManagerService {
         UserRole userRole = userRoleRepository.findByUser(e).orElseThrow();
         if (!userRole.getRole().getRoleName().equals(request.getRole()))
         {
-            actionDetails += "Thay đồi tên vai trò " + userRole.getRole().getRoleName() + " thành " + request.getRole() + "\n";
+            actionDetails += "Thay đổi tên vai trò " + userRole.getRole().getRoleName() + " thành " + request.getRole() + "\n";
             Role newRole = roleRepository.findByRoleName(request.getRole());
             userRole.setRole(newRole);
         }
@@ -306,7 +307,12 @@ public class ManagerService {
     //endregion
 
     //region Activity Log
-
+    public APIResponse<List<EmployeeActivityLog>> getEmployeeActivityLog(){
+        return APIResponse.<List<EmployeeActivityLog>>builder()
+                .code(1000)
+                .result(activityLogRepository.getEmployeeActivityLog())
+                .build();
+    }
     //endregion
 
     //region Statistic

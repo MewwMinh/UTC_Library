@@ -3,6 +3,7 @@ package edu.utc.demo_01.controller;
 import edu.utc.demo_01.dto.APIResponse;
 import edu.utc.demo_01.dto.manager.request.EmployeeCreateRequest;
 import edu.utc.demo_01.dto.manager.request.EmployeeUpdateRequest;
+import edu.utc.demo_01.dto.manager.response.EmployeeActivityLog;
 import edu.utc.demo_01.dto.manager.response.EmployeeDetails;
 import edu.utc.demo_01.dto.manager.response.EmployeeInformation;
 import edu.utc.demo_01.dto.manager.setting.*;
@@ -83,7 +84,10 @@ public class ManagerController {
     //endregion
 
     //region Activity Log
-
+    @GetMapping("get-employee-activity-log")
+    public APIResponse<List<EmployeeActivityLog>> getEmployeeActivityLog(){
+        return service.getEmployeeActivityLog();
+    }
     //endregion
 
     //region Statistic

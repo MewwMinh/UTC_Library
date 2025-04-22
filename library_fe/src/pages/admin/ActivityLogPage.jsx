@@ -1,7 +1,7 @@
 import { Breadcrumb } from "antd";
-import { HomeOutlined, UserOutlined } from "@ant-design/icons";
+import { HomeOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import EmployeeList from "/src/components/admin/manage-employee/EmployeeList";
+import ActivityLog from "/src/components/admin/activity-log/ActivityLog";
 import styles from "/src/styles/manager/Page.module.css";
 
 const ActivityLogPage = () => {
@@ -29,7 +29,7 @@ const ActivityLogPage = () => {
           onClick={() => handleNavigate("/manager/activity-logs")}
           className={styles.breadcrumbLink}
         >
-          <UserOutlined /> Nhật ký hoạt động
+          <FileTextOutlined /> Nhật ký hoạt động
         </span>
       ),
       key: "logs",
@@ -39,7 +39,7 @@ const ActivityLogPage = () => {
   return (
     <div className={styles.bookCatalogPage}>
       <Breadcrumb items={breadcrumbItems} className={styles.breadcrumbBelow} />
-      {/* <EmployeeList /> */}
+      <ActivityLog />
     </div>
   );
 };

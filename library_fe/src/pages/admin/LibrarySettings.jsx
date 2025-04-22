@@ -1,23 +1,7 @@
 // src/components/LibrarySettings/LibrarySettings.jsx
-import React, { useState, useEffect } from "react";
-import {
-  Row,
-  Col,
-  Spin,
-  Alert,
-  Button,
-  Typography,
-  Divider,
-  notification,
-} from "antd";
-import {
-  SettingOutlined,
-  ReloadOutlined,
-  BookOutlined,
-  FieldTimeOutlined,
-  DollarOutlined,
-  TrophyOutlined,
-} from "@ant-design/icons";
+import { useState, useEffect } from "react";
+import { Col, Spin, Button, Typography, Divider } from "antd";
+import { SettingOutlined, ReloadOutlined } from "@ant-design/icons";
 import styles from "/src/styles/manager/config-system/LibrarySettings.module.css";
 import librarySettingsService from "/src/services/manager/librarySettingsService.js";
 
@@ -28,9 +12,6 @@ import {
   LateFeeSettings,
   RewardsAndPenaltiesSettings,
 } from "/src/components/admin/config-system";
-// import LateFeeSettings from "./LateFeeSettings";
-// import BorrowingLimitsSettings from "./BorrowingLimitsSettings";
-// import BorrowingPeriodSettings from "./BorrowingPeriodSettings";
 
 const { Title, Text } = Typography;
 

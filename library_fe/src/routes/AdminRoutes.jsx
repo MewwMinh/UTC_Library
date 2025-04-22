@@ -7,8 +7,8 @@ import {
   EmployeeListPage,
   EmployeeDetailPage,
   EmployeeCreatePage,
+  StatisticsReportPage,
 } from "/src/pages/admin";
-import CreateEmployee from "/src/components/admin/manage-employee/CreateEmployee";
 
 const AdminRoutes = () => {
   return (
@@ -27,6 +27,7 @@ const AdminRoutes = () => {
         />
         <Route path="config-system" element={<LibrarySettings />} />
         <Route path="activity-logs" element={<ActivityLogPage />} />
+        <Route path="reports" element={<StatisticsReportPage />} />
       </Route>
     </Routes>
   );
