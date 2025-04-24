@@ -1,4 +1,6 @@
-import { Col, Row } from "antd";
+import { Breadcrumb, Col, Row } from "antd";
+import { HomeOutlined, UserOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import styles from "/src/styles/manager/Page.module.css";
 import {
   StatisticsCardGrid,
@@ -11,9 +13,42 @@ import {
   TopBorrowedBooksChart,
 } from "/src/components/statistic";
 
-const AdminDashboard = () => {
+const StatisticsReportPage = () => {
+  const navigate = useNavigate();
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const breadcrumbItems = [
+    {
+      title: (
+        <span
+          onClick={() => handleNavigate("/staff/dashboard")}
+          className={styles.breadcrumbLink}
+        >
+          <HomeOutlined /> Trang chủ
+        </span>
+      ),
+      key: "home",
+    },
+    {
+      title: (
+        <span
+          onClick={() => handleNavigate("/staff/reports")}
+          className={styles.breadcrumbLink}
+        >
+          <UserOutlined /> Báo cáo & Thống kê
+        </span>
+      ),
+      key: "statistics",
+    },
+  ];
+
   return (
     <div className={styles.bookCatalogPage}>
+      <Breadcrumb items={breadcrumbItems} className={styles.breadcrumbBelow} />
+
       {/* Thống kê tổng quan */}
       <div style={{ marginBottom: 24 }}>
         <StatisticsCardGrid />
@@ -55,4 +90,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default StatisticsReportPage;

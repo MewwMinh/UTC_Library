@@ -1,75 +1,117 @@
-/* src/components/PieChart/PieChart.module.css */
 .container {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.activeItem {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.colorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.content {
   display: flex;
   flex-direction: column;
 }
 
-.title {
-  font-size: 18px;
-  margin-bottom: 20px;
-  color: #333;
-  text-align: center;
-}
-
-.chartContainer {
-  position: relative;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tooltip {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f0f0f0;
-}
-
-.tooltipLabel {
-  margin: 0;
-  font-weight: 500;
-  font-size: 14px;
-  color: #666;
-}
-
-.tooltipValue {
-  margin: 0;
+.name {
   font-weight: 600;
-  font-size: 16px;
-  margin-top: 5px;
+  margin-bottom: 4px;
+  color: #333;
 }
 
-.legendItem {
+.value {
   font-size: 14px;
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
+  color: #555;
 }
 
-.totalValue {
+.percent {
+  font-size: 13px;
+  color: #888;
+  margin-left: 6px;
+}
+
+/* Thêm các trang trí cho Card */
+.chartCard {
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.chartCard:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Trang trí hình tròn */
+.decorationCircle1 {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  top: -60px;
+  right: -60px;
+  opacity: 0.6;
   z-index: 1;
 }
 
-.totalLabel {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 5px;
+.decorationCircle2 {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  bottom: -40px;
+  left: 30px;
+  opacity: 0.4;
+  z-index: 1;
 }
 
-.total {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
+.decorationCircle3 {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  top: 40px;
+  left: -20px;
+  opacity: 0.5;
+  z-index: 1;
 }

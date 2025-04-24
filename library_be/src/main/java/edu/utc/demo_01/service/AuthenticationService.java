@@ -6,29 +6,31 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import edu.utc.demo_01.dto.APIResponse;
-import edu.utc.demo_01.dto.auth.AuthenticationRequest;
-import edu.utc.demo_01.dto.auth.AuthenticationResponse;
-import edu.utc.demo_01.dto.auth.CommonInformation;
-import edu.utc.demo_01.dto.auth.Token;
+import edu.utc.demo_01.dto.auth.*;
 import edu.utc.demo_01.entity.AuthCredential;
 import edu.utc.demo_01.entity.InvalidToken;
 import edu.utc.demo_01.entity.User;
 import edu.utc.demo_01.entity.UserRole;
 import edu.utc.demo_01.exception.AppException;
 import edu.utc.demo_01.exception.ErrorCode;
-import edu.utc.demo_01.repository.*;
+import edu.utc.demo_01.repository.AuthCredentialRepository;
+import edu.utc.demo_01.repository.InvalidTokenRepository;
+import edu.utc.demo_01.repository.UserRepository;
+import edu.utc.demo_01.repository.UserRoleRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
@@ -37,7 +39,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-    private final RoleRepository roleRepository;
     @NonFinal
     @Value("${jwt.signer-key}")
     protected String SIGNER_KEY;
@@ -54,15 +55,21 @@ public class AuthenticationService {
     AuthCredentialRepository authCredentialRepository;
     UserRoleRepository userRoleRepository;
     InvalidTokenRepository invalidTokenRepository;
+    PasswordEncoder passwordEncoder;
+    CloudinaryService cloudinaryService;
 
+    @Transactional
     public APIResponse<AuthenticationResponse> authenticate(AuthenticationRequest request) {
         User user = userRepository.findById(request.getUsername()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         AuthCredential credential = authCredentialRepository.findByUserID(user).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated =  passwordEncoder.matches(request.getPassword(), credential.getPasswordHash());
         if (!authenticated) throw new AppException(ErrorCode.WRONG_PASSWORD);
         var token = generateToken(credential, false);
         var refreshToken = generateToken(credential, true);
+
+        credential.setLastLogin(LocalDateTime.now());
+        authCredentialRepository.save(credential);
+
         return APIResponse.<AuthenticationResponse>builder()
                 .code(1000)
                 .result(AuthenticationResponse.builder()
@@ -150,6 +157,36 @@ public class AuthenticationService {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public APIResponse changePassword(ChangePasswordRequest request){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        AuthCredential authCredential = authCredentialRepository.findByUserID(user).orElseThrow();
+
+        boolean isTrue = passwordEncoder.matches(request.getOldPassword(), authCredential.getPasswordHash());
+
+        if (!isTrue) throw new AppException(ErrorCode.WRONG_PASSWORD);
+
+        authCredential.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        authCredentialRepository.save(authCredential);
+        return APIResponse.builder()
+                .code(1000)
+                .message("Đổi mật khẩu thành công!!")
+                .build();
+    }
+
+    public APIResponse changeAvatar(MultipartFile avt){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+        user.setUserImage(cloudinaryService.uploadEmployeeAvatar(avt, userID));
+        userRepository.save(user);
+        return APIResponse.builder()
+                .code(1000)
+                .message("Thay đổi ảnh công")
+                .build();
     }
 
     private String generateToken(AuthCredential user, boolean isRefresh) {

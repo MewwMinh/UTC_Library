@@ -1,6 +1,7 @@
 package edu.utc.demo_01.service;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.auth.UserDetailInformation;
 import edu.utc.demo_01.dto.manager.request.EmployeeCreateRequest;
 import edu.utc.demo_01.dto.manager.request.EmployeeUpdateRequest;
 import edu.utc.demo_01.dto.manager.response.EmployeeActivityLog;
@@ -42,6 +43,33 @@ public class ManagerService {
 
 
     //region Dashboard
+    public APIResponse<UserDetailInformation> getDetailsInfo(){
+        String userID = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (userID == null) throw new AppException(ErrorCode.CAN_NOT_GET_USER_INFORMATION);
+        User user = userRepository.findByUserID(userID).orElseThrow();
+
+        UserRole userRole = userRoleRepository.findByUser(user).orElseThrow();
+        AuthCredential ac = authCredentialRepository.findByUserID(user).orElseThrow();
+
+        UserDetailInformation result = new UserDetailInformation();
+        result.setUserID(user.getUserID());
+        result.setUserName(user.getFullName());
+        result.setStatus(user.getStatus());
+        result.setCreatedAt(user.getCreatedAt());
+        result.setDob(user.getDob());
+        result.setGender(user.getGender());
+        result.setUserImage(user.getUserImage());
+        result.setNationalID(user.getNationalID());
+        result.setRoleName(userRole.getRole().getDescription());
+        result.setEmail(ac.getEmail());
+        result.setLastLogin(ac.getLastLogin());
+
+        return APIResponse.<UserDetailInformation>builder()
+                .code(1000)
+                .result(result)
+                .build();
+    }
+
 
     //endregion
 

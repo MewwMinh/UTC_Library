@@ -63,6 +63,83 @@ const authService = {
       };
     }
   },
+
+  // Get staff details
+  getStaffDetails: async () => {
+    try {
+      const response = await apiClient.get("/manager/get-details-info");
+
+      if (response.data.code === 1000) {
+        return {
+          success: true,
+          data: response.data.result,
+        };
+      } else {
+        return {
+          success: false,
+          message:
+            response.data.message || "Không thể tải thông tin người dùng",
+          code: response.data.code,
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Không thể kết nối đến máy chủ",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
+
+  // Change password
+  changePassword: async (oldPassword, newPassword) => {
+    try {
+      const response = await apiClient.post("/auth/change-password", {
+        oldPassword,
+        newPassword,
+      });
+
+      return {
+        success: response.data.code === 1000,
+        message: response.data.message,
+        code: response.data.code,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Không thể đổi mật khẩu",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
+
+  // Change avatar
+  changeAvatar: async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await apiClient.post("/auth/change-avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return {
+        success: response.data.code === 1000,
+        message: response.data.message,
+        code: response.data.code,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Không thể thay đổi ảnh đại diện",
+        code: error.response?.data?.code || 0,
+      };
+    }
+  },
 };
 
 export default authService;

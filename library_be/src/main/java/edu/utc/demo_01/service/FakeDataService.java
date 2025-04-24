@@ -199,7 +199,7 @@ public class FakeDataService {
                 UserRole userRole = new UserRole();
                 userRole.setUser(user);
                 userRole.setRole(role);
-                userRole.setAssignedAt(Instant.now());
+                userRole.setAssignedAt(LocalDateTime.now());
                 userRoleRepository.save(userRole);
             }
         }
@@ -245,7 +245,7 @@ public class FakeDataService {
                 UserRole userRole = new UserRole();
                 userRole.setUser(user);
                 userRole.setRole(role);
-                userRole.setAssignedAt(Instant.now());
+                userRole.setAssignedAt(LocalDateTime.now());
                 userRoleRepository.save(userRole);
             }
         }

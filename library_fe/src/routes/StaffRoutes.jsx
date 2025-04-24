@@ -4,13 +4,11 @@ import {
   PatronListPage,
   PatronDetails,
   ReadingRoomControl,
-  ManageSupportRequest,
   EvenListPage,
   EventDetailPage,
   CreateNewEventPage,
 } from "/src/pages/staff/coordinator";
 import {
-  LibrarianDashboard,
   BookCatalogPage,
   BookEditPage,
   BookAddPage,
@@ -22,11 +20,16 @@ import {
 import {
   SupportRequestsPage,
   SupportRequestDetail,
+  StatisticsReportPage,
+  StaffDashboard,
 } from "/src/pages/staff/shared";
+import EmployeeProfile from "/src/pages/common/EmployeeProfile";
 const StaffRoutes = () => {
   return (
     <Routes>
       <Route element={<StaffLayout />} path="/">
+        <Route index element={<StaffDashboard />} />
+        <Route path="dashboard" element={<StaffDashboard />} />
         <Route path="books" element={<BookCatalogPage />} />
         <Route path="books/details/:bookId" element={<BookDetailsPage />} />
         <Route path="books/edit/:bookId" element={<BookEditPage />} />
@@ -37,11 +40,14 @@ const StaffRoutes = () => {
           path="violations/:violationId"
           element={<ViolationDetailPage />}
         />
+
         <Route path="support-requests" element={<SupportRequestsPage />} />
         <Route
           path="support-requests/:ticketId"
           element={<SupportRequestDetail />}
         />
+        <Route path="reports" element={<StatisticsReportPage />} />
+        <Route path="profile" element={<EmployeeProfile />} />
 
         <Route path="members" element={<PatronListPage />} />
         <Route path="reading-room" element={<ReadingRoomControl />} />
@@ -49,12 +55,6 @@ const StaffRoutes = () => {
         <Route path="events/create-event" element={<CreateNewEventPage />} />
         <Route path="events/details/:eventId" element={<EventDetailPage />} />
         <Route path="patron-info/:patronID" element={<PatronDetails />} />
-        <Route index element={<LibrarianDashboard />} />
-        <Route path="dashboard" element={<LibrarianDashboard />} />
-        <Route
-          path="handle-support-request"
-          element={<ManageSupportRequest />}
-        />
       </Route>
     </Routes>
   );

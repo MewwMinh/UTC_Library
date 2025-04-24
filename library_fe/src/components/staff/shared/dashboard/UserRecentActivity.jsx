@@ -134,7 +134,7 @@ export default function UserRecentActivity() {
   return (
     <Col span={24}>
       <Card
-        title="Hoạt động gần đây"
+        title={<div style={{ marginLeft: 15 }}>Hoạt động gần đây</div>}
         extra={
           <Button
             type="link"

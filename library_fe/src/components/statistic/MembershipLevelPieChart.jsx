@@ -13,6 +13,9 @@ const MembershipLevelPieChart = () => {
   // Màu cho Đồng (Bronze), Bạc (Silver), Vàng (Gold)
   const colors = ["#cd7f32", "#c0c0c0", "#ffd700"];
 
+  // Màu nền gradient nhẹ cho biểu đồ
+  const backgroundColors = ["#f7f1e3", "#f5f6fa"];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -62,6 +65,9 @@ const MembershipLevelPieChart = () => {
       data={chartData}
       title="Phân bố hạng thành viên"
       colors={colors}
+      backgroundColors={backgroundColors}
+      autoAnimate={false} // Tắt tự động luân phiên các phần tử
+      decorations={true} // Bật trang trí
     />
   );
 };

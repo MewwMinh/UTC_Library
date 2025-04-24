@@ -1,6 +1,7 @@
 package edu.utc.demo_01.controller;
 
 import edu.utc.demo_01.dto.APIResponse;
+import edu.utc.demo_01.dto.auth.UserDetailInformation;
 import edu.utc.demo_01.dto.manager.request.EmployeeCreateRequest;
 import edu.utc.demo_01.dto.manager.request.EmployeeUpdateRequest;
 import edu.utc.demo_01.dto.manager.response.EmployeeActivityLog;
@@ -26,7 +27,10 @@ public class ManagerController {
     ManagerService service;
 
     //region Dashboard
-
+    @GetMapping("get-details-info")
+    public APIResponse<UserDetailInformation> getDetailsInfo(){
+        return service.getDetailsInfo();
+    }
     //endregion
 
     //region Manage Employee

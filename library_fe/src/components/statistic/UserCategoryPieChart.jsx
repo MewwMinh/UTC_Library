@@ -1,5 +1,5 @@
 // src/components/UserCategoryPieChart/UserCategoryPieChart.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Spin, Alert } from "antd";
 import PieChart from "./PieChart";
 import fetchUserCategoryData from "/src/services/shared/statisticsService";

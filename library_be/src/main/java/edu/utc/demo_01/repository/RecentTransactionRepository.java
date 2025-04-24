@@ -15,7 +15,8 @@ public interface RecentTransactionRepository extends JpaRepository<RecentTransac
                BookName bookName,
                TransactionTime AS time
         FROM RecentTransactions                    
-        ORDER BY TransactionTime DESC 
+        ORDER BY TransactionTime DESC
+        LIMIT 10
 """, nativeQuery = true)
     List<PatronRecentActivity> getSomePatronReasonActivities();
 }

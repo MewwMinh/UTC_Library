@@ -7,7 +7,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -34,6 +34,6 @@ public class UserRole {
     private Role role;
 
     @Column(name = "AssignedAt")
-    private Instant assignedAt;
+    private LocalDateTime assignedAt;
 
 }

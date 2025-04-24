@@ -273,7 +273,7 @@ public class CoordinatorService {
         UserRole userRole = new UserRole();
         userRole.setUser(user);
         userRole.setRole(role);
-        userRole.setAssignedAt(Instant.now());
+        userRole.setAssignedAt(LocalDateTime.now());
         userRoleRepository.save(userRole);
 
         Membership membership = new Membership();

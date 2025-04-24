@@ -1,0 +1,44 @@
+/* src/components/common/BarChart.module.css */
+.chartContainer {
+  background: linear-gradient(145deg, #fff0e6, #ffe3d3);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.chartContainer:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.chartTitle {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.chartSubtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+  font-weight: normal;
+}
+
+.chartGrid {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .chartContainer {
+    padding: 15px;
+  }
+
+  .chartTitle {
+    font-size: 16px;
+  }
+
+  .chartSubtitle {
+    font-size: 13px;
+  }
+}

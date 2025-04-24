@@ -33,7 +33,7 @@ const AdminHeader = () => {
   };
 
   const handleProfileClick = () => {
-    navigate("/admin/profile");
+    navigate("/manager/profile");
   };
 
   const items = [
@@ -47,7 +47,7 @@ const AdminHeader = () => {
       key: "settings",
       label: "Cài đặt tài khoản",
       icon: <SettingOutlined />,
-      onClick: () => navigate("/admin/settings"),
+      onClick: () => navigate("/manager/settings"),
     },
     {
       type: "divider",

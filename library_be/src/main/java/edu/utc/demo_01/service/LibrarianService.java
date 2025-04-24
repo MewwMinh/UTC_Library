@@ -63,7 +63,6 @@ public class LibrarianService {
     }
     //endregion
 
-
     //region Manage Books
     private String generateBarcode(String prefix, int copyNumber) {
         // Tạo mã barcode theo định dạng ISBN-COPY_NUMBER

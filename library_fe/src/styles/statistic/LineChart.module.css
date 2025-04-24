@@ -1,0 +1,27 @@
+.chartContainer {
+  background: linear-gradient(145deg, #eef2ff, #f9faff);
+  border-radius: 12px;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); */
+  padding: 24px;
+  margin-bottom: 24px;
+  /* transition: box-shadow 0.3s ease; */
+}
+
+.chartTitle {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .chartContainer {
+    padding: 16px;
+  }
+
+  .chartTitle {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+}
